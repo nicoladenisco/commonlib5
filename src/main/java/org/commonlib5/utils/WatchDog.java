@@ -5,7 +5,6 @@
  *
  * Copyright (C) WinSOFT di Nicola De Nisco
  */
-
 package org.commonlib5.utils;
 
 /**
@@ -17,7 +16,7 @@ package org.commonlib5.utils;
  * intermedi. Ogni watchdog usa un thread dedicato. La risoluzione
  * del watchdog è per default 1 secondo (può essere variata con la
  * proprietà tsleep).
- * 
+ *
  * <pre>
  *  WatchDog wdAbort = new WatchDog("Abort", 5000, new WatchDogListner()
  *  {
@@ -43,7 +42,7 @@ package org.commonlib5.utils;
  *    System.out.println("L'operazione non è andata a buon fine causa timeout.");
  *  }
  * </pre>
- * 
+ *
  * @author Nicola De Nisco
  */
 public class WatchDog implements Runnable
@@ -66,6 +65,16 @@ public class WatchDog implements Runnable
     this.name = name;
     this.timeout = timeout;
     this.listner = listner;
+
+    // abbassa il tempo di ciclo da 1 secondo alla metà del timeout (solo se inferiore a un secondo)
+    long t = timeout / 10;
+    if(t < 10)
+      t = 10;
+    if(t < tsleep)
+      tsleep = t;
+
+    if(listner == null)
+      throw new NullPointerException("Listner cannot be null.");
   }
 
   /**
@@ -76,7 +85,7 @@ public class WatchDog implements Runnable
   {
     if(!thRun.isAlive())
     {
-      thRun.setName("WatchDog "+name);
+      thRun.setName("WatchDog_" + name);
       thRun.setDaemon(true);
       thRun.start();
     }
@@ -172,5 +181,10 @@ public class WatchDog implements Runnable
   public void setTsleep(long tsleep)
   {
     this.tsleep = tsleep;
+  }
+
+  public void setExplicitSignaled(boolean explicitSignaled)
+  {
+    st.setExplicitSignaled(explicitSignaled);
   }
 }

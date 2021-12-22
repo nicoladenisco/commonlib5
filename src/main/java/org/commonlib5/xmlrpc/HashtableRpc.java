@@ -15,6 +15,7 @@
 package org.commonlib5.xmlrpc;
 
 import java.util.*;
+import java.util.Map.Entry;
 import org.commonlib5.utils.DateTime;
 import org.commonlib5.utils.StringOper;
 
@@ -32,6 +33,15 @@ import org.commonlib5.utils.StringOper;
  */
 public class HashtableRpc extends Hashtable<String, Object>
 {
+  public HashtableRpc()
+  {
+  }
+
+  public HashtableRpc(Map<? extends String, ? extends Object> map)
+  {
+    this.putAll(map);
+  }
+
   @Override
   public synchronized Object put(String key, Object value)
   {
@@ -62,6 +72,18 @@ public class HashtableRpc extends Hashtable<String, Object>
       return remove(key);
 
     return super.put(key, value);
+  }
+
+  @Override
+  public synchronized void putAll(Map<? extends String, ? extends Object> t)
+  {
+    for(Entry<? extends String, ? extends Object> entry : t.entrySet())
+    {
+      String key = entry.getKey();
+      Object val = entry.getValue();
+
+      this.put(key, val);
+    }
   }
 
   public synchronized Object put(String key, int value)

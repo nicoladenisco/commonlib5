@@ -131,6 +131,9 @@ public class HtmlTableHelper
    */
   public void formatHtmlHeader(StringBuilder sb)
   {
+    if(header.isEmpty())
+      return;
+
     sb.append("<thead><tr>\n");
     int col = 0;
     for(Object h : header)
@@ -148,6 +151,9 @@ public class HtmlTableHelper
    */
   public void formatHtmlRows(StringBuilder sb)
   {
+    if(rows.isEmpty())
+      return;
+
     sb.append("<tbody>\n");
     int row = 0;
     for(Collection<? extends Object> valuesrow : rows)

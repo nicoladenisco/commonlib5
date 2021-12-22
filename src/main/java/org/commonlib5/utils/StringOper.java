@@ -967,7 +967,7 @@ public class StringOper
    * Se len è maggiore dalla lunghezza di origine
    * tutta la stringa viene ritornata.
    * @param origine stringa originale (toString())
-   * @param defVal
+   * @param defVal valore di default per stringa vuota/nulla
    * @param Len numero di caratteri richiesti
    * @return parte finale della stringa origine
    */
@@ -985,6 +985,47 @@ public class StringOper
   }
 
   /**
+   * Cerca ed estrae parte di stringa.
+   * Cerca toSearch all'interno di Origine; se la trova ritorna la parte rimanente
+   * della stringa, altrimenti l'intera stringa.
+   * La stringa in ingresso viene passata attraverso
+   * okStr() che ne rimuove gli spazi in testa e in coda
+   * e controlla che non sia null.
+   * @param origine stringa originale (toString())
+   * @param toSearch stringa da cercare
+   * @return stringa risultato
+   */
+  public static String findAndGetRight(Object origine, String toSearch)
+  {
+    String Origine = okStr(origine);
+    int pos = Origine.indexOf(toSearch);
+    return pos == -1 ? Origine : Origine.substring(pos + toSearch.length());
+  }
+
+  /**
+   * Cerca ed estrae parte di stringa.
+   * Cerca toSearch all'interno di Origine; se la trova ritorna la parte rimanente
+   * della stringa, altrimenti l'intera stringa.
+   * La stringa in ingresso viene passata attraverso
+   * okStr() che ne rimuove gli spazi in testa e in coda
+   * e controlla che non sia null.
+   * @param origine stringa originale (toString())
+   * @param defVal valore di default per stringa vuota/nulla
+   * @param toSearch stringa da cercare
+   * @return stringa risultato
+   */
+  public static String findAndGetRight(Object origine, String defVal, String toSearch)
+  {
+    String Origine = okStr(origine, defVal);
+
+    if(Origine == null)
+      return null;
+
+    int pos = Origine.indexOf(toSearch);
+    return pos == -1 ? Origine : Origine.substring(pos + toSearch.length());
+  }
+
+  /**
    * Come la left del basic.
    * Estrae la parte iniziale di una stringa.
    * La stringa in ingresso viene passata attraverso
@@ -993,7 +1034,7 @@ public class StringOper
    * Se len è maggiore dalla lunghezza di origine
    * tutta la stringa viene ritornata.
    * @param origine stringa originale (toString())
-   * @param defVal
+   * @param defVal valore di default per stringa vuota/nulla
    * @param Len numero di caratteri richiesti
    * @return la parte iniziale di origine
    */

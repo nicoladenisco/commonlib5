@@ -146,7 +146,7 @@ public final class ExecHelper
   public static ExecHelper exec(String[] cmdarray, String[] envp, File dir)
      throws IOException
   {
-    return new ExecHelper(Runtime.getRuntime().exec(cmdarray, envp), null);
+    return new ExecHelper(Runtime.getRuntime().exec(cmdarray, envp, dir), null);
   }
 
   /**
@@ -305,7 +305,7 @@ public final class ExecHelper
    *
    * @since ostermillerutils 1.06.00
    */
-  protected ExecHelper(Process process, String charset)
+  public ExecHelper(Process process, String charset)
      throws IOException
   {
     runExecHelper(process, charset);

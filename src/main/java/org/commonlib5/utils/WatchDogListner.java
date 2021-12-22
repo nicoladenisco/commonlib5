@@ -5,22 +5,22 @@
  *
  * Copyright (C) WinSOFT di Nicola De Nisco
  */
-
 package org.commonlib5.utils;
 
 /**
  * Notifica eventi watchdog.
- * 
+ *
  * @author Nicola De Nisco
  */
-public interface WatchDogListner 
+@FunctionalInterface
+public interface WatchDogListner
 {
   /**
    * Funzione di notifica di un timeout di WatchDog.
-   * @param wathDogName nome del watchdog
+   * @param watchDogName nome del watchdog
    * @param timeout il timeout del watchdog
    * @return true per ripetere il conteggio false per interromperlo definitivamente
    * @see WatchDog
    */
-  public boolean elapsedTotal(String wathDogName, long timeout);
+  public boolean elapsedTotal(String watchDogName, long timeout);
 }

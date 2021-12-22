@@ -21,6 +21,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.commonlib5.io.ByteBufferOutputStream;
 
 /**
@@ -30,6 +32,8 @@ import org.commonlib5.io.ByteBufferOutputStream;
  */
 public class ClassOper
 {
+  private static Log log = LogFactory.getLog(ClassOper.class);
+
   /**
    * Caricatore dinamico di classe.
    * @param className nome completo della classe da caricare
@@ -41,8 +45,13 @@ public class ClassOper
     {
       return Class.forName(className);
     }
+    catch(ClassNotFoundException e)
+    {
+      return null;
+    }
     catch(Throwable e)
     {
+      log.error("Unexpected error loading class " + className, e);
       return null;
     }
   }

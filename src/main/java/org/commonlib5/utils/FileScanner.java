@@ -248,12 +248,22 @@ public class FileScanner
     return scan(fDir, maxLev, wildCard, false);
   }
 
+  public static List<File> scan(File fDir, int maxLev, WildcardFileFilter filter)
+  {
+    return scan(fDir, maxLev, filter, false);
+  }
+
   public static List<File> scan(File fDir, int maxLev, String wildCard, boolean onlyOne)
+  {
+    return scan(fDir, maxLev, new WildcardFileFilter(wildCard), onlyOne);
+  }
+
+  public static List<File> scan(File fDir, int maxLev, WildcardFileFilter filter, boolean onlyOne)
   {
     FileScanner fs = new FileScanner();
     fs.maxLivello = maxLev;
     fs.onlyOne = onlyOne;
-    fs.fn = new WildcardFileFilter(wildCard);
+    fs.fn = filter;
     fs.scanInternalFilenameFilter(0, fDir);
     return fs.vFile;
   }
@@ -266,13 +276,6 @@ public class FileScanner
   public static boolean fileExist(File fDir, int maxLevel, String wildCard)
   {
     return !scan(fDir, maxLevel, wildCard, true).isEmpty();
-  }
-
-  public static boolean acceptDicomFile(String name)
-  {
-    String test = name.toLowerCase();
-//    return (test.indexOf(".dic") != -1 || test.indexOf(".dcm") != -1 || test.indexOf('.') == -1);
-    return true;
   }
 
   public static File findFirst(File fDir, int maxLev, String wildCard)

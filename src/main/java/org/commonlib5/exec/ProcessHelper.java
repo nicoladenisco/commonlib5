@@ -211,10 +211,15 @@ public class ProcessHelper
     if(err == null)
       err = System.err;
 
-    ProcessWatch.watch(process, killOnExit, listner);
-
-    running = false;
-    notify();
+    try
+    {
+      ProcessWatch.watch(process, killOnExit, listner);
+    }
+    finally
+    {
+      running = false;
+      notify();
+    }
   }
 
   public boolean isKillOnExit()

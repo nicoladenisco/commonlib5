@@ -133,17 +133,10 @@ public class CommonFileUtils
   public static boolean copyFile(File in, File out)
      throws Exception
   {
-    FileInputStream fis = new FileInputStream(in.getAbsolutePath());
-    FileOutputStream fos = new FileOutputStream(out.getAbsolutePath());
-
-    try
+    try (FileInputStream fis = new FileInputStream(in.getAbsolutePath());
+       FileOutputStream fos = new FileOutputStream(out.getAbsolutePath()))
     {
       copyStream(fis, fos);
-    }
-    finally
-    {
-      fis.close();
-      fos.close();
     }
 
     return true;
@@ -161,19 +154,12 @@ public class CommonFileUtils
   public static boolean copyTxtFile(File in, String encodingInput, File out, String encodingOutput)
      throws Exception
   {
-    Reader r = encodingInput == null ? new InputStreamReader(new FileInputStream(in))
-                  : new InputStreamReader(new FileInputStream(in), encodingInput);
-    Writer w = encodingOutput == null ? new OutputStreamWriter(new FileOutputStream(out))
-                  : new OutputStreamWriter(new FileOutputStream(out), encodingOutput);
-
-    try
+    try (Reader r = encodingInput == null ? new InputStreamReader(new FileInputStream(in))
+                       : new InputStreamReader(new FileInputStream(in), encodingInput);
+       Writer w = encodingOutput == null ? new OutputStreamWriter(new FileOutputStream(out))
+                     : new OutputStreamWriter(new FileOutputStream(out), encodingOutput))
     {
       copyChar(r, w);
-    }
-    finally
-    {
-      r.close();
-      w.close();
     }
 
     return true;
@@ -1213,6 +1199,21 @@ public class CommonFileUtils
       return fileName + "." + newExtension;
 
     return fileName.substring(0, pos) + "." + newExtension;
+  }
+
+  /**
+   * Cambia l'estensione al nome di un file.
+   * L'estensione si intende separata dal nome vero e proprio da un '.':
+   * in-pippo.txt out-pippo.bak
+   * @param origin file originario
+   * @param newExtension nuova estensione desiderata
+   * @return il file con la nuova estensione.
+   * @throws Exception
+   */
+  public static File changeFileExtension(File origin, String newExtension)
+     throws Exception
+  {
+    return new File(changeFilenameExtension(origin.getAbsolutePath(), newExtension));
   }
 
   /**
