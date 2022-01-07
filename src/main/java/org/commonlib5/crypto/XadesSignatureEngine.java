@@ -24,16 +24,17 @@ import java.util.Collection;
 import java.util.Date;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.utils.Constants;
 import org.commonlib5.utils.CommonFileUtils;
 import org.commonlib5.utils.StringOper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import xades4j.algorithms.Algorithm;
 import xades4j.algorithms.EnvelopedSignatureTransform;
 import xades4j.production.*;
 import xades4j.properties.*;
@@ -98,25 +99,29 @@ public class XadesSignatureEngine extends SignatureEngine
   public void signBes(File toSign, File signed, String tagToSign, TsaInfo ti, boolean removeIdtag)
      throws Exception
   {
+    // per scongiurare problemi con i validatori .NET, eliminiamo lineBreak (&#13;)
+    System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
+    org.apache.xml.security.Init.init();
+
     Document doc = getDocument(toSign);
     Element elem = doc.getDocumentElement();
     DOMHelper.useIdAsXmlId(elem);
 
-    if(!StringOper.isOkStr(tagToSign))
-    {
-      // prova a leggere il tag 'Id' del root node
-      tagToSign = elem.getAttribute("Id");
-      if(!StringOper.isOkStr(tagToSign))
-      {
-        // se ancora vuoto da il nome del root node
-        tagToSign = elem.getTagName();
-      }
-    }
-
+    /* il documento non va manomesso, altrimenti fallisce la verifica della firma
+//    if(!StringOper.isOkStr(tagToSign))
+//    {
+//      // prova a leggere il tag 'Id' del root node
+//      tagToSign = elem.getAttribute("Id");
+//      if(!StringOper.isOkStr(tagToSign))
+//      {
+//        // se ancora vuoto da il nome del root node
+//        tagToSign = elem.getTagName();
+//      }
+//    }
     // reimposta il tag Id del root node per identificare la sezione sottoposta a firma
     DOMHelper.setIdAsXmlId(elem, tagToSign);
-
-    DataObjectDesc obj = new DataObjectReference("#" + tagToSign)
+     */
+    DataObjectDesc obj = new DataObjectReference("")
        .withTransform(new EnvelopedSignatureTransform());
     SignedDataObjects dataObjs = new SignedDataObjects().withSignedDataObject(obj);
 
@@ -133,11 +138,10 @@ public class XadesSignatureEngine extends SignatureEngine
 
     signer.sign(dataObjs, elem, SignatureAppendingStrategies.AsLastChild);
 
-    if(removeIdtag && elem.hasAttributeNS(null, Constants._ATT_ID))
-    {
-      elem.removeAttributeNS(null, Constants._ATT_ID);
-    }
-
+//    if(removeIdtag && elem.hasAttributeNS(null, Constants._ATT_ID))
+//    {
+//      elem.removeAttributeNS(null, Constants._ATT_ID);
+//    }
     writeDocument(doc, signed);
   }
 
@@ -188,6 +192,10 @@ public class XadesSignatureEngine extends SignatureEngine
   public void signC(File toSign, File signed, CertificateValidationProvider lcvp)
      throws Exception
   {
+    // per scongiurare problemi con i validatori .NET, eliminiamo lineBreak (&#13;)
+    System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
+    org.apache.xml.security.Init.init();
+
     Document doc = getDocument(toSign);
     Element elemToSign = doc.getDocumentElement();
 
@@ -201,6 +209,10 @@ public class XadesSignatureEngine extends SignatureEngine
   public void signCda(File toSign, File signed, CertificateValidationProvider lcvp)
      throws Exception
   {
+    // per scongiurare problemi con i validatori .NET, eliminiamo lineBreak (&#13;)
+    System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
+    org.apache.xml.security.Init.init();
+
     Document doc = getDocument(toSign);
 
     ValidationDataProvider vdp = new ValidationDataFromCertValidationProvider(lcvp);
@@ -212,20 +224,34 @@ public class XadesSignatureEngine extends SignatureEngine
 
   public static class AlgorithmsProviderSardegna extends DefaultAlgorithmsProviderEx
   {
-//    @Override
-//    public Algorithm getCanonicalizationAlgorithmForSignature()
-//    {
-//      return new xades4j.algorithms.ALGO_ID_C14N11_WITH_COMMENTS();
-//    }
+    @Override
+    public Algorithm getCanonicalizationAlgorithmForSignature()
+    {
+      return new CanonicalXMLWithComments11();
+    }
   }
 
-  public void signCdaSardegna(File toSign, File signed)
+  public static class CanonicalXMLWithComments11 extends Algorithm
+  {
+    public CanonicalXMLWithComments11()
+    {
+      super(Canonicalizer.ALGO_ID_C14N11_WITH_COMMENTS);
+    }
+  }
+
+  public void signCdaSardegna(File toSign, File signed, File signedpdf)
      throws Exception
   {
+    // lineBreak (&#13;) nella signature mandano in crisi il validatore .NET
+    System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true");
+    org.apache.xml.security.Init.init();
+
     Document doc = getDocument(toSign);
+    Element elem = doc.getDocumentElement();
 
     BasicSignatureOptions opts = new BasicSignatureOptions();
     opts.includeIssuerSerial(false);
+    opts.signKeyInfo(true);
 
     XadesBesSigningProfile profile = new XadesBesSigningProfile(kdp);
     profile.withBinding(BasicSignatureOptions.class, opts);
@@ -233,7 +259,7 @@ public class XadesSignatureEngine extends SignatureEngine
 
     XadesSigner signer = profile.newSigner();
     Cda2EnvelopedSardegna envelope = new Cda2EnvelopedSardegna(signer, doc, kdp.getUserCertificateSubjectFields());
-    envelope.sign();
+    envelope.signS(elem, signedpdf);
 
     writeDocument(doc, signed);
   }
@@ -340,19 +366,22 @@ public class XadesSignatureEngine extends SignatureEngine
   public static void writeDocument(Document doc, File outXml)
      throws Exception
   {
+    // il file dopo la firma non può subire trasformazioni
+    // altrimenti viene modificata l'impronta delle sezioni firmate del documento
     TransformerFactory tFactory = TransformerFactory.newInstance();
-    tFactory.setAttribute("indent-number", 2);
+//    tFactory.setAttribute("indent-number", 2);
 
     Transformer transformer = tFactory.newTransformer();
-    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+//    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
     StringWriter sw = new StringWriter(8192);
     StreamResult result = new StreamResult(sw);
     DOMSource source = new DOMSource(doc);
     transformer.transform(source, result);
 
-    String out = sw.toString().replace("&#13;", "");
+//    String out = sw.toString().replace("&#13;", "");
+    String out = sw.toString();
     CommonFileUtils.writeFileTxt(outXml, out, "UTF-8");
   }
 }

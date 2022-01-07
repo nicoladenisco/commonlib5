@@ -121,10 +121,11 @@ public class testXades extends testFirmaBase
   {
     File input = new File("/tmp/xades-originale.xml");
     File output = new File("/tmp/xades-firmato-cda2-sardegna.xml");
+    File signedpdf = new File("/tmp/pdf-firmato.pdf");
 
     // qui viene passato il PIN
     engine.prepareSmartCardAndData(pin);
 
-    engine.signCdaSardegna(input, output);
+    engine.signCdaSardegna(input, output, signedpdf);
   }
 }

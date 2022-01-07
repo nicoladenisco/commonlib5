@@ -17,10 +17,23 @@
  */
 package org.commonlib5.crypto;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.commonlib5.utils.CommonFileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import xades4j.algorithms.Algorithm;
+import xades4j.algorithms.EnvelopedSignatureTransform;
+import xades4j.production.DataObjectReference;
+import xades4j.production.SignedDataObjects;
+import xades4j.production.XadesSignatureResult;
 import xades4j.production.XadesSigner;
+import xades4j.providers.ValidationDataException;
+import xades4j.utils.DOMHelper;
 
 /**
  * Versione specializzata per regione sardegna.
@@ -36,11 +49,11 @@ public class Cda2EnvelopedSardegna extends Cda2Enveloped
 
   /**
    * Crea il tag 'legalAuthenticator' con le nuove informazioni di firma.
-   * @param signature firma XADES da aggiungere al tag
    * @return tag completo
+   * @throws java.lang.Exception
    */
-  @Override
-  public Element createLegalAutenticator(Element signature)
+  private Element createLegalAuthenticator()
+     throws Exception
   {
     /*
   <legalAuthenticator>
@@ -64,6 +77,11 @@ public class Cda2EnvelopedSardegna extends Cda2Enveloped
 
     Element legalAuthenticator = doc.createElement("legalAuthenticator");
 
+    signTimestamp = new Date();
+
+    if(thumbnailText == null)
+      thumbnailText = createThumbnailText();
+
     Element time = doc.createElement("time");
     time.setAttribute("value", dt1.format(signTimestamp));
     legalAuthenticator.appendChild(time);
@@ -71,8 +89,69 @@ public class Cda2EnvelopedSardegna extends Cda2Enveloped
     signatureCode.setAttribute("code", "S");
     legalAuthenticator.appendChild(signatureCode);
 
-    legalAuthenticator.appendChild(signature);
+    // se non disponibile crea il tag assigned entity
+    if(assignedEntity == null)
+      assignedEntity = createAssignedEntity();
+
+    legalAuthenticator.appendChild(assignedEntity);
 
     return legalAuthenticator;
+  }
+
+  public void signS(Element elementToSign, File signedpdf)
+     throws Exception
+  {
+    Collection<Element> custodian = DOMHelper.getChildElementsByTagNameNS(elementToSign, URNHL7ORGV3, "custodian");
+    if(custodian.isEmpty())
+      throw new ValidationDataException("Nessun tag 'custodian' nel documento; non conforme a CDA2.");
+
+    /*
+    Per la firma XAdES Enveloped, la rimozione delle firme precedenti e
+    la successiva reintroduzione comprometterebbe l'impronta del documento
+    quindi, momentaneamente commento la sezione interessata
+     */
+    //    purgeSignatures();
+    //va inserito il PADES
+    if(signedpdf != null)
+    {
+      Collection<Element> Ccomponent
+         = DOMHelper.getChildElementsByTagNameNS(elementToSign, URNHL7ORGV3, "component");
+      Element component = Ccomponent.iterator().next();
+      Element nonXMLBody = (Element) component.getElementsByTagName("nonXMLBody").item(0);
+
+      Node text = nonXMLBody.getElementsByTagName("text").item(0);
+      text.setTextContent(CommonFileUtils.binary_2_Base64(signedpdf));
+    }
+
+    DataObjectReference dataObjRef = new DataObjectReference("");
+    dataObjRef.withTransform(new EnvelopedSignatureTransform());
+    dataObjRef.withTransform(new CanonicalXMLWithoutComments11());
+
+    /*
+    l'elemento che conterrà la signature va creato prima della firma stessa
+    perché deve essere esso stesso firmato
+     */
+    Element legalAuthenticator = createLegalAuthenticator();
+    Node successivo = custodian.iterator().next().getNextSibling();
+    elementToSign.insertBefore(legalAuthenticator, successivo);
+
+    /* aggiunge nuovamente le firme precedenti
+    auths.forEach((e) -> elementToSign.insertBefore(e, successivo));
+    lauths.forEach((e) -> elementToSign.insertBefore(e, successivo));
+     */
+    // firma il documento
+    XadesSignatureResult sres = signer.sign(new SignedDataObjects(dataObjRef), elementToSign);
+
+    //inietta la  signature nel legalAuthenticator prima di assignedEntity
+    Element signature = sres.getSignature().getElement();
+    legalAuthenticator.insertBefore(signature, assignedEntity);
+  }
+
+  public static class CanonicalXMLWithoutComments11 extends Algorithm
+  {
+    public CanonicalXMLWithoutComments11()
+    {
+      super(Canonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS);
+    }
   }
 }
