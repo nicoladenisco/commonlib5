@@ -1696,4 +1696,25 @@ public class CommonFileUtils
 
     return true;
   }
+
+  /**
+   * Ricerca di pattern in uno stream con riposizionamento.
+   * Lo stream viene letto fino a trovare la pattern indicata.
+   * Se la pattern viene trovata la posizione dello stream sarà al byte di inizio della pattern.
+   * Simile a skipPattern() ma qui lo stream punta all'inizio della pattern e non alla fine.
+   * @param pattern sequenza di byte da trovare
+   * @param is stream da leggere (necessario un pushback stream per reinserire la pattern)
+   * @return vero se la pattern è stata trovata
+   * @throws IOException
+   */
+  public static boolean skipPatternRepos(byte[] pattern, PushbackInputStream is)
+     throws IOException
+  {
+    if(skipPattern(pattern, is))
+    {
+      is.unread(pattern);
+      return true;
+    }
+    return false;
+  }
 }
