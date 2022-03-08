@@ -616,10 +616,10 @@ public class StringOper
   }
 
   /**
-   * Verifica se la stringa è contenuta nell'array di tokens.
-   * @param vToken array di stringhe da testare
-   * @param strTest stringa contenuta all'interno delle stringhe
-   * @return numero di stringhe contenenti strTest
+   * Verifica se la stringa contiene i tokens.
+   * @param vToken array di token
+   * @param strTest stringa per il test di contenimento
+   * @return numero di token contenuti in strTest
    */
   public static int testTokens(List<String> vToken, String strTest)
   {
@@ -635,10 +635,10 @@ public class StringOper
   }
 
   /**
-   * Verifica se la stringa è contenuta nell'array di tokens.
-   * @param vToken array di stringhe da testare
-   * @param strTest stringa contenuta all'interno delle stringhe
-   * @return numero di stringhe contenenti strTest
+   * Verifica se la stringa contiene i tokens.
+   * @param vToken array di token
+   * @param strTest stringa per il test di contenimento
+   * @return numero di token contenuti in strTest
    */
   public static int testTokens(String[] vToken, String strTest)
   {
