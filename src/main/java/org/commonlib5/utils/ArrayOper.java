@@ -574,4 +574,48 @@ public class ArrayOper
 
     return rv;
   }
+
+  public static List<Integer> convertToIntList(Object value, int defVal)
+  {
+    if(value == null)
+      return Collections.EMPTY_LIST;
+
+    if(value instanceof int[])
+      return asList((int[]) value);
+
+    if(value instanceof String[])
+    {
+      String[] ar = (String[]) value;
+      ArrayList<Integer> rv = new ArrayList<>(ar.length);
+      for(int i = 0; i < ar.length; i++)
+        rv.add(StringOper.parse(ar[i], defVal));
+      return rv;
+    }
+
+    if(value instanceof Object[])
+    {
+      Object[] ar = (Object[]) value;
+      ArrayList<Integer> rv = new ArrayList<>(ar.length);
+      for(int i = 0; i < ar.length; i++)
+        rv.add(StringOper.parse(value, defVal));
+      return rv;
+    }
+
+    if(value instanceof String)
+    {
+      String[] ss = StringOper.split(value.toString(), ',');
+      return convertToIntList(ss, defVal);
+    }
+
+    if(value instanceof Collection)
+    {
+      Collection ar = (Collection) value;
+      ArrayList<Integer> rv = new ArrayList<>();
+      for(Object o : ar)
+        rv.add(StringOper.parse(o, defVal));
+      return rv;
+    }
+
+    return Arrays.asList(StringOper.parse(value, defVal));
+  }
 }
