@@ -539,6 +539,30 @@ public class ArrayOper
     return result;
   }
 
+  /**
+   * Fonde array multipli in un unico risultato.
+   * @param first primo array
+   * @param rest altri array dello stesso tipo
+   * @return un array con tutti gli elementi
+   */
+  public static int[] concatAllInt(int[] first, int[]... rest)
+  {
+    int totalLength = first.length;
+    for(int[] array : rest)
+      totalLength += array.length;
+
+    int[] result = Arrays.copyOf(first, totalLength);
+    int offset = first.length;
+
+    for(int[] array : rest)
+    {
+      System.arraycopy(array, 0, result, offset, array.length);
+      offset += array.length;
+    }
+
+    return result;
+  }
+
   public static Map asMapFromPair(Object... pairObjects)
   {
     ArrayMap rv = new ArrayMap();

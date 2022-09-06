@@ -30,6 +30,27 @@ import org.commonlib5.utils.StringOper;
  */
 public class VectorRpc extends Vector
 {
+  public VectorRpc()
+  {
+  }
+
+  public VectorRpc(int initialCapacity)
+  {
+    super(initialCapacity);
+  }
+
+  public VectorRpc(int initialCapacity, int capacityIncrement)
+  {
+    super(initialCapacity, capacityIncrement);
+  }
+
+  public VectorRpc(Collection c)
+  {
+    super(c.size());
+    for(Object o : c)
+      add(o);
+  }
+
   @Override
   public synchronized boolean add(Object value)
   {
