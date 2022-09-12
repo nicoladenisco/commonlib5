@@ -600,6 +600,21 @@ public class ArrayOper
     return rv;
   }
 
+  public static <T> T[] asArray(T... rest)
+  {
+    return rest;
+  }
+
+  public static int[] asArrayInt(int... rest)
+  {
+    return rest;
+  }
+
+  public static long[] asArrayLong(long... rest)
+  {
+    return rest;
+  }
+
   public static List<Integer> convertToIntList(Object value, int defVal)
   {
     if(value == null)
