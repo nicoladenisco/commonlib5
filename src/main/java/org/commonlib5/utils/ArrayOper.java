@@ -22,6 +22,7 @@
 package org.commonlib5.utils;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Operazioni comuni su array.
@@ -641,5 +642,20 @@ public class ArrayOper
     }
 
     return Arrays.asList(StringOper.parse(value, defVal));
+  }
+
+  public static int[] filter(int[] source, Predicate<Integer> fun)
+  {
+    int k = 0;
+    int[] rv = new int[source.length];
+
+    for(int i = 0; i < source.length; i++)
+    {
+      int j = source[i];
+      if(fun.test(j))
+        rv[k++] = j;
+    }
+
+    return Arrays.copyOf(rv, k);
   }
 }
