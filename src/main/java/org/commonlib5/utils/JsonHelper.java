@@ -1,19 +1,16 @@
 /*
- * Copyright (C) 2022 Nicola De Nisco
+ *  JsonHelper.java
+ *  Creato il 5 ott 2022, 13:06:58
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ *  Copyright (C) 2022 Informatica Medica s.r.l.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  Questo software è proprietà di Informatica Medica s.r.l.
+ *  Tutti gli usi non esplicitimante autorizzati sono da
+ *  considerarsi tutelati ai sensi di legge.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *  Informatica Medica s.r.l.
+ *  Viale dei Tigli, 19
+ *  Casalnuovo di Napoli (NA)
  */
 package org.commonlib5.utils;
 
@@ -27,69 +24,115 @@ import java.net.URL;
 import org.json.JSONObject;
 
 /**
- * Helper per richieste JSON.
+ * Helper per chiamate API REST (json).
  *
- * @author Nicola De Nisco
+ * @author nicola
  */
 public class JsonHelper implements Closeable
 {
-  protected boolean autoclose;
-  protected HttpURLConnection con;
+  private final URL url;
+  private final HttpURLConnection httpConnection;
 
-  public JsonHelper(HttpURLConnection con)
-  {
-    this.con = con;
-  }
-
-  public JsonHelper(URL url, String method)
+  public JsonHelper(URL url)
      throws IOException
   {
-    con = (HttpURLConnection) url.openConnection();
-    con.setRequestMethod(method);
-    con.setRequestProperty("Accept", "application/json");
-    autoclose = true;
-  }
-
-  public JSONObject getJsonResponse()
-     throws Exception
-  {
-    if(con.getResponseCode() != 200)
-      throw new Exception("request failure: code " + con.getResponseCode() + " (" + con.getResponseMessage() + ")");
-
-    try ( BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream())))
-    {
-      StringBuilder sb = new StringBuilder();
-      String s;
-      while((s = br.readLine()) != null)
-        sb.append(s);
-
-      return new JSONObject(sb.toString());
-    }
-  }
-
-  public JSONObject getJsonResponse(JSONObject jsonRequest)
-     throws Exception
-  {
-    if(jsonRequest != null)
-    {
-      try ( OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream()))
-      {
-        wr.write(jsonRequest.toString());
-        wr.flush();
-      }
-    }
-
-    return getJsonResponse();
+    this.url = url;
+    this.httpConnection = (HttpURLConnection) url.openConnection();
   }
 
   @Override
   public void close()
      throws IOException
   {
-    if(autoclose && con != null)
+    httpConnection.disconnect();
+  }
+
+  public URL getUrl()
+  {
+    return url;
+  }
+
+  public HttpURLConnection getHttpConnection()
+  {
+    return httpConnection;
+  }
+
+  public void addHeader(String key, String value)
+     throws Exception
+  {
+    httpConnection.setRequestProperty(key, value);
+  }
+
+  public Pair<Integer, JSONObject> post()
+     throws Exception
+  {
+    return post(null);
+  }
+
+  public Pair<Integer, JSONObject> post(JSONObject request)
+     throws Exception
+  {
+    httpConnection.setRequestMethod("POST");
+    httpConnection.setRequestProperty("Accept", "application/json");
+    httpConnection.setRequestProperty("Content-Type", "application/json");
+
+    if(request != null)
+      return getJsonResponse(request, httpConnection);
+
+    return getJsonResponse(httpConnection);
+  }
+
+  public Pair<Integer, JSONObject> get()
+     throws Exception
+  {
+    return get(null);
+  }
+
+  public Pair<Integer, JSONObject> get(JSONObject request)
+     throws Exception
+  {
+    httpConnection.setRequestMethod("GET");
+    httpConnection.setRequestProperty("Accept", "application/json");
+    httpConnection.setRequestProperty("Content-Type", "application/json");
+
+    if(request != null)
+      return getJsonResponse(request, httpConnection);
+
+    return getJsonResponse(httpConnection);
+  }
+
+  public Pair<Integer, JSONObject> getJsonResponse(HttpURLConnection httpConnection)
+     throws Exception
+  {
+    int responseCode = httpConnection.getResponseCode();
+    JSONObject response = null;
+
+    try ( BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream())))
     {
-      con.disconnect();
-      con = null;
+      StringBuilder sb = new StringBuilder();
+
+      String s;
+      while((s = br.readLine()) != null)
+        sb.append(s);
+
+      response = new JSONObject(sb.toString());
     }
+    catch(Throwable t)
+    {
+      // eccezione ignorata
+    }
+
+    return new Pair<>(responseCode, response);
+  }
+
+  public Pair<Integer, JSONObject> getJsonResponse(JSONObject jsonRequest, HttpURLConnection httpConnection)
+     throws Exception
+  {
+    try ( OutputStreamWriter wr = new OutputStreamWriter(httpConnection.getOutputStream()))
+    {
+      wr.write(jsonRequest.toString());
+      wr.flush();
+    }
+    return getJsonResponse(httpConnection);
   }
 }
