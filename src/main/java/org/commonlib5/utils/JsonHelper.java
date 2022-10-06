@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -63,18 +64,19 @@ public class JsonHelper implements Closeable
     httpConnection.setRequestProperty(key, value);
   }
 
-  public Pair<Integer, JSONObject> post()
+  public Pair<Integer, JSONObject> postAsJson()
      throws Exception
   {
-    return post(null);
+    return postAsJson(null);
   }
 
-  public Pair<Integer, JSONObject> post(JSONObject request)
+  public Pair<Integer, JSONObject> postAsJson(JSONObject request)
      throws Exception
   {
     httpConnection.setRequestMethod("POST");
     httpConnection.setRequestProperty("Accept", "application/json");
     httpConnection.setRequestProperty("Content-Type", "application/json");
+    httpConnection.setDoOutput(true);
 
     if(request != null)
       return getJsonResponse(request, httpConnection);
@@ -82,13 +84,13 @@ public class JsonHelper implements Closeable
     return getJsonResponse(httpConnection);
   }
 
-  public Pair<Integer, JSONObject> get()
+  public Pair<Integer, JSONObject> getAsJson()
      throws Exception
   {
-    return get(null);
+    return getAsJson(null);
   }
 
-  public Pair<Integer, JSONObject> get(JSONObject request)
+  public Pair<Integer, JSONObject> getAsJson(JSONObject request)
      throws Exception
   {
     httpConnection.setRequestMethod("GET");
@@ -99,6 +101,45 @@ public class JsonHelper implements Closeable
       return getJsonResponse(request, httpConnection);
 
     return getJsonResponse(httpConnection);
+  }
+
+  public Pair<Integer, String> postAsText()
+     throws Exception
+  {
+    return postAsText(null);
+  }
+
+  public Pair<Integer, String> postAsText(JSONObject request)
+     throws Exception
+  {
+    httpConnection.setRequestMethod("POST");
+    httpConnection.setRequestProperty("Accept", "application/text");
+    httpConnection.setRequestProperty("Content-Type", "application/json");
+    httpConnection.setDoOutput(true);
+
+    if(request != null)
+      return getTextResponse(request, httpConnection);
+
+    return getTextResponse(httpConnection);
+  }
+
+  public Pair<Integer, String> getAsText()
+     throws Exception
+  {
+    return getAsText(null);
+  }
+
+  public Pair<Integer, String> getAsText(JSONObject request)
+     throws Exception
+  {
+    httpConnection.setRequestMethod("GET");
+    httpConnection.setRequestProperty("Accept", "application/text");
+    httpConnection.setRequestProperty("Content-Type", "application/json");
+
+    if(request != null)
+      return getTextResponse(request, httpConnection);
+
+    return getTextResponse(httpConnection);
   }
 
   public Pair<Integer, JSONObject> getJsonResponse(HttpURLConnection httpConnection)
@@ -117,6 +158,10 @@ public class JsonHelper implements Closeable
 
       response = new JSONObject(sb.toString());
     }
+    catch(JSONException e)
+    {
+      throw e;
+    }
     catch(Throwable t)
     {
       // eccezione ignorata
@@ -134,5 +179,40 @@ public class JsonHelper implements Closeable
       wr.flush();
     }
     return getJsonResponse(httpConnection);
+  }
+
+  public Pair<Integer, String> getTextResponse(HttpURLConnection httpConnection)
+     throws Exception
+  {
+    int responseCode = httpConnection.getResponseCode();
+    String response = null;
+
+    try ( BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream())))
+    {
+      StringBuilder sb = new StringBuilder();
+
+      String s;
+      while((s = br.readLine()) != null)
+        sb.append(s);
+
+      response = sb.toString();
+    }
+    catch(Throwable t)
+    {
+      // eccezione ignorata
+    }
+
+    return new Pair<>(responseCode, response);
+  }
+
+  public Pair<Integer, String> getTextResponse(JSONObject jsonRequest, HttpURLConnection httpConnection)
+     throws Exception
+  {
+    try ( OutputStreamWriter wr = new OutputStreamWriter(httpConnection.getOutputStream()))
+    {
+      wr.write(jsonRequest.toString());
+      wr.flush();
+    }
+    return getTextResponse(httpConnection);
   }
 }
