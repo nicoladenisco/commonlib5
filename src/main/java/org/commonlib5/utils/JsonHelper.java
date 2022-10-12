@@ -18,7 +18,7 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.json.JSONException;
@@ -148,7 +148,7 @@ public class JsonHelper implements Closeable
     int responseCode = httpConnection.getResponseCode();
     JSONObject response = null;
 
-    try ( BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream())))
+    try ( BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream(), "UTF-8")))
     {
       StringBuilder sb = new StringBuilder();
 
@@ -173,10 +173,10 @@ public class JsonHelper implements Closeable
   public Pair<Integer, JSONObject> getJsonResponse(JSONObject jsonRequest, HttpURLConnection httpConnection)
      throws Exception
   {
-    try ( OutputStreamWriter wr = new OutputStreamWriter(httpConnection.getOutputStream()))
+    try ( OutputStream os = httpConnection.getOutputStream())
     {
-      wr.write(jsonRequest.toString());
-      wr.flush();
+      byte[] input = jsonRequest.toString().getBytes("utf-8");
+      os.write(input, 0, input.length);
     }
     return getJsonResponse(httpConnection);
   }
@@ -187,7 +187,7 @@ public class JsonHelper implements Closeable
     int responseCode = httpConnection.getResponseCode();
     String response = null;
 
-    try ( BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream())))
+    try ( BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream(), "UTF-8")))
     {
       StringBuilder sb = new StringBuilder();
 
@@ -208,10 +208,10 @@ public class JsonHelper implements Closeable
   public Pair<Integer, String> getTextResponse(JSONObject jsonRequest, HttpURLConnection httpConnection)
      throws Exception
   {
-    try ( OutputStreamWriter wr = new OutputStreamWriter(httpConnection.getOutputStream()))
+    try ( OutputStream os = httpConnection.getOutputStream())
     {
-      wr.write(jsonRequest.toString());
-      wr.flush();
+      byte[] input = jsonRequest.toString().getBytes("utf-8");
+      os.write(input, 0, input.length);
     }
     return getTextResponse(httpConnection);
   }
