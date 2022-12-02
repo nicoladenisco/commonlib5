@@ -139,7 +139,7 @@ public class ByteBufferOutputStream extends OutputStream
    * @param os destinazione del contenuto
    * @throws IOException
    */
-  synchronized void writeTo(OutputStream os)
+  synchronized public void writeTo(OutputStream os)
      throws IOException
   {
     os.write(buffer, 0, count);
