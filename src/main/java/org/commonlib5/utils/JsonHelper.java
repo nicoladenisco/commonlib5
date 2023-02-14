@@ -14,14 +14,13 @@
  */
 package org.commonlib5.utils;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
-import org.json.JSONException;
+import java.util.Map;
+import org.commonlib5.io.ByteBufferOutputStream;
 import org.json.JSONObject;
 
 /**
@@ -31,188 +30,180 @@ import org.json.JSONObject;
  */
 public class JsonHelper implements Closeable
 {
-  private final URL url;
-  private final HttpURLConnection httpConnection;
+  protected final URI uri;
+  protected final ArrayMap<String, String> headers = new ArrayMap<>();
 
-  public JsonHelper(URL url)
-     throws IOException
+  public JsonHelper(URI uri)
   {
-    this.url = url;
-    this.httpConnection = (HttpURLConnection) url.openConnection();
+    this.uri = uri;
   }
 
   @Override
   public void close()
      throws IOException
   {
-    httpConnection.disconnect();
   }
 
-  public URL getUrl()
+  public URI getUri()
   {
-    return url;
+    return uri;
   }
 
-  public HttpURLConnection getHttpConnection()
+  public void addToHeader(String key, String value)
   {
-    return httpConnection;
+    headers.put(key, value);
   }
 
-  public void addHeader(String key, String value)
-     throws Exception
+  public void addToHeader(Map<String, String> values)
   {
-    httpConnection.setRequestProperty(key, value);
-  }
-
-  public Pair<Integer, JSONObject> postAsJson()
-     throws Exception
-  {
-    return postAsJson(null);
+    headers.putAll(values);
   }
 
   public Pair<Integer, JSONObject> postAsJson(JSONObject request)
      throws Exception
   {
-    httpConnection.setRequestMethod("POST");
-    httpConnection.setRequestProperty("Accept", "application/json");
-    httpConnection.setRequestProperty("Content-Type", "application/json");
-    httpConnection.setDoOutput(true);
-
-    if(request != null)
-      return getJsonResponse(request, httpConnection);
-
-    return getJsonResponse(httpConnection);
+    Pair<Integer, String> rv = postRequest(uri, request);
+    return new Pair<>(rv.first, new JSONObject(rv.second));
   }
 
   public Pair<Integer, JSONObject> getAsJson()
      throws Exception
   {
-    return getAsJson(null);
-  }
-
-  public Pair<Integer, JSONObject> getAsJson(JSONObject request)
-     throws Exception
-  {
-    httpConnection.setRequestMethod("GET");
-    httpConnection.setRequestProperty("Accept", "application/json");
-    httpConnection.setRequestProperty("Content-Type", "application/json");
-
-    if(request != null)
-      return getJsonResponse(request, httpConnection);
-
-    return getJsonResponse(httpConnection);
-  }
-
-  public Pair<Integer, String> postAsText()
-     throws Exception
-  {
-    return postAsText(null);
-  }
-
-  public Pair<Integer, String> postAsText(JSONObject request)
-     throws Exception
-  {
-    httpConnection.setRequestMethod("POST");
-    httpConnection.setRequestProperty("Accept", "application/text");
-    httpConnection.setRequestProperty("Content-Type", "application/json");
-    httpConnection.setDoOutput(true);
-
-    if(request != null)
-      return getTextResponse(request, httpConnection);
-
-    return getTextResponse(httpConnection);
+    Pair<Integer, String> rv = getRequest(uri);
+    return new Pair<>(rv.first, new JSONObject(rv.second));
   }
 
   public Pair<Integer, String> getAsText()
      throws Exception
   {
-    return getAsText(null);
+    return getRequest(uri);
   }
 
-  public Pair<Integer, String> getAsText(JSONObject request)
+  public Pair<Integer, String> postAsText(JSONObject request)
      throws Exception
   {
-    httpConnection.setRequestMethod("GET");
-    httpConnection.setRequestProperty("Accept", "application/text");
-    httpConnection.setRequestProperty("Content-Type", "application/json");
-
-    if(request != null)
-      return getTextResponse(request, httpConnection);
-
-    return getTextResponse(httpConnection);
+    return postRequest(uri, request);
   }
 
-  public Pair<Integer, JSONObject> getJsonResponse(HttpURLConnection httpConnection)
+  public Pair<Integer, String> deleteAsText()
      throws Exception
   {
-    int responseCode = httpConnection.getResponseCode();
-    JSONObject response = null;
-
-    try ( BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream(), "UTF-8")))
-    {
-      StringBuilder sb = new StringBuilder();
-
-      String s;
-      while((s = br.readLine()) != null)
-        sb.append(s);
-
-      response = new JSONObject(sb.toString());
-    }
-    catch(JSONException e)
-    {
-      throw e;
-    }
-    catch(Throwable t)
-    {
-      // eccezione ignorata
-    }
-
-    return new Pair<>(responseCode, response);
+    return deleteRequest(uri);
   }
 
-  public Pair<Integer, JSONObject> getJsonResponse(JSONObject jsonRequest, HttpURLConnection httpConnection)
+  public Pair<Integer, String> putAsText(JSONObject request)
      throws Exception
   {
-    try ( OutputStream os = httpConnection.getOutputStream())
-    {
-      byte[] input = jsonRequest.toString().getBytes("utf-8");
-      os.write(input, 0, input.length);
-    }
-    return getJsonResponse(httpConnection);
+    return putRequest(uri, request);
   }
 
-  public Pair<Integer, String> getTextResponse(HttpURLConnection httpConnection)
+  public Pair<Integer, JSONObject> putAsJson(JSONObject request)
      throws Exception
   {
-    int responseCode = httpConnection.getResponseCode();
-    String response = null;
-
-    try ( BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream(), "UTF-8")))
-    {
-      StringBuilder sb = new StringBuilder();
-
-      String s;
-      while((s = br.readLine()) != null)
-        sb.append(s);
-
-      response = sb.toString();
-    }
-    catch(Throwable t)
-    {
-      // eccezione ignorata
-    }
-
-    return new Pair<>(responseCode, response);
+    Pair<Integer, String> rv = putRequest(uri, request);
+    return new Pair<>(rv.first, new JSONObject(rv.second));
   }
 
-  public Pair<Integer, String> getTextResponse(JSONObject jsonRequest, HttpURLConnection httpConnection)
+  public Pair<Integer, String> patchAsText(JSONObject request)
      throws Exception
   {
-    try ( OutputStream os = httpConnection.getOutputStream())
+    return patchRequest(uri, request);
+  }
+
+  public Pair<Integer, JSONObject> patchAsJson(JSONObject request)
+     throws Exception
+  {
+    Pair<Integer, String> rv = patchRequest(uri, request);
+    return new Pair<>(rv.first, new JSONObject(rv.second));
+  }
+
+  public Pair<Integer, JSONObject> deleteAsJson()
+     throws Exception
+  {
+    Pair<Integer, String> rv = deleteRequest(uri);
+    return new Pair<>(rv.first, new JSONObject(rv.second));
+  }
+
+  protected Pair<Integer, String> genericRequest(URI uri, String method)
+     throws Exception
+  {
+    URL url = uri.toURL();
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+    try
     {
-      byte[] input = jsonRequest.toString().getBytes("utf-8");
-      os.write(input, 0, input.length);
+      conn.setDoOutput(true);
+      conn.setRequestMethod(method);
+      conn.setRequestProperty("Content-Type", "application/json");
+      headers.forEach((k, v) -> conn.setRequestProperty(k, v));
+
+      ByteBufferOutputStream bos = new ByteBufferOutputStream();
+      CommonFileUtils.copyStream(conn.getInputStream(), bos);
+      return new Pair<>(conn.getResponseCode(), bos.toString("UTF-8"));
     }
-    return getTextResponse(httpConnection);
+    finally
+    {
+      conn.disconnect();
+    }
+  }
+
+  protected Pair<Integer, String> genericRequest(URI uri, String method, JSONObject req)
+     throws Exception
+  {
+    URL url = uri.toURL();
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+    try
+    {
+      conn.setDoOutput(true);
+      conn.setRequestMethod(method);
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Accept", "application/json");
+      headers.forEach((k, v) -> conn.setRequestProperty(k, v));
+
+      String input = req.toString();
+      byte[] byteInput = input.getBytes("UTF-8");
+
+      conn.setFixedLengthStreamingMode(byteInput.length);
+      conn.getOutputStream().write(byteInput);
+
+      ByteBufferOutputStream bos = new ByteBufferOutputStream();
+      CommonFileUtils.copyStream(conn.getInputStream(), bos);
+      return new Pair<>(conn.getResponseCode(), bos.toString("UTF-8"));
+    }
+    finally
+    {
+      conn.disconnect();
+    }
+  }
+
+  protected Pair<Integer, String> getRequest(URI uri)
+     throws Exception
+  {
+    return genericRequest(uri, "GET");
+  }
+
+  protected Pair<Integer, String> deleteRequest(URI uri)
+     throws Exception
+  {
+    return genericRequest(uri, "DELETE");
+  }
+
+  protected Pair<Integer, String> postRequest(URI uri, JSONObject req)
+     throws Exception
+  {
+    return genericRequest(uri, "POST", req);
+  }
+
+  protected Pair<Integer, String> putRequest(URI uri, JSONObject req)
+     throws Exception
+  {
+    return genericRequest(uri, "PUT", req);
+  }
+
+  protected Pair<Integer, String> patchRequest(URI uri, JSONObject req)
+     throws Exception
+  {
+    return genericRequest(uri, "PATCH", req);
   }
 }

@@ -32,6 +32,21 @@ import java.util.Set;
 public class ArraySet<T> extends ArrayList<T>
    implements Set<T>, Serializable
 {
+  public ArraySet()
+  {
+  }
+
+  public ArraySet(int i)
+  {
+    super(i);
+  }
+
+  public ArraySet(Collection<? extends T> clctn)
+  {
+    super(clctn.size());
+    clctn.forEach((t) -> add(t));
+  }
+
   @Override
   public boolean add(T e)
   {

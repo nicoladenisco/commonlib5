@@ -32,19 +32,27 @@ import org.commonlib5.lambda.ConsumerThrowException;
 public class ArrayMap<K, V> extends AbstractMap<K, V>
    implements Serializable
 {
-  private ArraySet<Entry<K, V>> theSet = new ArraySet<>();
+  protected final ArraySet<Entry<K, V>> theSet;
 
   public ArrayMap()
   {
+    theSet = new ArraySet<>();
+  }
+
+  public ArrayMap(int size)
+  {
+    theSet = new ArraySet<>(size);
   }
 
   public ArrayMap(Map<K, V> othermap)
   {
+    theSet = new ArraySet<>(othermap.size());
     putAll(othermap);
   }
 
   public ArrayMap(Collection<Pair<K, V>> pcoll)
   {
+    theSet = new ArraySet<>(pcoll.size());
     addAll(pcoll);
   }
 
@@ -57,6 +65,8 @@ public class ArrayMap<K, V> extends AbstractMap<K, V>
   {
     if((pairObjects.length & 1) != 0)
       throw new IllegalArgumentException("The array must have a pair length.");
+
+    theSet = new ArraySet<>(pairObjects.length / 2);
 
     for(int i = 0; i < pairObjects.length; i += 2)
     {
@@ -79,7 +89,7 @@ public class ArrayMap<K, V> extends AbstractMap<K, V>
     if(key != null)
     {
       remove(key);
-      theSet.add(new Pair<>(key, value));
+      add(new Pair<>(key, value));
     }
 
     return value;
@@ -161,5 +171,35 @@ public class ArrayMap<K, V> extends AbstractMap<K, V>
       }
     }
     return null;
+  }
+
+  public void sortByKey(Comparator<K> cmp)
+  {
+    List<Pair<K, V>> rv = getAsList();
+    rv.sort((a, b) -> cmp.compare(a.first, b.first));
+    clear();
+    addAll(rv);
+  }
+
+  public void sortByValue(Comparator<V> cmp)
+  {
+    List<Pair<K, V>> rv = getAsList();
+    rv.sort((a, b) -> cmp.compare(a.second, b.second));
+    clear();
+    addAll(rv);
+  }
+
+  public List<Pair<K, V>> getSortedByKey(Comparator<K> cmp)
+  {
+    List<Pair<K, V>> rv = getAsList();
+    rv.sort((a, b) -> cmp.compare(a.first, b.first));
+    return rv;
+  }
+
+  public List<Pair<K, V>> getSortedByValue(Comparator<V> cmp)
+  {
+    List<Pair<K, V>> rv = getAsList();
+    rv.sort((a, b) -> cmp.compare(a.second, b.second));
+    return rv;
   }
 }

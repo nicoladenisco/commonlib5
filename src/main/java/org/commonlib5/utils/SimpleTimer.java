@@ -17,7 +17,7 @@ import java.io.Serializable;
  */
 public class SimpleTimer implements Serializable
 {
-  private long tstart = 0;
+  private long tstart = 0, precedente = 0;
   private boolean explicitSignaled = false;
 
   /**
@@ -154,5 +154,22 @@ public class SimpleTimer implements Serializable
     {
       return false;
     }
+  }
+
+  public long resetIntermedio()
+  {
+    return precedente = getElapsed();
+  }
+
+  public long getIntermedio()
+  {
+    return getElapsed() - precedente;
+  }
+
+  public long getIntermedioReset()
+  {
+    long intermedio = getElapsed() - precedente;
+    resetIntermedio();
+    return intermedio;
   }
 }
