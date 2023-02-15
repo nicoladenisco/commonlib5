@@ -18,6 +18,8 @@
 package org.commonlib5.crypto;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
@@ -25,6 +27,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.commonlib5.utils.CommonFileUtils;
 
 /**
@@ -76,5 +80,23 @@ public class KeyUtils
     byte[] content = pf.getPemObject().getContent();
     X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(content);
     return (RSAPublicKey) factory.generatePublic(pubKeySpec);
+  }
+
+  public static void writeRSAPrivateKeyPEM(File toWrite, RSAPrivateKey key)
+     throws IOException
+  {
+    try ( PemWriter pw = new PemWriter(new FileWriter(toWrite)))
+    {
+      pw.writeObject(new PemObject("PRIVATE_KEY", key.getEncoded()));
+    }
+  }
+
+  public static void writeRSAPublicKeyPEM(File toWrite, RSAPublicKey key)
+     throws IOException
+  {
+    try ( PemWriter pw = new PemWriter(new FileWriter(toWrite)))
+    {
+      pw.writeObject(new PemObject("PUBLIC_KEY", key.getEncoded()));
+    }
   }
 }

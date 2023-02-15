@@ -37,7 +37,7 @@ public class RSAEncryptUtils
   public static final String ALGORITHM = "RSA";
   public static final String BOUNCY_CASTLE = "BC";
 
-  public static void init()
+  static
   {
     if(Security.getProvider(BOUNCY_CASTLE) == null)
       Security.addProvider(new BouncyCastleProvider());
@@ -63,7 +63,7 @@ public class RSAEncryptUtils
    * @return Encrypted text
    * @throws java.lang.Exception
    */
-  public static byte[] encrypt(byte[] text, PublicKey key)
+  public static byte[] encrypt(byte[] text, Key key)
      throws Exception
   {
     // get an RSA cipher object and print the provider
@@ -83,7 +83,7 @@ public class RSAEncryptUtils
    * @return Encrypted text encoded as BASE64
    * @throws java.lang.Exception
    */
-  public static String encrypt(String text, PublicKey key)
+  public static String encrypt(String text, Key key)
      throws Exception
   {
     byte[] cipherText = encrypt(text.getBytes("UTF8"), key);
@@ -96,10 +96,11 @@ public class RSAEncryptUtils
    * Use UTF8 encoding.
    * @param text The original unencrypted text
    * @param key The public key
+   * @param isChunked
    * @return Encrypted text encoded as BASE64
    * @throws java.lang.Exception
    */
-  public static String encrypt(String text, PublicKey key, boolean isChunked)
+  public static String encrypt(String text, Key key, boolean isChunked)
      throws Exception
   {
     byte[] cipherText = encrypt(text.getBytes("UTF8"), key);
@@ -113,7 +114,7 @@ public class RSAEncryptUtils
    * @return The unencrypted text
    * @throws java.lang.Exception
    */
-  public static byte[] decrypt(byte[] text, PrivateKey key)
+  public static byte[] decrypt(byte[] text, Key key)
      throws Exception
   {
     // decrypt the text using the private key
@@ -129,7 +130,7 @@ public class RSAEncryptUtils
    * @return The unencrypted text encoded as UTF8
    * @throws java.lang.Exception
    */
-  public static String decrypt(String text, PrivateKey key)
+  public static String decrypt(String text, Key key)
      throws Exception
   {
     // decrypt the text using the private key
@@ -192,6 +193,7 @@ public class RSAEncryptUtils
   /**
    * Encode bytes array to BASE64 string
    * @param bytes
+   * @param isChunked
    * @return Encoded string
    */
   public static String encodeBASE64(byte[] bytes, boolean isChunked)
@@ -222,8 +224,7 @@ public class RSAEncryptUtils
   public static void encryptFile(File src, File dest, PublicKey key)
      throws Exception
   {
-    try (InputStream is = new FileInputStream(src);
-       OutputStream os = new FileOutputStream(dest))
+    try ( InputStream is = new FileInputStream(src);  OutputStream os = new FileOutputStream(dest))
     {
       encryptDecryptFile(is, os, key, Cipher.ENCRYPT_MODE);
     }
@@ -240,8 +241,7 @@ public class RSAEncryptUtils
   public static void decryptFile(File src, File dest, PrivateKey key)
      throws Exception
   {
-    try (InputStream is = new FileInputStream(src);
-       OutputStream os = new FileOutputStream(dest))
+    try ( InputStream is = new FileInputStream(src);  OutputStream os = new FileOutputStream(dest))
     {
       encryptDecryptFile(is, os, key, Cipher.DECRYPT_MODE);
     }
