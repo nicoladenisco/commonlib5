@@ -122,7 +122,7 @@ public class ErrorDialog extends javax.swing.JDialog
 
         getContentPane().add(panelTitle, java.awt.BorderLayout.NORTH);
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resource/button_cancel.png"))); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/button_cancel.png"))); // NOI18N
         getContentPane().add(jLabel2, java.awt.BorderLayout.WEST);
 
         pack();

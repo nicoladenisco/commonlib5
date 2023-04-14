@@ -104,7 +104,7 @@ public class EditButtonsPanel extends javax.swing.JPanel
     jbEdit = new javax.swing.JButton();
     jbDup = new javax.swing.JButton();
 
-    jbAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resource/tab_new.png"))); // NOI18N
+    jbAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tab_new.png"))); // NOI18N
     jbAdd.setToolTipText(i18n("Agginge un nuovo elemento"));
     jbAdd.addActionListener(new java.awt.event.ActionListener()
     {
@@ -114,7 +114,7 @@ public class EditButtonsPanel extends javax.swing.JPanel
       }
     });
 
-    jbRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resource/tab_remove.png"))); // NOI18N
+    jbRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tab_remove.png"))); // NOI18N
     jbRemove.setToolTipText(i18n("Rimuove la selezione"));
     jbRemove.addActionListener(new java.awt.event.ActionListener()
     {
@@ -124,7 +124,7 @@ public class EditButtonsPanel extends javax.swing.JPanel
       }
     });
 
-    jbDown.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resource/downarrow.png"))); // NOI18N
+    jbDown.setIcon(new javax.swing.ImageIcon(getClass().getResource("/downarrow.png"))); // NOI18N
     jbDown.setToolTipText(i18n("Sposta la selezione verso il basso"));
     jbDown.addActionListener(new java.awt.event.ActionListener()
     {
@@ -134,7 +134,7 @@ public class EditButtonsPanel extends javax.swing.JPanel
       }
     });
 
-    jbUp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resource/uparrow.png"))); // NOI18N
+    jbUp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uparrow.png"))); // NOI18N
     jbUp.setToolTipText(i18n("Sposta la selezione verso l'alto"));
     jbUp.addActionListener(new java.awt.event.ActionListener()
     {
@@ -144,7 +144,7 @@ public class EditButtonsPanel extends javax.swing.JPanel
       }
     });
 
-    jbEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resource/edit.png"))); // NOI18N
+    jbEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/edit.png"))); // NOI18N
     jbEdit.setToolTipText(i18n("Modifica l'elemento selezionato"));
     jbEdit.addActionListener(new java.awt.event.ActionListener()
     {
@@ -154,7 +154,7 @@ public class EditButtonsPanel extends javax.swing.JPanel
       }
     });
 
-    jbDup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resource/tab_duplicate.png"))); // NOI18N
+    jbDup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tab_duplicate.png"))); // NOI18N
     jbDup.setToolTipText(i18n("Duplica elemento selezionato"));
     jbDup.addActionListener(new java.awt.event.ActionListener()
     {
