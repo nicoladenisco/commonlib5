@@ -38,7 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -92,9 +91,7 @@ public class JavaLoggingToCommonLoggingRedirector
 
       // remove old handlers
       for(Handler handler : rootLogger.getHandlers())
-      {
         rootLogger.removeHandler(handler);
-      }
 
       // add our own
       activeHandler = new JDKLogHandler(minLivel);
@@ -104,7 +101,7 @@ public class JavaLoggingToCommonLoggingRedirector
 
       // done, let's check it right away!!!
       Logger.getLogger(JavaLoggingToCommonLoggingRedirector.class.getName()).
-         info("activated: sending JDK log messages to Commons Logging");
+         fine("activated: sending JDK log messages to Commons Logging");
     }
     catch(Exception exc)
     {
@@ -157,25 +154,15 @@ public class JavaLoggingToCommonLoggingRedirector
       Throwable exception = record.getThrown();
 
       if(level == Level.SEVERE)
-      {
         log.error(message, exception);
-      }
       else if(level == Level.WARNING)
-      {
         log.warn(message, exception);
-      }
       else if(level == Level.INFO)
-      {
         log.info(message, exception);
-      }
       else if(level == Level.CONFIG)
-      {
         log.debug(message, exception);
-      }
       else
-      {
         log.trace(message, exception);
-      }
     }
 
     @Override
