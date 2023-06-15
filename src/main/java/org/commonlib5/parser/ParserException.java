@@ -24,6 +24,8 @@ package org.commonlib5.parser;
  */
 public class ParserException extends Exception
 {
+  private String missing;
+
   public ParserException()
   {
     super();
@@ -32,5 +34,21 @@ public class ParserException extends Exception
   public ParserException(String message)
   {
     super(message);
+  }
+
+  public ParserException(String message, String missing)
+  {
+    super(message);
+    this.missing = missing;
+  }
+
+  public String getMissing()
+  {
+    return missing;
+  }
+
+  public void setMissing(String missing)
+  {
+    this.missing = missing;
   }
 }
