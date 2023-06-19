@@ -1328,6 +1328,37 @@ public class StringOper
   }
 
   /**
+   * Fonde una array di stringhe in una unica stringa
+   * utilizzando il separatore e' il delimitatore specificato.
+   * Specifico per funzione Lambda di estrazione del valore.
+   * @param <T> tipo di oggetto generico
+   * @param arStrings array oggetti da iterare
+   * @param fn funzione che ritorna il valore per ogni oggetto
+   * @param separator carattere separatore fra le stringhe
+   * @return
+   */
+  public static <T> String join2int(Collection<T> arStrings, Function<T, Integer> fn, String separator)
+  {
+    if(arStrings == null || arStrings.isEmpty())
+      return "";
+
+    int i = 0;
+    StringBuilder rv = new StringBuilder(512);
+
+    for(T obj : arStrings)
+    {
+      if(i > 0)
+        rv.append(separator);
+
+      rv.append(fn.apply(obj));
+
+      i++;
+    }
+
+    return rv.toString();
+  }
+
+  /**
    * Fonde un array di stringhe in una unica stringa
    * utilizzando il separatore e' il delimitatore specificato.
    * Specifico per funzione Lambda di estrazione del valore.
