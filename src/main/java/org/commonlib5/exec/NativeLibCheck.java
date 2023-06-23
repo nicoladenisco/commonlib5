@@ -110,8 +110,9 @@ public class NativeLibCheck
       case OsIdent.OS_LINUX:
       case OsIdent.OS_MACOSX:
       case OsIdent.OS_SOLARIS:
+      case OsIdent.OS_FREEBSD:
       {
-        ExecHelper eh = ExecHelper.execUsingShell("file -L " + nativeLib.getAbsolutePath());
+        ExecHelper eh = ExecHelper.execUsingShell("file -L \"" + nativeLib.getAbsolutePath() + "\"");
         String ehOut = eh.getOutput();
         if(ehOut != null && StringOper.testTokens(token32, ehOut) > 0)
           return true;
