@@ -584,17 +584,33 @@ public class ArrayOper
 
   public static Map<String, String> asMapFromPairStrings(String... pairObjects)
   {
-    ArrayMap<String, String> rv = new ArrayMap<>();
-
     if((pairObjects.length & 1) != 0)
       throw new IllegalArgumentException("The array must have a pair length.");
 
+    ArrayMap<String, String> rv = new ArrayMap<>();
     for(int i = 0; i < pairObjects.length; i += 2)
     {
       String o1 = pairObjects[i];
       String o2 = pairObjects[i + 1];
 
       rv.put(o1, o2);
+    }
+
+    return rv;
+  }
+
+  public static List<Pair<String, String>> asListFromPairStrings(String... pairObjects)
+  {
+    if((pairObjects.length & 1) != 0)
+      throw new IllegalArgumentException("The array must have a pair length.");
+
+    List<Pair<String, String>> rv = new ArrayList<>(pairObjects.length / 2);
+    for(int i = 0; i < pairObjects.length; i += 2)
+    {
+      String o1 = pairObjects[i];
+      String o2 = pairObjects[i + 1];
+
+      rv.add(new Pair<>(o1, o2));
     }
 
     return rv;
