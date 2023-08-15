@@ -274,6 +274,30 @@ public class DateTime
     return mergeDataOra(data, 23, 59, 59, 999);
   }
 
+  public static Date inizioMese(Date data)
+  {
+    Calendar cald = new GregorianCalendar(Locale.ITALIAN);
+    cald.setTime(data);
+    cald.set(Calendar.DAY_OF_MONTH, 1);
+    cald.set(Calendar.HOUR_OF_DAY, 0);
+    cald.set(Calendar.MINUTE, 0);
+    cald.set(Calendar.SECOND, 0);
+    cald.set(Calendar.MILLISECOND, 0);
+    return cald.getTime();
+  }
+
+  public static Date fineMese(Date data)
+  {
+    Calendar cald = new GregorianCalendar(Locale.ITALIAN);
+    cald.setTime(data);
+    cald.set(Calendar.DAY_OF_MONTH, cald.getActualMaximum(Calendar.DAY_OF_MONTH));
+    cald.set(Calendar.HOUR_OF_DAY, 23);
+    cald.set(Calendar.MINUTE, 59);
+    cald.set(Calendar.SECOND, 59);
+    cald.set(Calendar.MILLISECOND, 999);
+    return cald.getTime();
+  }
+
   public static boolean isEqu(Date data1, Date data2)
   {
     if(data1 == null && data2 == null)
