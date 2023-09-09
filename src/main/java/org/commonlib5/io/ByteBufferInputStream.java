@@ -32,7 +32,7 @@ public class ByteBufferInputStream extends PushbackInputStream
   private boolean blocking = true;
 
   /**
-   * The currently marked position in the stream.  This defaults to 0, so a
+   * The currently marked position in the stream. This defaults to 0, so a
    * reset operation on the stream resets it to read from array index 0 in
    * the buffer - even if the stream was initially created with an offset
    * greater than 0
@@ -41,7 +41,7 @@ public class ByteBufferInputStream extends PushbackInputStream
 
   /**
    * This indicates the maximum number of bytes that can be read from this
-   * stream.  It is the array index of the position after the last valid
+   * stream. It is the array index of the position after the last valid
    * byte in the buffer <code>buf</code>
    */
   protected int count;
@@ -75,7 +75,7 @@ public class ByteBufferInputStream extends PushbackInputStream
 
   /**
    * This method returns the number of bytes available to be read from this
-   * stream.  The value returned will be equal to <code>count - pos</code>.
+   * stream. The value returned will be equal to <code>count - pos</code>.
    *
    * @return The number of bytes that can be read from this stream
    * before blocking, which is all of them
@@ -87,9 +87,9 @@ public class ByteBufferInputStream extends PushbackInputStream
   }
 
   /**
-   * This method reads one byte from the stream.  The <code>pos</code>
-   * counter is advanced to the next byte to be read.  The byte read is
-   * returned as an int in the range of 0-255.  If the stream position
+   * This method reads one byte from the stream. The <code>pos</code>
+   * counter is advanced to the next byte to be read. The byte read is
+   * returned as an int in the range of 0-255. If the stream position
    * is already at the end of the buffer, no byte is read and a -1 is
    * returned in order to indicate the end of the stream.
    *
@@ -121,11 +121,11 @@ public class ByteBufferInputStream extends PushbackInputStream
 
   /**
    * This method reads bytes from the stream and stores them into a
-   * caller supplied buffer.  It starts storing the data at index
+   * caller supplied buffer. It starts storing the data at index
    * <code>offset</code> into the buffer and attempts to read
-   * <code>len</code> bytes.  This method can return before reading
+   * <code>len</code> bytes. This method can return before reading
    * the number of bytes requested if the end of the stream is
-   * encountered first.  The actual number of bytes read is returned.
+   * encountered first. The actual number of bytes read is returned.
    * If no bytes can be read because the stream is already at the end
    * of stream position, a -1 is returned.
    * <p>
@@ -166,10 +166,10 @@ public class ByteBufferInputStream extends PushbackInputStream
 
   /**
    * This method attempts to skip the requested number of bytes in the
-   * input stream.  It does this by advancing the <code>pos</code>
-   * value by the specified number of bytes.  It this would exceed the
+   * input stream. It does this by advancing the <code>pos</code>
+   * value by the specified number of bytes. It this would exceed the
    * length of the buffer, then only enough bytes are skipped to
-   * position the stream at the end of the buffer.  The actual number
+   * position the stream at the end of the buffer. The actual number
    * of bytes skipped is returned.
    *
    * @param num The requested number of bytes to skip
@@ -190,8 +190,19 @@ public class ByteBufferInputStream extends PushbackInputStream
 
   /**
    * Aggiunge byte al buffer in memoria.
+   * @param toAdd byte da aggiungere
+   */
+  public synchronized void addToBuffer(int toAdd)
+  {
+    byte[] dummy = new byte[1];
+    dummy[0] = (byte) toAdd;
+    addToBuffer(dummy, 0, 1);
+  }
+
+  /**
+   * Aggiunge byte al buffer in memoria.
    * E' equivalente a addToBuffer(toAdd, 0, toAdd.length).
-   * @param toAdd
+   * @param toAdd array con dati da aggiungere
    */
   public synchronized void addToBuffer(byte[] toAdd)
   {
@@ -235,7 +246,8 @@ public class ByteBufferInputStream extends PushbackInputStream
    * @throws IOException
    */
   @Override
-  public synchronized void close() throws IOException
+  public synchronized void close()
+     throws IOException
   {
     buf = null;
     count = 0;
@@ -256,25 +268,29 @@ public class ByteBufferInputStream extends PushbackInputStream
   }
 
   @Override
-  public synchronized void reset() throws IOException
+  public synchronized void reset()
+     throws IOException
   {
     pos = mark;
   }
 
   @Override
-  public synchronized void unread(int b) throws IOException
+  public synchronized void unread(int b)
+     throws IOException
   {
     super.unread(b);
   }
 
   @Override
-  public synchronized void unread(byte[] b, int off, int len) throws IOException
+  public synchronized void unread(byte[] b, int off, int len)
+     throws IOException
   {
     super.unread(b, off, len);
   }
 
   @Override
-  public synchronized void unread(byte[] b) throws IOException
+  public synchronized void unread(byte[] b)
+     throws IOException
   {
     super.unread(b);
   }

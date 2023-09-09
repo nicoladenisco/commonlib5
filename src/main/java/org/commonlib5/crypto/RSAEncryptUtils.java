@@ -224,7 +224,7 @@ public class RSAEncryptUtils
   public static void encryptFile(File src, File dest, PublicKey key)
      throws Exception
   {
-    try ( InputStream is = new FileInputStream(src);  OutputStream os = new FileOutputStream(dest))
+    try (InputStream is = new FileInputStream(src); OutputStream os = new FileOutputStream(dest))
     {
       encryptDecryptFile(is, os, key, Cipher.ENCRYPT_MODE);
     }
@@ -241,41 +241,46 @@ public class RSAEncryptUtils
   public static void decryptFile(File src, File dest, PrivateKey key)
      throws Exception
   {
-    try ( InputStream is = new FileInputStream(src);  OutputStream os = new FileOutputStream(dest))
+    try (InputStream is = new FileInputStream(src); OutputStream os = new FileOutputStream(dest))
     {
       encryptDecryptFile(is, os, key, Cipher.DECRYPT_MODE);
     }
   }
 
   /**
-   * Encrypt and Decrypt files using 1024 RSA encryption.
+   * Encrypt and Decrypt stream using 1024 RSA encryption.
+   * Vengono letti blocchi dallo stream compatibili con la chiave
+   * ed effettuata l'operazione su ogni blocco letto.
    *
    * @param is Source stream
    * @param os Destination stream
    * @param key The key. For encryption this is the Private Key and for decryption this is the public key
    * @param cipherMode Cipher Mode (Cipher.ENCRYPT_MODE/Cipher.DECRYPT_MODE)
+   * @return numero di blocchi generati
    * @throws Exception
    */
-  public static void encryptDecryptFile(InputStream is, OutputStream os, Key key, int cipherMode)
+  public static int encryptDecryptFile(InputStream is, OutputStream os, Key key, int cipherMode)
      throws Exception
   {
     Cipher cipher = Cipher.getInstance(RSA_CHIPER);
-    int blockSize = cipher.getBlockSize();
-    byte[] buf = new byte[blockSize];
+    int numBlocks = 0;
 
     // RSA encryption data size limitations are slightly less than the key modulus size,
     // depending on the actual padding scheme used (e.g. with 1024 bit (128 byte) RSA key,
     // the size limit is 117 bytes for PKCS#1 v 1.5 padding. (http://www.jensign.com/JavaScience/dotnet/RSAEncrypt/)
-    //byte[] buf = cipherMode == Cipher.ENCRYPT_MODE ? new byte[100] : new byte[128];
-    // init the Cipher object for Encryption...
-    //cipher.init(cipherMode, key);
+    byte[] buf = cipherMode == Cipher.ENCRYPT_MODE ? new byte[100] : new byte[128];
+    // init the Cipher
+    cipher.init(cipherMode, key);
+
     // start FileIO
-    int bufl;
-    while((bufl = is.read(buf)) != -1)
+    int nb;
+    while((nb = is.read(buf)) > 0)
     {
-      cipher.init(cipherMode, key);
-      byte[] encText = cipher.doFinal(buf, 0, bufl);
+      byte[] encText = cipher.doFinal(buf, 0, nb);
       os.write(encText);
+      numBlocks++;
     }
+
+    return numBlocks;
   }
 }
