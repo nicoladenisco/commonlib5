@@ -28,21 +28,21 @@ import org.commonlib5.mail.SimpleMultiMailSender;
  */
 public class testSendMail
 {
-  public static void main1(String[] args)
+  public static void main(String[] args)
   {
     try
     {
-      SimpleMailSender sm = new SimpleMailSender("smtps.aruba.it", 465,
+      SimpleMailSender sm = new SimpleMailSender("smtp.gmail.com", 465,
          SimpleMailSender.SMTP_PROTOCOL_SSL, true);
-      sm.setAuth("xxx", "xxx");
+      sm.setAuth("ar19661@gmail.com", "abc23def");
       sm.setDebugMailSession(true);
-      sm.addRecipients("ndenisco@infomedica.it");
+      sm.addRecipients("nicoladenisco@gmail.com");
       sm.addBodyPart("Questa è una prova di testo semplice.");
       sm.addBodyPart("<html><body>Questa è una prova di testo html.</body></html>", "text/html; charset=UTF-8");
       sm.addBodyPart("<html><body>Questa è una prova di altro testo html.</body></html>", "text/html; charset=UTF-8");
       //sm.addBodyPart(new File("/tmp/error_log"));
       //sm.addBodyPart(new File("/tmp/logoCsGroup.png"));
-      sm.sendMail("Prova SimpleMailSender", "caleido@infomedica.it");
+      sm.sendMail("Prova SimpleMailSender", "ar19661@gmail.com");
     }
     catch(Exception e)
     {
@@ -110,7 +110,7 @@ public class testSendMail
     }
   }
 
-  public static void main(String[] args)
+  public static void main4(String[] args)
   {
     try
     {
