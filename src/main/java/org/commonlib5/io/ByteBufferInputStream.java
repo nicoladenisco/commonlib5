@@ -74,6 +74,17 @@ public class ByteBufferInputStream extends PushbackInputStream
   }
 
   /**
+   * Crea un nuovo buffer.
+   * @param blocking se vero il comportamento e' bloccante
+   * @param initialContent contenuto iniziale del buffer
+   */
+  public ByteBufferInputStream(boolean blocking, byte[] initialContent)
+  {
+    this(blocking);
+    addToBuffer(initialContent);
+  }
+
+  /**
    * This method returns the number of bytes available to be read from this
    * stream. The value returned will be equal to <code>count - pos</code>.
    *

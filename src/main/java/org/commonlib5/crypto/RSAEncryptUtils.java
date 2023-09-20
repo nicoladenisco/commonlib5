@@ -224,7 +224,8 @@ public class RSAEncryptUtils
   public static void encryptFile(File src, File dest, PublicKey key)
      throws Exception
   {
-    try (InputStream is = new FileInputStream(src); OutputStream os = new FileOutputStream(dest))
+    try(InputStream is = new FileInputStream(src);
+       OutputStream os = new FileOutputStream(dest))
     {
       encryptDecryptFile(is, os, key, Cipher.ENCRYPT_MODE);
     }
@@ -241,7 +242,8 @@ public class RSAEncryptUtils
   public static void decryptFile(File src, File dest, PrivateKey key)
      throws Exception
   {
-    try (InputStream is = new FileInputStream(src); OutputStream os = new FileOutputStream(dest))
+    try(InputStream is = new FileInputStream(src);
+       OutputStream os = new FileOutputStream(dest))
     {
       encryptDecryptFile(is, os, key, Cipher.DECRYPT_MODE);
     }
@@ -262,14 +264,15 @@ public class RSAEncryptUtils
   public static int encryptDecryptFile(InputStream is, OutputStream os, Key key, int cipherMode)
      throws Exception
   {
-    Cipher cipher = Cipher.getInstance(RSA_CHIPER);
     int numBlocks = 0;
+    Cipher cipher = Cipher.getInstance(RSA_CHIPER);
 
     // RSA encryption data size limitations are slightly less than the key modulus size,
     // depending on the actual padding scheme used (e.g. with 1024 bit (128 byte) RSA key,
     // the size limit is 117 bytes for PKCS#1 v 1.5 padding. (http://www.jensign.com/JavaScience/dotnet/RSAEncrypt/)
     byte[] buf = cipherMode == Cipher.ENCRYPT_MODE ? new byte[100] : new byte[128];
-    // init the Cipher
+
+    // init the Cipher object for Encryption...
     cipher.init(cipherMode, key);
 
     // start FileIO
