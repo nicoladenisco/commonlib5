@@ -896,11 +896,11 @@ public class StringOper
   {
     Origine = okStr(Origine);
 
-    if(Len >= Origine.length())
-      return Origine;
-
     if(Len < 0)
       Len = Origine.length() + Len;
+
+    if(Len >= Origine.length())
+      return Origine;
 
     return Origine.substring(Origine.length() - Len);
   }
@@ -977,6 +977,9 @@ public class StringOper
 
     if(Origine == null)
       return null;
+
+    if(Len < 0)
+      Len = Origine.length() + Len;
 
     if(Len >= Origine.length())
       return Origine;
