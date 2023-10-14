@@ -13,6 +13,10 @@
  */
 package org.commonlib5.xmlrpc;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -43,6 +47,11 @@ public class HashtableParser extends Hashtable
     return new MutableObject(StringOper.okStr(get(key)));
   }
 
+  public void getAsMutableString(String key, MutableObject obj)
+  {
+    obj.setValue(StringOper.okStr(get(key)));
+  }
+
   public String getAsStringNull(String key)
   {
     return StringOper.okStrNull(get(key));
@@ -52,6 +61,13 @@ public class HashtableParser extends Hashtable
   {
     String s = StringOper.okStrNull(get(key));
     return s == null ? null : new MutableObject(s);
+  }
+
+  public void getAsMutableStringNull(String key, MutableObject obj)
+  {
+    String s = StringOper.okStrNull(get(key));
+    if(s != null)
+      obj.setValue(s);
   }
 
   public int getAsInt(String key)
@@ -112,7 +128,7 @@ public class HashtableParser extends Hashtable
     if(rv == null)
       return defVal;
 
-    if(rv instanceof Number)
+    if(rv instanceof Boolean)
       return (Boolean) rv;
 
     return StringOper.checkTrueFalse(rv, defVal);
@@ -146,7 +162,26 @@ public class HashtableParser extends Hashtable
 
   public List getAsList(String key)
   {
-    return (List) get(key);
+    return getAsList(key, Collections.EMPTY_LIST);
+  }
+
+  public List getAsList(String key, List defVal)
+  {
+    Object rv = super.get(key);
+
+    if(rv == null)
+      return defVal;
+
+    if(rv instanceof List)
+      return (List) rv;
+
+    if(rv instanceof Object[])
+      return Arrays.asList((Object[]) rv);
+
+    if(rv instanceof Collection)
+      return new ArrayList((Collection) rv);
+
+    return defVal;
   }
 
   public String getAsStringByList(String key)
