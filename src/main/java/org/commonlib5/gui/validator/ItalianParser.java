@@ -18,11 +18,14 @@
 package org.commonlib5.gui.validator;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.commonlib5.utils.DateTime;
 import org.commonlib5.utils.StringOper;
 
 /**
@@ -51,6 +54,12 @@ public class ItalianParser implements ValidatorParserInterface
   public final Pattern patCompatFullItalian2 = Pattern.compile("^[0-9]{8} [0-9]{4}$");
   public final Pattern patMoreCompatFullItalian1 = Pattern.compile("^[0-9]{6} [0-9]{6}$");
   public final Pattern patMoreCompatFullItalian2 = Pattern.compile("^[0-9]{6} [0-9]{4}$");
+
+  public final Pattern patStringFullItalian1 = Pattern.compile("^([a-z|A-Z]+) ([0-9]{2}:[0-9]{2}:[0-9]{2})$");
+  public final Pattern patStringFullItalian2 = Pattern.compile("^([a-z|A-Z]+) ([0-9]{2}:[0-9]{2})$");
+  public final Pattern patStringCompatFullItalian1 = Pattern.compile("^([a-z|A-Z]+) ([0-9]{6})$");
+  public final Pattern patStringCompatFullItalian2 = Pattern.compile("^([a-z|A-Z]+) ([0-9]{4})$");
+
   public final Pattern patGiorni = Pattern.compile("^[+|-][0-9]+$");
   public final Pattern patSettimane = Pattern.compile("^[+|-][0-9]+s$");
   public final Pattern patMesi = Pattern.compile("^[+|-][0-9]+m$");
@@ -108,24 +117,39 @@ public class ItalianParser implements ValidatorParserInterface
   @Override
   public Date parseDate(String s, Date defVal)
   {
+    return parseDate(s, defVal, 0);
+  }
+
+  @Override
+  public Date parseDate(String s, Date defVal, int flags)
+  {
+    Date rv = parseDateInternal(s, defVal, flags);
+
+    if(flags == FLAG_ALWAIS_BEGIN_DAY)
+      return DateTime.mergeDataOra(rv, 0, 0, 0, 0);
+
+    if(flags == FLAG_ALWAIS_END_DAY)
+      return DateTime.mergeDataOra(rv, 23, 59, 59, 999);
+
+    return rv;
+  }
+
+  private Date parseDateInternal(String s, Date defVal, int flags)
+  {
     try
     {
       if((s = StringOper.okStrNull(s)) == null)
         return defVal;
 
-      if(s.equalsIgnoreCase("oggi") || s.equalsIgnoreCase("today")
-         || s.equalsIgnoreCase("adesso") || s.equalsIgnoreCase("now")
-         || s.equalsIgnoreCase("o") || s.equalsIgnoreCase("t")
-         || s.equalsIgnoreCase("s") || s.equalsIgnoreCase("n"))
-        return new Date();
+      if(StringOper.isEquNocaseAny(s, "oggi", "o", "today", "t"))
+        return adjust(flags, new Date());
 
-      if(s.equalsIgnoreCase("ieri") || s.equalsIgnoreCase("yesterday")
-         || s.equalsIgnoreCase("i") || s.equalsIgnoreCase("y"))
+      if(StringOper.isEquNocaseAny(s, "ieri", "i", "yesterday", "y"))
       {
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         cal.add(Calendar.DAY_OF_YEAR, -1);
-        return cal.getTime();
+        return adjust(flags, cal.getTime());
       }
 
       if(s.equalsIgnoreCase("domani") || s.equalsIgnoreCase("tomorrow")
@@ -134,7 +158,7 @@ public class ItalianParser implements ValidatorParserInterface
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         cal.add(Calendar.DAY_OF_YEAR, 1);
-        return cal.getTime();
+        return adjust(flags, cal.getTime());
       }
 
       if(patGiorni.matcher(s).matches())
@@ -143,7 +167,7 @@ public class ItalianParser implements ValidatorParserInterface
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         cal.add(Calendar.DAY_OF_YEAR, spiazzamento);
-        return cal.getTime();
+        return adjust(flags, cal.getTime());
       }
       if(patSettimane.matcher(s).matches())
       {
@@ -152,7 +176,7 @@ public class ItalianParser implements ValidatorParserInterface
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         cal.add(Calendar.WEEK_OF_YEAR, spiazzamento);
-        return cal.getTime();
+        return adjust(flags, cal.getTime());
       }
       if(patMesi.matcher(s).matches())
       {
@@ -161,7 +185,7 @@ public class ItalianParser implements ValidatorParserInterface
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         cal.add(Calendar.MONTH, spiazzamento);
-        return cal.getTime();
+        return adjust(flags, cal.getTime());
       }
       if(patAnni.matcher(s).matches())
       {
@@ -170,19 +194,19 @@ public class ItalianParser implements ValidatorParserInterface
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date());
         cal.add(Calendar.YEAR, spiazzamento);
-        return cal.getTime();
+        return adjust(flags, cal.getTime());
       }
 
       if(patItalian.matcher(s).matches())
-        return dfItalian.parse(s);
+        return adjust(flags, dfItalian.parse(s));
 
       if(patItalian1.matcher(s).matches())
       {
         String anno = StringOper.right(s, 2);
         if(StringOper.parse(anno, 0) < 50)
-          return dfItalian.parse(s.substring(0, 6) + "20" + anno);
+          return adjust(flags, dfItalian.parse(s.substring(0, 6) + "20" + anno));
         else
-          return dfItalian.parse(s.substring(0, 6) + "19" + anno);
+          return adjust(flags, dfItalian.parse(s.substring(0, 6) + "19" + anno));
       }
 
       if(patFullItalian.matcher(s).matches())
@@ -210,15 +234,15 @@ public class ItalianParser implements ValidatorParserInterface
       }
 
       if(patCompatItalian.matcher(s).matches())
-        return dfCompatItalian.parse(s);
+        return adjust(flags, dfCompatItalian.parse(s));
 
       if(patMoreCompatItalian.matcher(s).matches())
       {
         String anno = StringOper.right(s, 2);
         if(StringOper.parse(anno, 0) < 50)
-          return dfCompatItalian.parse(s.substring(0, 4) + "20" + anno);
+          return adjust(flags, dfCompatItalian.parse(s.substring(0, 4) + "20" + anno));
         else
-          return dfCompatItalian.parse(s.substring(0, 4) + "19" + anno);
+          return adjust(flags, dfCompatItalian.parse(s.substring(0, 4) + "19" + anno));
       }
 
       if(patCompatFullItalian1.matcher(s).matches())
@@ -237,6 +261,50 @@ public class ItalianParser implements ValidatorParserInterface
       {
         s = StringOper.left(s, 4) + "19" + StringOper.right(s, 7) + "00";
         return dfCompatFullItalian.parse(s);
+      }
+
+      {
+        Matcher m = patStringFullItalian1.matcher(s);
+        if(m.matches())
+        {
+          String giorno = m.group(1);
+          String ora = m.group(2);
+
+          return subparse1(giorno, ora, defVal);
+        }
+      }
+
+      {
+        Matcher m = patStringFullItalian2.matcher(s);
+        if(m.matches())
+        {
+          String giorno = m.group(1);
+          String ora = m.group(2) + ":00";
+
+          return subparse1(giorno, ora, defVal);
+        }
+      }
+
+      {
+        Matcher m = patStringCompatFullItalian1.matcher(s);
+        if(m.matches())
+        {
+          String giorno = m.group(1);
+          String ora = m.group(2);
+
+          return subparse2(giorno, ora, defVal);
+        }
+      }
+
+      {
+        Matcher m = patStringCompatFullItalian2.matcher(s);
+        if(m.matches())
+        {
+          String giorno = m.group(1);
+          String ora = m.group(2) + "00";
+
+          return subparse2(giorno, ora, defVal);
+        }
       }
 
       return defVal;
@@ -303,5 +371,61 @@ public class ItalianParser implements ValidatorParserInterface
     }
 
     return String.format("Il campo '%s' non contiene un valore valido.", fldName);
+  }
+
+  private Date adjust(int flags, Date date)
+  {
+    if(flags == FLAG_ROUND_BEGIN_DAY)
+      return DateTime.mergeDataOra(date, 0, 0, 0, 0);
+    if(flags == FLAG_ROUND_END_DAY)
+      return DateTime.mergeDataOra(date, 23, 59, 59, 999);
+
+    return date;
+  }
+
+  private Date subparse1(String s, String ora, Date defVal)
+     throws ParseException
+  {
+    String base;
+
+    if(StringOper.isEquNocaseAny(s, "oggi", "o", "today", "t"))
+    {
+      base = dfItalian.format(new Date());
+      return dfFullItalian.parse(base + " " + ora);
+    }
+
+    if(StringOper.isEquNocaseAny(s, "ieri", "i", "yesterday", "y"))
+    {
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.setTime(new Date());
+      cal.add(Calendar.DAY_OF_YEAR, -1);
+      base = dfItalian.format(cal.getTime());
+      return dfFullItalian.parse(base + " " + ora);
+    }
+
+    return defVal;
+  }
+
+  private Date subparse2(String s, String ora, Date defVal)
+     throws ParseException
+  {
+    String base;
+
+    if(StringOper.isEquNocaseAny(s, "oggi", "o", "today", "t"))
+    {
+      base = dfCompatItalian.format(new Date());
+      return dfCompatFullItalian.parse(base + " " + ora);
+    }
+
+    if(StringOper.isEquNocaseAny(s, "ieri", "i", "yesterday", "y"))
+    {
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.setTime(new Date());
+      cal.add(Calendar.DAY_OF_YEAR, -1);
+      base = dfCompatItalian.format(cal.getTime());
+      return dfCompatFullItalian.parse(base + " " + ora);
+    }
+
+    return defVal;
   }
 }

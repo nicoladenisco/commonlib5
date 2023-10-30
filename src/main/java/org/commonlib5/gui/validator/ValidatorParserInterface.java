@@ -27,6 +27,12 @@ import java.util.Date;
  */
 public interface ValidatorParserInterface
 {
+  public static final int FLAG_ROUND_DEAULT = 0;
+  public static final int FLAG_ROUND_BEGIN_DAY = 1;
+  public static final int FLAG_ROUND_END_DAY = 2;
+  public static final int FLAG_ALWAIS_BEGIN_DAY = 3;
+  public static final int FLAG_ALWAIS_END_DAY = 4;
+
   /**
    * Formatta la data.
    * @param d data da formattare
@@ -50,11 +56,21 @@ public interface ValidatorParserInterface
 
   /**
    * Interpreta la stringa e ritorna la data corrsipondente.
+   * Equivalente a parseDate(s, defval, FLAG_ROUND_DEAULT).
    * @param s stringa da interpretare
    * @param defVal valore di default se il parsing non è possibile
    * @return il valore interpretato oppure defVal
    */
   public Date parseDate(String s, Date defVal);
+
+  /**
+   * Interpreta la stringa e ritorna la data corrsipondente.
+   * @param s stringa da interpretare
+   * @param defVal valore di default se il parsing non è possibile
+   * @param flags una delle costanti FLAG_ROUND
+   * @return il valore interpretato oppure defVal
+   */
+  public Date parseDate(String s, Date defVal, int flags);
 
   /**
    * Interpreta la string e ritorna l'ora corrispondente.
