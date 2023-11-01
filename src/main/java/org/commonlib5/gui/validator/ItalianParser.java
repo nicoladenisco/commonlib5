@@ -61,6 +61,9 @@ public class ItalianParser implements ValidatorParserInterface
   public final Pattern patStringCompatFullItalian2 = Pattern.compile("^([a-z|A-Z]+) ([0-9]{4})$");
 
   public final Pattern patGiorni = Pattern.compile("^[+|-][0-9]+$");
+  public final Pattern patGiorni1 = Pattern.compile("^([+|-][0-9]+) ([0-9]{6})$");
+  public final Pattern patGiorni2 = Pattern.compile("^([+|-][0-9]+) ([0-9]{4})$");
+
   public final Pattern patSettimane = Pattern.compile("^[+|-][0-9]+s$");
   public final Pattern patMesi = Pattern.compile("^[+|-][0-9]+m$");
   public final Pattern patAnni = Pattern.compile("^[+|-][0-9]+a$");
@@ -304,6 +307,34 @@ public class ItalianParser implements ValidatorParserInterface
           String ora = m.group(2) + "00";
 
           return subparse2(giorno, ora, defVal);
+        }
+      }
+
+      {
+        Matcher m = patGiorni1.matcher(s);
+        if(m.matches())
+        {
+          int spiazzamento = StringOper.parse(m.group(1), 0);
+          String ora = m.group(2);
+          GregorianCalendar cal = new GregorianCalendar();
+          cal.setTime(new Date());
+          cal.add(Calendar.DAY_OF_YEAR, spiazzamento);
+          String tmp = dfCompatItalian.format(cal.getTime()) + " " + ora;
+          return dfCompatFullItalian.parse(tmp);
+        }
+      }
+
+      {
+        Matcher m = patGiorni2.matcher(s);
+        if(m.matches())
+        {
+          int spiazzamento = StringOper.parse(m.group(1), 0);
+          String ora = m.group(2) + "00";
+          GregorianCalendar cal = new GregorianCalendar();
+          cal.setTime(new Date());
+          cal.add(Calendar.DAY_OF_YEAR, spiazzamento);
+          String tmp = dfCompatItalian.format(cal.getTime()) + " " + ora;
+          return dfCompatFullItalian.parse(tmp);
         }
       }
 

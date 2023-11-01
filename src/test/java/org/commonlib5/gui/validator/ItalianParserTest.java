@@ -414,4 +414,76 @@ public class ItalianParserTest
       assertEquals(ed, result);
     }
   }
+
+  @Test
+  public void testParseDate10()
+  {
+    System.out.println("parseDate10");
+    String s = "-30 143015";
+    Date expResult = DateTime.mergeDataOra(DateTime.dataSpiazzata(null, -30), 14, 30, 15);
+    Date defVal = null;
+    Date bd = DateTime.mergeDataOra(expResult, 0, 0, 0, 0);
+    Date ed = DateTime.mergeDataOra(expResult, 23, 59, 59, 999);
+    ItalianParser instance = new ItalianParser();
+
+    {
+      int flags = ValidatorParserInterface.FLAG_ROUND_BEGIN_DAY;
+      Date result = instance.parseDate(s, defVal, flags);
+      assertEquals(expResult, result);
+    }
+
+    {
+      int flags = ValidatorParserInterface.FLAG_ROUND_END_DAY;
+      Date result = instance.parseDate(s, defVal, flags);
+      assertEquals(expResult, result);
+    }
+
+    {
+      int flags = ValidatorParserInterface.FLAG_ALWAIS_BEGIN_DAY;
+      Date result = instance.parseDate(s, defVal, flags);
+      assertEquals(bd, result);
+    }
+
+    {
+      int flags = ValidatorParserInterface.FLAG_ALWAIS_END_DAY;
+      Date result = instance.parseDate(s, defVal, flags);
+      assertEquals(ed, result);
+    }
+  }
+
+  @Test
+  public void testParseDate11()
+  {
+    System.out.println("parseDate11");
+    String s = "-30 1430";
+    Date expResult = DateTime.mergeDataOra(DateTime.dataSpiazzata(null, -30), 14, 30, 0);
+    Date defVal = null;
+    Date bd = DateTime.mergeDataOra(expResult, 0, 0, 0, 0);
+    Date ed = DateTime.mergeDataOra(expResult, 23, 59, 59, 999);
+    ItalianParser instance = new ItalianParser();
+
+    {
+      int flags = ValidatorParserInterface.FLAG_ROUND_BEGIN_DAY;
+      Date result = instance.parseDate(s, defVal, flags);
+      assertEquals(expResult, result);
+    }
+
+    {
+      int flags = ValidatorParserInterface.FLAG_ROUND_END_DAY;
+      Date result = instance.parseDate(s, defVal, flags);
+      assertEquals(expResult, result);
+    }
+
+    {
+      int flags = ValidatorParserInterface.FLAG_ALWAIS_BEGIN_DAY;
+      Date result = instance.parseDate(s, defVal, flags);
+      assertEquals(bd, result);
+    }
+
+    {
+      int flags = ValidatorParserInterface.FLAG_ALWAIS_END_DAY;
+      Date result = instance.parseDate(s, defVal, flags);
+      assertEquals(ed, result);
+    }
+  }
 }

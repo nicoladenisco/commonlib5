@@ -2734,4 +2734,87 @@ public class StringOper
 
     return rv.toString();
   }
+
+  /**
+   * Split di una linea CSV.
+   * Riconosce automaticamente campi racchiusi da doppi apici:<br>
+   * <b>M,"1","A/S","Amp/Sulbactam","16/8",N , "I","I" , , , , , , , , , , , , , , , , ,N</b>
+   * @param linea linea da splittare
+   * @return array di campi equivalenti
+   * @throws Exception
+   */
+  public static String[] splitCampiCSV(String linea)
+     throws Exception
+  {
+    char[] arChar = linea.toCharArray();
+    StringBuilder sb = new StringBuilder();
+    ArrayList<String> rv = new ArrayList<>();
+
+    int stato = 0;
+    for(int i = 0; i < arChar.length; i++)
+    {
+      int c = arChar[i];
+
+      switch(stato)
+      {
+        case 0: // quiete
+          if(c == '\"')
+          {
+            stato = 1;
+          }
+          else if(c == ' ')
+          {
+            break;
+          }
+          else if(c == ',')
+          {
+            rv.add(sb.toString().trim());
+            sb = new StringBuilder();
+            stato = 0;
+          }
+          else
+          {
+            stato = 2;
+            sb.append((char) c);
+          }
+          break;
+        case 1: // dentro apici
+          if(c == '\"')
+          {
+            stato = 3;
+          }
+          else
+          {
+            sb.append((char) c);
+          }
+          break;
+        case 2: // dentro no apici
+          if(c == ',')
+          {
+            rv.add(sb.toString().trim());
+            sb = new StringBuilder();
+            stato = 0;
+          }
+          else
+          {
+            sb.append((char) c);
+          }
+          break;
+        case 3: // aspetto virgola dopo apici
+          if(c == ',')
+          {
+            rv.add(sb.toString().trim());
+            sb = new StringBuilder();
+            stato = 0;
+          }
+          break;
+      }
+    }
+
+    // recupero del residuo
+    if(sb.length() > 0)
+      rv.add(sb.toString().trim());
+
+    return toArray(rv);
+  }
 }
