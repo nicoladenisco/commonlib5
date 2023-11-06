@@ -48,6 +48,13 @@ public class HashtableRpc extends Hashtable<String, Object>
     if(value == null)
       return remove(key);
 
+    // array vengono trasformati in liste
+    if(value.getClass().isArray())
+    {
+      List<Object> lsObj = Arrays.asList((Object[]) value);
+      return super.put(key, new Vector(lsObj));
+    }
+
     // caso speciale container wrappati in hashtable e vector
     if(value instanceof Map)
       return put(key, (Map) value);

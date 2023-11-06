@@ -18,8 +18,10 @@
 package org.commonlib5.xmlrpc;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Map;
 import org.commonlib5.utils.DateTime;
 import org.commonlib5.utils.StringOper;
 
@@ -39,8 +41,48 @@ public class HashtableRpcString extends Hashtable<String, String>
     super(64);
   }
 
+  public Object put(String key, Object value)
+  {
+    if(value == null)
+      return remove(key);
+
+    if(value instanceof Collection || value.getClass().isArray())
+      throw new IllegalArgumentException("Collections or Arrays are proibited: use HashtableRpc instead.");
+
+    // valori tipi base più pratici in forma di stringa
+    if(value instanceof String)
+      value = StringOper.okStrNull(value);
+    else if(value instanceof java.sql.Date)
+      value = DateTime.formatIso((java.sql.Date) value, "");
+    else if(value instanceof java.sql.Timestamp)
+      value = DateTime.formatIsoFull((java.sql.Timestamp) value, "");
+    else if(value instanceof java.util.Date)
+      value = DateTime.formatIsoFull((java.util.Date) value, "");
+
+    if(value == null)
+      return remove(key);
+
+    return super.put(key, value.toString());
+  }
+
   @Override
-  public synchronized String put(String key, String value)
+  public void putAll(Map t)
+  {
+    for(Object key : t.keySet())
+    {
+      Object val = t.get(key);
+      this.put(key.toString(), val);
+    }
+  }
+
+  public HashtableRpcString append(String key, Object value)
+  {
+    put(key, value);
+    return this;
+  }
+
+  @Override
+  public String put(String key, String value)
   {
     if((value = StringOper.okStrNull(value)) == null)
       return remove(key);
@@ -48,40 +90,40 @@ public class HashtableRpcString extends Hashtable<String, String>
     return super.put(key, value);
   }
 
-  public synchronized String put(String key, int value)
+  public String put(String key, int value)
   {
     return put(key, Integer.toString(value));
   }
 
-  public synchronized String put(String key, double value)
+  public String put(String key, double value)
   {
     return put(key, Double.toString(value));
   }
 
-  public synchronized String put(String key, boolean value)
+  public String put(String key, boolean value)
   {
     return put(key, value ? "1" : "0");
   }
 
-  public synchronized String put(String key, Date value)
+  public String put(String key, Date value)
      throws Exception
   {
     return put(key, DateTime.formatIsoFull(value));
   }
 
-  public synchronized String put(String key, Timestamp value)
+  public String put(String key, Timestamp value)
      throws Exception
   {
     return put(key, DateTime.formatIsoFull(value));
   }
 
-  public synchronized String putDateOnly(String key, Date value)
+  public String putDateOnly(String key, Date value)
      throws Exception
   {
     return put(key, DateTime.formatIso(value));
   }
 
-  public synchronized String putTimeOnly(String key, Date value)
+  public String putTimeOnly(String key, Date value)
      throws Exception
   {
     return put(key, StringOper.right(DateTime.formatIsoFull(value), 8));
