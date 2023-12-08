@@ -16,11 +16,14 @@ package org.commonlib5.utils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import org.commonlib5.io.ByteBufferOutputStream;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -32,6 +35,45 @@ public class JsonHelper implements Closeable
 {
   protected final URI uri;
   protected final ArrayMap<String, String> headers = new ArrayMap<>();
+
+  // Fino alla JDK 8 non era previsto l'http method PATCH. L'errore che si presenta è:
+  // java.net.ProtocolException: Invalid HTTP method: PATCH
+  // La seguente soluzione, precedentemente adottata, non veniva accettata dall'endpoint invocato:
+  // HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+  // conn.setRequestMethod("POST");
+  // conn.setRequestProperty ("X-HTTP-Method-Override", "PATCH");
+  // (vedi porzione commentata nei metodi genericRequest)
+  // Per ovviare al problema forziamo tramite reflection i metodi http consentiti
+  static
+  {
+    try
+    {
+      if(OsIdent.getJavaVersionNumber() <= 1.8f)
+      {
+        Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
+        methodsField.setAccessible(true);
+        // get the methods field modifiers
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        // bypass the "private" modifier
+        modifiersField.setAccessible(true);
+
+        // remove the "final" modifier
+        modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+
+        /* valid HTTP methods */
+        String[] methods =
+        {
+          "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE", "PATCH"
+        };
+        // set the new methods - including patch
+        methodsField.set(null, methods);
+      }
+    }
+    catch(IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex)
+    {
+      throw new RuntimeException(ex);
+    }
+  }
 
   public JsonHelper(URI uri)
   {
@@ -63,14 +105,14 @@ public class JsonHelper implements Closeable
      throws Exception
   {
     Pair<Integer, String> rv = postRequest(uri, request);
-    return new Pair<>(rv.first, new JSONObject(rv.second));
+    return wrappedJsonResponse(rv);
   }
 
   public Pair<Integer, JSONObject> getAsJson()
      throws Exception
   {
     Pair<Integer, String> rv = getRequest(uri);
-    return new Pair<>(rv.first, new JSONObject(rv.second));
+    return wrappedJsonResponse(rv);
   }
 
   public Pair<Integer, String> getAsText()
@@ -101,7 +143,7 @@ public class JsonHelper implements Closeable
      throws Exception
   {
     Pair<Integer, String> rv = putRequest(uri, request);
-    return new Pair<>(rv.first, new JSONObject(rv.second));
+    return wrappedJsonResponse(rv);
   }
 
   public Pair<Integer, String> patchAsText(JSONObject request)
@@ -114,20 +156,40 @@ public class JsonHelper implements Closeable
      throws Exception
   {
     Pair<Integer, String> rv = patchRequest(uri, request);
-    return new Pair<>(rv.first, new JSONObject(rv.second));
+    return wrappedJsonResponse(rv);
+  }
+
+  public Pair<Integer, JSONObject> patchAsJson(JSONArray request)
+     throws Exception
+  {
+    Pair<Integer, String> rv = patchRequest(uri, request);
+    return wrappedJsonResponse(rv);
   }
 
   public Pair<Integer, JSONObject> deleteAsJson()
      throws Exception
   {
     Pair<Integer, String> rv = deleteRequest(uri);
-    return new Pair<>(rv.first, new JSONObject(rv.second));
+    return wrappedJsonResponse(rv);
+  }
+
+  private Pair<Integer, JSONObject> wrappedJsonResponse(Pair<Integer, String> rv)
+  {
+    try
+    {
+      return new Pair<>(rv.first, new JSONObject(rv.second));
+    }
+    catch(Exception e)
+    {
+      // Gestiamo eventuale response corrotta che non permetterebbe la costruzione del JSONObject
+      return new Pair<>(rv.first, null);
+    }
   }
 
   protected Pair<Integer, String> genericRequest(URI uri, String method)
      throws Exception
   {
-    URL url = uri.toURL();
+    URL url = buildConnection(uri);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
     try
@@ -147,18 +209,74 @@ public class JsonHelper implements Closeable
     }
   }
 
+  public URL buildConnection(URI uri1)
+     throws Exception
+  {
+    return new URL(uri1.toURL(), "", new sun.net.www.protocol.https.Handler());
+  }
+
   protected Pair<Integer, String> genericRequest(URI uri, String method, JSONObject req)
      throws Exception
   {
-    URL url = uri.toURL();
+    URL url = buildConnection(uri);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
     try
     {
       conn.setDoOutput(true);
-      conn.setRequestMethod(method);
       conn.setRequestProperty("Content-Type", "application/json");
       conn.setRequestProperty("Accept", "application/json");
+
+//      if("PATCH".equals(method))
+//      {
+//        // Per l'http method PATCH siamo obbligati a fare questo.
+//        // Andare qui per i dettagli: https://medium.com/javarevisited/invalid-http-method-patch-e12ba62ddd9f
+//        conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+//        conn.setRequestMethod("POST");
+//      }
+//      else
+      conn.setRequestMethod(method);
+
+      headers.forEach((k, v) -> conn.setRequestProperty(k, v));
+
+      String input = req.toString();
+      byte[] byteInput = input.getBytes("UTF-8");
+
+      conn.setFixedLengthStreamingMode(byteInput.length);
+      conn.getOutputStream().write(byteInput);
+
+      ByteBufferOutputStream bos = new ByteBufferOutputStream();
+      CommonFileUtils.copyStream(conn.getInputStream(), bos);
+      return new Pair<>(conn.getResponseCode(), bos.toString("UTF-8"));
+    }
+    finally
+    {
+      conn.disconnect();
+    }
+  }
+
+  protected Pair<Integer, String> genericRequest(URI uri, String method, JSONArray req)
+     throws Exception
+  {
+    URL url = buildConnection(uri);
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+    try
+    {
+      conn.setDoOutput(true);
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Accept", "application/json");
+
+//      if("PATCH".equals(method))
+//      {
+//        // siamo obbligati a fare questo per il method PATCH.
+//        // Leggere il link per i dettagli: https://medium.com/javarevisited/invalid-http-method-patch-e12ba62ddd9f
+//        conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+//        conn.setRequestMethod("POST");
+//      }
+//      else
+      conn.setRequestMethod(method);
+
       headers.forEach((k, v) -> conn.setRequestProperty(k, v));
 
       String input = req.toString();
@@ -202,6 +320,12 @@ public class JsonHelper implements Closeable
   }
 
   protected Pair<Integer, String> patchRequest(URI uri, JSONObject req)
+     throws Exception
+  {
+    return genericRequest(uri, "PATCH", req);
+  }
+
+  protected Pair<Integer, String> patchRequest(URI uri, JSONArray req)
      throws Exception
   {
     return genericRequest(uri, "PATCH", req);

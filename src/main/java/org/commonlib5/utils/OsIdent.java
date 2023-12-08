@@ -22,9 +22,11 @@ public class OsIdent
   public static final int OS_WINDOWS = 3;
   public static final int OS_SOLARIS = 4;
   public static final int OS_FREEBSD = 5;
+  public static final int OS_UNKNOW = 6;
   //
   private static int osType = OS_UNDEFINED;
   private static boolean vm64bit = false;
+  private static String javaVersion;
 
   /**
    * Idendifica il sistema operativo ospite.
@@ -46,6 +48,10 @@ public class OsIdent
         osType = OS_SOLARIS;
       else if(os.contains("freebsd"))
         osType = OS_FREEBSD;
+      else
+        osType = OS_UNKNOW;
+
+      javaVersion = System.getProperty("java.version");
 
       // verifica per architetture a 64 bit
       vm64bit = System.getProperty("sun.arch.data.model").equals("64");
@@ -363,5 +369,43 @@ public class OsIdent
 
     s += vm64bit ? " 64bit" : " 32bit";
     return s;
+  }
+
+  public static String getJavaVersion()
+  {
+    checkOStype();
+    return javaVersion;
+  }
+
+  public static float getJavaVersionNumber()
+  {
+    checkOStype();
+
+    int pos;
+    if(javaVersion.startsWith("1.") && (pos = javaVersion.indexOf('.', 2)) != -1)
+      return Float.parseFloat(javaVersion.substring(0, pos));
+
+    if((pos = javaVersion.indexOf('.')) != -1)
+      return Float.parseFloat(javaVersion.substring(0, pos));
+
+    return Float.parseFloat(javaVersion);
+  }
+
+  public static boolean isJava8()
+  {
+    checkOStype();
+    return javaVersion.startsWith("1.8.");
+  }
+
+  public static boolean isJava11()
+  {
+    checkOStype();
+    return javaVersion.startsWith("11.");
+  }
+
+  public static boolean isJava17()
+  {
+    checkOStype();
+    return javaVersion.startsWith("17.");
   }
 }
