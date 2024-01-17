@@ -3,6 +3,7 @@ package org.commonlib5.utils;
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.commonlib5.lambda.FunctionTrowException;
@@ -616,10 +617,10 @@ public class StringOper
   }
 
   /**
-   * Verifica se la stringa contiene i tokens.
-   * @param vToken array di token
-   * @param strTest stringa per il test di contenimento
-   * @return numero di token contenuti in strTest
+   * Verifica se la stringa è contenuta nell'array di tokens.
+   * @param vToken array di stringhe da testare
+   * @param strTest stringa contenuta all'interno delle stringhe
+   * @return numero di stringhe contenenti strTest
    */
   public static int testTokens(List<String> vToken, String strTest)
   {
@@ -635,10 +636,10 @@ public class StringOper
   }
 
   /**
-   * Verifica se la stringa contiene i tokens.
-   * @param vToken array di token
-   * @param strTest stringa per il test di contenimento
-   * @return numero di token contenuti in strTest
+   * Verifica se la stringa è contenuta nell'array di tokens.
+   * @param vToken array di stringhe da testare
+   * @param strTest stringa contenuta all'interno delle stringhe
+   * @return numero di stringhe contenenti strTest
    */
   public static int testTokens(String[] vToken, String strTest)
   {
@@ -1417,6 +1418,51 @@ public class StringOper
    * @param separator carattere separatore fra le stringhe
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
+   * @throws java.lang.Exception
+   */
+  public static <T> String joinNotNull(T[] arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
+     throws Exception
+  {
+    if(arStrings == null || arStrings.length == 0)
+      return "";
+
+    int i = 0;
+    StringBuilder rv = new StringBuilder(512);
+
+    for(T obj : arStrings)
+    {
+      String val = fn.apply(obj);
+
+      if(val == null)
+        continue;
+
+      val = val.trim();
+      if(val.isEmpty())
+        continue;
+
+      if(i++ > 0)
+        rv.append(separator);
+
+      if(delimiter == null)
+        rv.append(val);
+      else
+        rv.append(delimiter).append(val).append(delimiter);
+    }
+
+    return rv.toString();
+  }
+
+  /**
+   * Fonde un array di stringhe in una unica stringa
+   * utilizzando il separatore e' il delimitatore specificato.
+   * Specifico per funzione Lambda di estrazione del valore.
+   * Se la funzione ritorna null o stringa vuota il valore viene ignorato.
+   * @param <T> tipo di oggetto generico
+   * @param arStrings array oggetti da iterare
+   * @param fn funzione che ritorna il valore per ogni oggetto
+   * @param separator carattere separatore fra le stringhe
+   * @param delimiter delimitatore di ogni stringa (può essere null)
+   * @return
    */
   public static <T> String join2NotNull(Collection<T> arStrings, Function<T, String> fn, String separator, String delimiter)
   {
@@ -1750,6 +1796,7 @@ public class StringOper
    * array di interi. Le stringhe non convertibili
    * diventano defVal nell'indice corrispondente dell'array
    * ritornato.
+   * Viene garantita la corrispondenza 1:1 fra sArr e il ritorno.
    * @param sArr array da convertire
    * @param defVal valore di default per stringhe non convertibili
    * @return array di interi corrispondente
@@ -1757,9 +1804,93 @@ public class StringOper
   public static int[] strarr2intarr(String[] sArr, int defVal)
   {
     int[] rv = new int[sArr.length];
+
+    if(rv.length == 0)
+      return rv;
+
     for(int i = 0; i < rv.length; i++)
       rv[i] = parse(sArr[i], defVal);
+
     return rv;
+  }
+
+  /**
+   * Converte un array di stringhe nel corrispettivo array di interi.
+   * Le stringhe non convertibili diventano defVal nell'indice corrispondente dell'array
+   * ritornato.
+   * I valori sono sottoposti all'approvazione di una funzione di convalida.
+   * Non è garantita la corrispondenza fra sArr e il ritorno.
+   * Il ritorno è ordinato in ordine crescente.
+   * @param sArr array da convertire
+   * @param defVal valore di default per stringhe non convertibili
+   * @param fun funzione di convalida del valore (può essere null)
+   * @return array di interi corrispondente
+   */
+  public static int[] strarr2intarr(String[] sArr, int defVal, Predicate<Integer> fun)
+  {
+    int j = 0;
+    int[] rv = new int[sArr.length];
+
+    if(rv.length == 0)
+      return rv;
+
+    for(int i = 0; i < rv.length; i++)
+    {
+      int val = parse(sArr[i], defVal);
+      if(fun == null || fun.test(val))
+        rv[j++] = val;
+    }
+
+    int[] rrv = Arrays.copyOf(rv, j);
+    if(rrv.length > 1)
+      Arrays.sort(rrv);
+
+    return rrv;
+  }
+
+  /**
+   * Converte un array di stringhe nel corrispettivo array di interi.
+   * Le stringhe non convertibili diventano defVal nell'indice corrispondente dell'array
+   * ritornato.
+   * I valori sono sottoposti all'approvazione di una funzione di convalida.
+   * Non è garantita la corrispondenza fra sArr e il ritorno.
+   * Il ritorno è ordinato in ordine crescente e senza valori duplicati.
+   * @param sArr array da convertire
+   * @param defVal valore di default per stringhe non convertibili
+   * @param fun funzione di convalida del valore (può essere null)
+   * @return array di interi corrispondente
+   */
+  public static int[] strarr2intarrUnique(String[] sArr, int defVal, Predicate<Integer> fun)
+  {
+    int j = 0;
+    int[] rv = new int[sArr.length];
+
+    if(rv.length == 0)
+      return rv;
+
+    for(int i = 0; i < rv.length; i++)
+    {
+      int val = parse(sArr[i], defVal);
+      if(fun == null || fun.test(val))
+        if(j == 0 || !containsInt(rv, val, j))
+          rv[j++] = val;
+    }
+
+    int[] rrv = Arrays.copyOf(rv, j);
+    if(rrv.length > 1)
+      Arrays.sort(rrv);
+
+    return rrv;
+  }
+
+  public static boolean containsInt(int[] array, int val, int len)
+  {
+    for(int i = 0; i < len; i++)
+    {
+      if(array[i] == val)
+        return true;
+    }
+    return false;
   }
 
   /**
