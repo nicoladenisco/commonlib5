@@ -214,43 +214,41 @@ public class RSAEncryptUtils
   }
 
   /**
-   * Encrypt file using 1024 RSA encryption.
+   * Encrypt file using RSA encryption.
    *
    * @param src Source file
    * @param dest Destination file
    * @param key The key. For encryption this is the Private Key and for decryption this is the public key
    * @throws Exception
    */
-  public static void encryptFile(File src, File dest, PublicKey key)
+  public static void encryptFile(File src, File dest, Key key)
      throws Exception
   {
-    try(InputStream is = new FileInputStream(src);
-       OutputStream os = new FileOutputStream(dest))
+    try (InputStream is = new FileInputStream(src); OutputStream os = new FileOutputStream(dest))
     {
       encryptDecryptFile(is, os, key, Cipher.ENCRYPT_MODE);
     }
   }
 
   /**
-   * Decrypt file using 1024 RSA encryption.
+   * Decrypt file using RSA encryption.
    *
    * @param src Source file
    * @param dest Destination file
    * @param key The key. For encryption this is the Private Key and for decryption this is the public key
    * @throws Exception
    */
-  public static void decryptFile(File src, File dest, PrivateKey key)
+  public static void decryptFile(File src, File dest, Key key)
      throws Exception
   {
-    try(InputStream is = new FileInputStream(src);
-       OutputStream os = new FileOutputStream(dest))
+    try (InputStream is = new FileInputStream(src); OutputStream os = new FileOutputStream(dest))
     {
       encryptDecryptFile(is, os, key, Cipher.DECRYPT_MODE);
     }
   }
 
   /**
-   * Encrypt and Decrypt stream using 1024 RSA encryption.
+   * Encrypt and Decrypt stream using RSA encryption.
    * Vengono letti blocchi dallo stream compatibili con la chiave
    * ed effettuata l'operazione su ogni blocco letto.
    *
@@ -265,17 +263,10 @@ public class RSAEncryptUtils
      throws Exception
   {
     int numBlocks = 0;
-    Cipher cipher = Cipher.getInstance(RSA_CHIPER);
-
-    // RSA encryption data size limitations are slightly less than the key modulus size,
-    // depending on the actual padding scheme used (e.g. with 1024 bit (128 byte) RSA key,
-    // the size limit is 117 bytes for PKCS#1 v 1.5 padding. (http://www.jensign.com/JavaScience/dotnet/RSAEncrypt/)
-    byte[] buf = cipherMode == Cipher.ENCRYPT_MODE ? new byte[100] : new byte[128];
-
-    // init the Cipher object for Encryption...
+    Cipher cipher = Cipher.getInstance(RSA_CHIPER, BOUNCY_CASTLE);
     cipher.init(cipherMode, key);
+    byte[] buf = new byte[cipher.getBlockSize()];
 
-    // start FileIO
     int nb;
     while((nb = is.read(buf)) > 0)
     {

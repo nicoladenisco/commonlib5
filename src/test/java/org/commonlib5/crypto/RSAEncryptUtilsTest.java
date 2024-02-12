@@ -20,7 +20,9 @@ package org.commonlib5.crypto;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.security.Key;
 import java.security.KeyPair;
 import javax.crypto.Cipher;
 import org.commonlib5.utils.CommonFileUtils;
@@ -92,11 +94,40 @@ public class RSAEncryptUtilsTest
   }
 
   @Test
+  public void testEncryptDecriptString2()
+     throws Exception
+  {
+    System.out.println("testEncryptDecriptString2");
+
+    String s = "testo per il test";
+    KeyPair kp = RSAEncryptUtils.generateKey();
+    String encrypted = RSAEncryptUtils.encrypt(s, kp.getPrivate());
+    String decrypted = RSAEncryptUtils.decrypt(encrypted, kp.getPublic());
+
+    assertEquals(s, decrypted);
+  }
+
+  @Test
   public void testEncryptDecryptFile()
      throws Exception
   {
     System.out.println("testEncryptDecryptFile");
     KeyPair kp = RSAEncryptUtils.generateKey();
+    testEDOnFile(kp.getPublic(), kp.getPrivate());
+  }
+
+  @Test
+  public void testEncryptDecryptFileInvert()
+     throws Exception
+  {
+    System.out.println("testEncryptDecryptFileInvert");
+    KeyPair kp = RSAEncryptUtils.generateKey();
+    testEDOnFile(kp.getPrivate(), kp.getPublic());
+  }
+
+  protected void testEDOnFile(Key encrypt, Key decript)
+     throws Exception
+  {
     File __inputFile = File.createTempFile("__inputFile", ".bin");
     File encryptFile = File.createTempFile("encryptFile", ".bin");
     File decryptFile = File.createTempFile("decryptFile", ".bin");
@@ -105,13 +136,13 @@ public class RSAEncryptUtilsTest
 
     try (FileInputStream is = new FileInputStream(__inputFile); FileOutputStream os = new FileOutputStream(encryptFile))
     {
-      int result = RSAEncryptUtils.encryptDecryptFile(is, os, kp.getPublic(), Cipher.ENCRYPT_MODE);
+      int result = RSAEncryptUtils.encryptDecryptFile(is, os, encrypt, Cipher.ENCRYPT_MODE);
       System.out.println("Generati " + result + " blocchi.");
     }
 
     try (FileInputStream is = new FileInputStream(encryptFile); FileOutputStream os = new FileOutputStream(decryptFile))
     {
-      int result = RSAEncryptUtils.encryptDecryptFile(is, os, kp.getPrivate(), Cipher.DECRYPT_MODE);
+      int result = RSAEncryptUtils.encryptDecryptFile(is, os, decript, Cipher.DECRYPT_MODE);
       System.out.println("Generati " + result + " blocchi.");
     }
 
@@ -131,5 +162,61 @@ public class RSAEncryptUtilsTest
     {
       CommonFileUtils.copyStream(is, os, numBytes);
     }
+  }
+
+  @Test
+  public void testEncryptDecriptStringFromFileP12()
+     throws Exception
+  {
+    System.out.println("testEncryptDecriptStringFromFileP12");
+
+    KeyPair kp = loadP12keys();
+    String s = "testo per il test";
+    String encrypted = RSAEncryptUtils.encrypt(s, kp.getPublic());
+    String decrypted = RSAEncryptUtils.decrypt(encrypted, kp.getPrivate());
+
+    assertEquals(s, decrypted);
+  }
+
+  @Test
+  public void testEncryptDecriptStringInvertFromFileP12()
+     throws Exception
+  {
+    System.out.println("testEncryptDecriptStringInvertFromFileP12");
+
+    KeyPair kp = loadP12keys();
+    String s = "testo per il test";
+    String encrypted = RSAEncryptUtils.encrypt(s, kp.getPrivate());
+    String decrypted = RSAEncryptUtils.decrypt(encrypted, kp.getPublic());
+
+    assertEquals(s, decrypted);
+  }
+
+  protected KeyPair loadP12keys()
+     throws Exception
+  {
+    ClassLoader cl = RSAEncryptUtilsTest.class.getClassLoader();
+    try (InputStream is = cl.getResourceAsStream("HL7.p12"))
+    {
+      return KeyUtils.getKeyPairP12(is, null, "root".toCharArray());
+    }
+  }
+
+  @Test
+  public void testEncryptDecryptFileFromFileP12()
+     throws Exception
+  {
+    System.out.println("testEncryptDecryptFileFromFileP12");
+    KeyPair kp = loadP12keys();
+    testEDOnFile(kp.getPublic(), kp.getPrivate());
+  }
+
+  @Test
+  public void testEncryptDecryptFileInvertFromFileP12()
+     throws Exception
+  {
+    System.out.println("testEncryptDecryptFileInvertFromFileP12");
+    KeyPair kp = loadP12keys();
+    testEDOnFile(kp.getPrivate(), kp.getPublic());
   }
 }

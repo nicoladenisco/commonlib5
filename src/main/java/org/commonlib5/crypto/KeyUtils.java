@@ -18,10 +18,17 @@
 package org.commonlib5.crypto;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.PublicKey;
 import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -85,7 +92,7 @@ public class KeyUtils
   public static void writeRSAPrivateKeyPEM(File toWrite, RSAPrivateKey key)
      throws IOException
   {
-    try ( PemWriter pw = new PemWriter(new FileWriter(toWrite)))
+    try (PemWriter pw = new PemWriter(new FileWriter(toWrite)))
     {
       pw.writeObject(new PemObject("PRIVATE_KEY", key.getEncoded()));
     }
@@ -94,9 +101,35 @@ public class KeyUtils
   public static void writeRSAPublicKeyPEM(File toWrite, RSAPublicKey key)
      throws IOException
   {
-    try ( PemWriter pw = new PemWriter(new FileWriter(toWrite)))
+    try (PemWriter pw = new PemWriter(new FileWriter(toWrite)))
     {
       pw.writeObject(new PemObject("PUBLIC_KEY", key.getEncoded()));
     }
+  }
+
+  public static KeyPair getKeyPairP12(File kstore, String alias, char[] password)
+     throws Exception
+  {
+    try (FileInputStream is = new FileInputStream(kstore))
+    {
+      return getKeyPairP12(is, alias, password);
+    }
+  }
+
+  public static KeyPair getKeyPairP12(InputStream is, String alias, char[] password)
+     throws Exception
+  {
+    KeyStore store = KeyStore.getInstance("PKCS12", "BC");
+    store.load(is, password);
+
+    // se non specificato recupera il primo alias del keystore
+    if(alias == null)
+      alias = store.aliases().nextElement();
+
+    RSAPrivateCrtKey key = (RSAPrivateCrtKey) store.getKey(alias, password);
+    Certificate cert = store.getCertificate(alias);
+    PublicKey publicKeyCert = cert.getPublicKey();
+
+    return new KeyPair(publicKeyCert, key);
   }
 }
