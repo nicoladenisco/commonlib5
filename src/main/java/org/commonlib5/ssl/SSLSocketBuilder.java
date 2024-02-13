@@ -57,7 +57,7 @@ public class SSLSocketBuilder
      throws KeyStoreException, FileNotFoundException, IOException,
      NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyManagementException
   {
-      initFactory(info);
+    initFactory(info);
   }
 
   /**
@@ -77,9 +77,15 @@ public class SSLSocketBuilder
   {
     // First initialize the key and trust material
     KeyStore ksKeys = KeyStore.getInstance(info.keyStoreType);
-    ksKeys.load(new FileInputStream(info.keyStore), info.keyStorePassword.toCharArray());
+    try (FileInputStream is = new FileInputStream(info.keyStore))
+    {
+      ksKeys.load(is, info.keyStorePassword.toCharArray());
+    }
     KeyStore ksTrust = KeyStore.getInstance(info.trustStoreType);
-    ksTrust.load(new FileInputStream(info.trustStore), info.trustStorePassword.toCharArray());
+    try (FileInputStream is = new FileInputStream(info.trustStore))
+    {
+      ksTrust.load(is, info.trustStorePassword.toCharArray());
+    }
 
     // KeyManagers decide which key material to use
     KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
