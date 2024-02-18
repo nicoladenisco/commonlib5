@@ -15,6 +15,7 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URI;
 import java.util.*;
 import org.commonlib5.exec.ExecHelper;
 
@@ -504,5 +505,55 @@ public class CommonNetUtils
     }
 
     return false;
+  }
+
+  /**
+   * Ritorna la porta corretta di una URI per i protocolli conosciuti.
+   * @param uri
+   * @return
+   */
+  public static int getCorrectPort(URI uri)
+  {
+    int port = uri.getPort();
+
+    if(port > 0)
+      return port;
+
+    switch(StringOper.okStr(uri.getScheme()).toLowerCase())
+    {
+      case "http":
+        return 80;
+
+      case "https":
+        return 443;
+
+      case "ftp":
+        return 21;
+
+      case "ftps":
+        return 22;
+    }
+
+    throw new UnsupportedOperationException("Non riesco a determinare la porta per " + uri);
+  }
+
+  public static boolean isTLS(URI uri)
+  {
+    switch(StringOper.okStr(uri.getScheme()).toLowerCase())
+    {
+      case "http":
+        return false;
+
+      case "https":
+        return true;
+
+      case "ftp":
+        return false;
+
+      case "ftps":
+        return true;
+    }
+
+    throw new UnsupportedOperationException("Non riesco a determinare la porta per " + uri);
   }
 }
