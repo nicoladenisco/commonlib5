@@ -8,6 +8,7 @@
 package org.commonlib5.utils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -590,5 +591,69 @@ public class DateTime
       cal.setTime(origin);
     cal.add(Calendar.DAY_OF_YEAR, giorniSpiazzamento);
     return cal.getTime();
+  }
+
+  /**
+   * Prova la conversione per vari formati di data/ora.
+   * Ritorna il primo che corrisponde nell'ordine:<br>
+   * <ul>
+   * <li>ISOformatFull (yyyy-MM-dd HH:mm:ss)</li>
+   * <li>dfDataOra (yyyyMMdd HHmmss)</li>
+   * <li>dfDTMXDS (yyyyMMddHHmmss)</li>
+   * <li>ISOformat (yyyy-MM-dd)</li>
+   * <li>dfData (yyyyMMdd)</li>
+   * </ul>
+   * Il valore viene restituto in millisecondi da epoch.
+   * Facilmente convertibile in Date, Timestamp, Calendar, ecc.
+   * @param __s stringa da convertire
+   * @return la data corrispondente oppure 0
+   */
+  public static long convertDateCommonFormat(String __s)
+  {
+    String s = StringOper.okStr(__s);
+    if(s.isEmpty())
+      return 0;
+
+    try
+    {
+      return ISOformatFull.parse(s).getTime();
+    }
+    catch(ParseException ex)
+    {
+    }
+
+    try
+    {
+      return dfDataOra.parse(s).getTime();
+    }
+    catch(ParseException ex)
+    {
+    }
+
+    try
+    {
+      return dfDTMXDS.parse(s).getTime();
+    }
+    catch(ParseException ex)
+    {
+    }
+
+    try
+    {
+      return ISOformat.parse(s).getTime();
+    }
+    catch(ParseException ex)
+    {
+    }
+
+    try
+    {
+      return dfData.parse(s).getTime();
+    }
+    catch(ParseException ex)
+    {
+    }
+
+    return 0;
   }
 }
