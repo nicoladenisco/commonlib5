@@ -32,6 +32,7 @@ public class DateTime
   public static final DateFormat ISOformat = new SimpleDateFormat("yyyy-MM-dd");
   public static final DateFormat ISOformatFull = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   public static final DateFormat dfData = new SimpleDateFormat("yyyyMMdd");
+  public static final DateFormat dfDataOra = new SimpleDateFormat("yyyyMMdd HHmmss");
   public static final DateFormat dfOra = new SimpleDateFormat("HHmmss");
   public static final DateFormat dfOrans = new SimpleDateFormat("HHmm");
   public static final DateFormat dfDTMXDS = new SimpleDateFormat("yyyyMMddHHmmss");
