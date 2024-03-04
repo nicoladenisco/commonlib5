@@ -262,7 +262,12 @@ public class DateTime
 
   public static Date creaData(int giorno, int mese, int anno)
   {
-    return mergeDataOra(giorno, mese, anno, 0, 0, 0);
+    return mergeDataOra(giorno, mese, anno, 0, 0, 0, 0);
+  }
+
+  public static Date creaDataFine(int giorno, int mese, int anno)
+  {
+    return mergeDataOra(giorno, mese, anno, 23, 59, 59, 999);
   }
 
   public static Date inizioGiorno(Date data)
@@ -550,6 +555,26 @@ public class DateTime
   {
     SimpleDateFormat sf = new SimpleDateFormat(format);
     return sf.format(date == null ? new Date() : date);
+  }
+
+  /**
+   * Parsing di una data.
+   * Inverso della Format() di VB6.
+   * @param date data da convertire
+   * @param format formato java per la data (vedi SimpleDateFormat)
+   * @return stringa formattata con la data
+   */
+  public static Date Parse(String date, String format)
+  {
+    SimpleDateFormat sf = new SimpleDateFormat(format);
+    try
+    {
+      return sf.parse(date);
+    }
+    catch(Exception e)
+    {
+      return null;
+    }
   }
 
   /**
