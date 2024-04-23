@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import org.apache.commons.codec.binary.Base64;
 import org.commonlib5.exec.ExecHelper;
 import org.commonlib5.io.ByteBufferInputStream;
@@ -133,8 +135,8 @@ public class CommonFileUtils
   public static boolean copyFile(File in, File out)
      throws Exception
   {
-    try(FileInputStream fis = new FileInputStream(in.getAbsolutePath());
-       FileOutputStream fos = new FileOutputStream(out.getAbsolutePath()))
+    try (FileInputStream fis = new FileInputStream(in.getAbsolutePath()); FileOutputStream fos
+       = new FileOutputStream(out.getAbsolutePath()))
     {
       copyStream(fis, fos);
     }
@@ -154,10 +156,10 @@ public class CommonFileUtils
   public static boolean copyTxtFile(File in, String encodingInput, File out, String encodingOutput)
      throws Exception
   {
-    try(Reader r = encodingInput == null ? new InputStreamReader(new FileInputStream(in))
-                      : new InputStreamReader(new FileInputStream(in), encodingInput);
-       Writer w = encodingOutput == null ? new OutputStreamWriter(new FileOutputStream(out))
-                     : new OutputStreamWriter(new FileOutputStream(out), encodingOutput))
+    try (Reader r = encodingInput == null ? new InputStreamReader(new FileInputStream(in))
+                       : new InputStreamReader(new FileInputStream(in), encodingInput); Writer w
+       = encodingOutput == null ? new OutputStreamWriter(new FileOutputStream(out))
+            : new OutputStreamWriter(new FileOutputStream(out), encodingOutput))
     {
       copyChar(r, w);
     }
@@ -235,8 +237,7 @@ public class CommonFileUtils
     if(!fOrig.exists() || !fDest.exists())
       return false;
 
-    try(FileInputStream isOrig = new FileInputStream(fOrig);
-       FileInputStream isDest = new FileInputStream(fDest))
+    try (FileInputStream isOrig = new FileInputStream(fOrig); FileInputStream isDest = new FileInputStream(fDest))
     {
       byte[] bufOrig = new byte[BUFFER_SIZE];
       byte[] bufDest = new byte[BUFFER_SIZE];
@@ -831,8 +832,8 @@ public class CommonFileUtils
     String linea;
     int found = -1;
 
-    try(FileInputStream fis = new FileInputStream(asciiFile);
-       LineNumberReader br = new LineNumberReader(new InputStreamReader(fis, encoding), BUFFER_SIZE))
+    try (FileInputStream fis = new FileInputStream(asciiFile); LineNumberReader br
+       = new LineNumberReader(new InputStreamReader(fis, encoding), BUFFER_SIZE))
     {
       while((linea = br.readLine()) != null && found == -1)
       {
@@ -898,7 +899,7 @@ public class CommonFileUtils
     md.reset();
 
     // Calculate the digest for the given file.
-    try(FileInputStream in = new FileInputStream(f))
+    try (FileInputStream in = new FileInputStream(f))
     {
       byte[] buffer = new byte[8192];
 
@@ -951,7 +952,7 @@ public class CommonFileUtils
   public static void writeFileTxt(File f, String output, String encoding, boolean append)
      throws Exception
   {
-    try(FileOutputStream fos = new FileOutputStream(f, append))
+    try (FileOutputStream fos = new FileOutputStream(f, append))
     {
       writeFileTxt(fos, output, encoding);
     }
@@ -989,8 +990,7 @@ public class CommonFileUtils
     // totalLen lunghezza file
     int totalLen = connection.getContentLength();
 
-    try(InputStream is = connection.getInputStream();
-       OutputStream os = new FileOutputStream(fWrite))
+    try (InputStream is = connection.getInputStream(); OutputStream os = new FileOutputStream(fWrite))
     {
       if(totalLen == -1)
       {
@@ -1034,8 +1034,7 @@ public class CommonFileUtils
     MessageDigest md = MessageDigest.getInstance(hashAlgo);
     md.reset();
 
-    try(InputStream is = connection.getInputStream();
-       OutputStream os = new FileOutputStream(fWrite))
+    try (InputStream is = connection.getInputStream(); OutputStream os = new FileOutputStream(fWrite))
     {
       copyStream(is, os, totalLen, md, hll);
       os.flush();
@@ -1078,7 +1077,7 @@ public class CommonFileUtils
      throws Exception
   {
     int rv;
-    try(BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fileIn), encoding)))
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fileIn), encoding)))
     {
       rv = copyAllLines(in, out);
     }
@@ -1099,7 +1098,7 @@ public class CommonFileUtils
 
     int length = (int) fileIn.length();
     byte[] rv = new byte[length];
-    try(FileInputStream fis = new FileInputStream(fileIn))
+    try (FileInputStream fis = new FileInputStream(fileIn))
     {
       readStream(rv, fis, 0, length);
     }
@@ -1145,7 +1144,7 @@ public class CommonFileUtils
   public static void writeFile(File fileOut, byte[] arr, boolean append)
      throws Exception
   {
-    try(FileOutputStream fos = new FileOutputStream(fileOut, append))
+    try (FileOutputStream fos = new FileOutputStream(fileOut, append))
     {
       fos.write(arr);
       fos.flush();
@@ -1166,7 +1165,7 @@ public class CommonFileUtils
     {
       directory.mkdirs();
       fTest = File.createTempFile("test", ".tmp", directory);
-      try(FileOutputStream fos = new FileOutputStream(fTest))
+      try (FileOutputStream fos = new FileOutputStream(fTest))
       {
         fos.write("prova\n".getBytes());
       }
@@ -1253,7 +1252,7 @@ public class CommonFileUtils
     conn.connect();
 
     long size = conn.getContentLength();
-    try(InputStream isb = conn.getInputStream())
+    try (InputStream isb = conn.getInputStream())
     {
       CommonFileUtils.copyStream(isb, os, size, lol);
     }
@@ -1347,7 +1346,7 @@ public class CommonFileUtils
   public static void writeObjectToFile(Serializable toWrite, File file)
      throws Exception
   {
-    try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file)))
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file)))
     {
       oos.writeObject(toWrite);
     }
@@ -1364,7 +1363,7 @@ public class CommonFileUtils
   public static Serializable readObjectFromFile(File file)
      throws Exception
   {
-    try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file)))
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file)))
     {
       return (Serializable) ois.readObject();
     }
@@ -1382,7 +1381,7 @@ public class CommonFileUtils
      throws Exception
   {
     ByteBufferOutputStream fos = new ByteBufferOutputStream();
-    try(ObjectOutputStream oos = new ObjectOutputStream(fos))
+    try (ObjectOutputStream oos = new ObjectOutputStream(fos))
     {
       oos.writeObject(toWrite);
     }
@@ -1400,20 +1399,55 @@ public class CommonFileUtils
   public static Serializable readObjectFromBytes(byte[] array)
      throws Exception
   {
-    ByteBufferInputStream fis = new ByteBufferInputStream();
-    fis.addToBuffer(array);
-    ObjectInputStream ois = new ObjectInputStream(fis);
-    Object or = null;
-    try
+    ByteBufferInputStream fis = new ByteBufferInputStream(false, array);
+    try (ObjectInputStream ois = new ObjectInputStream(fis))
     {
-      or = ois.readObject();
+      return (Serializable) ois.readObject();
     }
-    finally
+  }
+
+  /**
+   * Scrive un oggetto in un array di bytes.
+   * Usa l'interfaccia serializzable per scrivere
+   * il contenuto dell'oggetto.
+   * Dopo la serializzazione i bytes sono compressi con GZIP.
+   * @param toWrite oggetto da scrivere
+   * @return array di bytes dell'oggetto
+   * @throws Exception
+   */
+  public static byte[] writeObjectToBytesZipped(Serializable toWrite)
+     throws Exception
+  {
+    byte[] nonCompressi = writeObjectToBytes(toWrite);
+    ByteBufferOutputStream fzs = new ByteBufferOutputStream();
+    try (GZIPOutputStream zipStream = new GZIPOutputStream(fzs);)
     {
-      ois.close();
-      fis.close();
+      zipStream.write(nonCompressi);
     }
-    return (Serializable) or;
+
+    return fzs.getBytes();
+  }
+
+  /**
+   * Legge un oggetto da un array di bytes.
+   * Usa l'interfaccia serializable per leggere
+   * il contenuto dell'oggetto.
+   * Prima della serializzazione i bytes sono decompressi usando GZIP.
+   * @param array array di bytes con l'oggetto
+   * @return oggetto serializzato
+   * @throws Exception
+   */
+  public static Serializable readObjectFromBytesZipped(byte[] array)
+     throws Exception
+  {
+    ByteBufferInputStream fis = new ByteBufferInputStream(false, array);
+    ByteBufferOutputStream fos = new ByteBufferOutputStream();
+    try (GZIPInputStream zipStream = new GZIPInputStream(fis);)
+    {
+      copyStream(zipStream, fos);
+    }
+
+    return readObjectFromBytes(fos.getBytes());
   }
 
   /**
@@ -1555,7 +1589,7 @@ public class CommonFileUtils
     {
       File f = inputFiles.get(i);
 
-      try(FileInputStream is = new FileInputStream(f))
+      try (FileInputStream is = new FileInputStream(f))
       {
         copyStream(is, os);
       }
@@ -1590,8 +1624,8 @@ public class CommonFileUtils
   {
     ArrayList<String> arRv = new ArrayList<String>();
 
-    try(FileInputStream fis = new FileInputStream(asciiFileName);
-       BufferedReader br = new BufferedReader(new InputStreamReader(fis, encoding)))
+    try (FileInputStream fis = new FileInputStream(asciiFileName); BufferedReader br
+       = new BufferedReader(new InputStreamReader(fis, encoding)))
     {
       grep(br, p, arRv);
     }
@@ -1661,7 +1695,7 @@ public class CommonFileUtils
 
     ArrayList<String> arRv = new ArrayList<String>();
 
-    try(BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), enc)))
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), enc)))
     {
       grep(br, p, arRv);
     }
