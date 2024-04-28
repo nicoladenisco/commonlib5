@@ -23,6 +23,7 @@ package org.commonlib5.utils;
 
 import java.util.*;
 import java.util.function.Predicate;
+import org.commonlib5.lambda.LEU;
 
 /**
  * Operazioni comuni su array.
@@ -688,5 +689,64 @@ public class ArrayOper
     }
 
     return Arrays.copyOf(rv, k);
+  }
+
+  /**
+   * Estrazione di interi da una collezioni di oggetti.
+   * @param <T>
+   * @param objs collezione di oggetti
+   * @param fun espressione lambda per l'estrazione interi
+   * @return array di interi senza duplicazioni
+   * @throws java.lang.Exception
+   */
+  public static <T> int[] extractIntArray(Collection<T> objs,
+     LEU.ToIntFunction_WithExceptions<T, Exception> fun)
+     throws Exception
+  {
+    return objs.stream()
+       .mapToInt(LEU.rethrowFunctionInt(fun))
+       .distinct()
+       .sorted()
+       .toArray();
+  }
+
+  /**
+   * Estrazione di Stringhe da una collezioni di oggetti.
+   * @param <T>
+   * @param objs collezione di oggetti
+   * @param fun espressione lambda per l'estrazione della stringa
+   * @return array di stringhe senza duplicazioni scartando null e stringhe vuote
+   * @throws java.lang.Exception
+   */
+  public static <T> String[] extractStringArray(Collection<T> objs,
+     LEU.Function_WithExceptions<T, String, Exception> fun)
+     throws Exception
+  {
+    return objs.stream()
+       .map(LEU.rethrowFunction(fun))
+       .filter((s) -> s != null && !s.isEmpty())
+       .distinct()
+       .sorted()
+       .toArray(String[]::new);
+  }
+
+  /**
+   * Estrazione di interi (Integer) da una collezioni di oggetti.
+   * @param <T>
+   * @param objs collezione di oggetti
+   * @param fun espressione lambda per l'estrazione interi
+   * @return array di interi senza duplicazioni
+   * @throws java.lang.Exception
+   */
+  public static <T> Integer[] extractIntegerArray(Collection<T> objs,
+     LEU.ToIntFunction_WithExceptions<T, Exception> fun)
+     throws Exception
+  {
+    return objs.stream()
+       .mapToInt(LEU.rethrowFunctionInt(fun))
+       .distinct()
+       .sorted()
+       .boxed()
+       .toArray(Integer[]::new);
   }
 }
