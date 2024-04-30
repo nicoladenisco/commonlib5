@@ -30,7 +30,7 @@ import org.commonlib5.lambda.LEU;
 public class Classificatore<K, V> extends HashMap<K, List<V>>
    implements Serializable
 {
-  protected FunctionTrowException<V, K> estrattore = null;
+  protected transient FunctionTrowException<V, K> estrattore = null;
 
   public Classificatore()
   {
