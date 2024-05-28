@@ -202,4 +202,10 @@ public class ArrayMap<K, V> extends AbstractMap<K, V>
     rv.sort((a, b) -> cmp.compare(a.second, b.second));
     return rv;
   }
+
+  public void removeAll(Collection<K> keys)
+  {
+    for(K k : keys)
+      remove(k);
+  }
 }
