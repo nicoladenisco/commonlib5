@@ -10,6 +10,7 @@ package org.commonlib5.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
@@ -32,7 +33,7 @@ import org.commonlib5.io.ByteBufferOutputStream;
  */
 public class ClassOper
 {
-  private static Log log = LogFactory.getLog(ClassOper.class);
+  private static final Log log = LogFactory.getLog(ClassOper.class);
 
   /**
    * Caricatore dinamico di classe.
@@ -106,8 +107,8 @@ public class ClassOper
   /**
    * Caricatore dinamico di classe.
    * @param className nome completo o parziale della classe da caricare
-   * @param prefBasePath percorso preferenziale per la ricerca della classe
-   * @param basePath array di percorsi da anteporre al nome classe per la ricerca
+   * @param prefBasePath percorso preferenziale per la ricerca della classe (puo essere null)
+   * @param basePath array di percorsi da anteporre al nome classe per la ricerca (puo essere null)
    * @return classe o null se non trovata
    */
   public static Class loadClass(String className, String prefBasePath, String[] basePath)
@@ -305,7 +306,7 @@ public class ClassOper
      throws Exception
   {
     ByteBufferOutputStream bb = new ByteBufferOutputStream(1024);
-    try (InputStream is = getResourceFromClassAsStream(clz, name))
+    try(InputStream is = getResourceFromClassAsStream(clz, name))
     {
       CommonFileUtils.copyStream(is, bb);
     }
@@ -344,7 +345,7 @@ public class ClassOper
   public static Date getDateOfJar(String path)
      throws IOException
   {
-    try (JarFile jarFile = new JarFile(path))
+    try(JarFile jarFile = new JarFile(path))
     {
       Enumeration ent = jarFile.entries();
       while(ent.hasMoreElements())
@@ -399,7 +400,7 @@ public class ClassOper
           File jarFileOnDisk = new File(path.substring(0, path.indexOf("!")));
           //long jfodLastModifiedLong = jarFileOnDisk.lastModified ();
           //Date jfodLasModifiedDate = new Date(jfodLastModifiedLong);
-          try (JarFile jf = new JarFile(jarFileOnDisk))
+          try(JarFile jf = new JarFile(jarFileOnDisk))
           {
             ZipEntry ze = jf.getEntry(path.substring(path.indexOf("!") + 2));//Skip the ! and the /
             long zeTimeLong = ze.getTime();
@@ -434,6 +435,35 @@ public class ClassOper
     }
     catch(Throwable t)
     {
+      return null;
+    }
+  }
+
+  /**
+   * Caricatore dinamico di oggetti.
+   * Usa loadClass per caricare la classe dell'oggetto.
+   * L'oggetto da caricare deve avere un costruttore vuoto da poter utilizzare.
+   * @param className nome completo o parziale della classe da caricare
+   * @param prefBasePath percorso preferenziale per la ricerca della classe (puo essere null)
+   * @param basePath array di percorsi da anteporre al nome classe per la ricerca (puo essere null)
+   * @return oggetto o null se non trovata
+   * @see loadClass
+   */
+  public static Object createObject(String className, String prefBasePath, String[] basePath)
+  {
+    Class objClass = loadClass(className, prefBasePath, basePath);
+
+    if(objClass == null)
+      return null;
+
+    try
+    {
+      Constructor c = objClass.getConstructor();
+      return c.newInstance();
+    }
+    catch(Exception ex)
+    {
+      log.error("Failed to create object " + objClass, ex);
       return null;
     }
   }
