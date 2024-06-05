@@ -22,8 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.CRC32;
 import org.commonlib5.utils.LongOperListener;
 import org.commonlib5.utils.StringOper;
@@ -52,7 +52,7 @@ public interface FileTransfer
    * @return informazioni per il download (vedi FileTransfer.TIPAR_...)
    * @throws Exception
    */
-  public Hashtable preparaDownload(String clientID, Hashtable dati, int suggestBlockSize)
+  public Map preparaDownload(String clientID, Map dati, int suggestBlockSize)
      throws Exception;
 
   /**
@@ -81,7 +81,7 @@ public interface FileTransfer
    * @return vettore di due elementi: 0=CRC 1=array di bytes del blocco
    * @throws Exception
    */
-  public Vector getFileBlockCRC32(String clientID, String idFile, int block)
+  public List getFileBlockCRC32(String clientID, String idFile, int block)
      throws Exception;
 
   /**
@@ -94,7 +94,7 @@ public interface FileTransfer
    * @return informazioni per l'upload (vedi TIPAR_...)
    * @throws Exception
    */
-  public Hashtable preparaUpload(String clientID, Hashtable dati, int suggestBlockSize)
+  public Map preparaUpload(String clientID, Map dati, int suggestBlockSize)
      throws Exception;
 
   /**
@@ -147,7 +147,7 @@ public interface FileTransfer
    * @return id del file inviato rilasciato dal server per elaborazioni successive
    * @throws Exception
    */
-  default public String uploadFileStandardLoop(String clientID, Hashtable pup, File toSend, LongOperListener lol)
+  default public String uploadFileStandardLoop(String clientID, Map pup, File toSend, LongOperListener lol)
      throws Exception
   {
     int numBlock = StringOper.parse(pup.get(FileTransfer.TIPAR_NUM_BLOCK), 0);
@@ -158,7 +158,7 @@ public interface FileTransfer
       lol.resetUI();
 
     int nb = 0, count = 0, ct;
-    try (FileInputStream fis = new FileInputStream(toSend))
+    try(FileInputStream fis = new FileInputStream(toSend))
     {
       long vc, cc;
       CRC32 checksum = new CRC32();
@@ -212,7 +212,7 @@ public interface FileTransfer
   }
 
   default public String downloadFileStandardLoop(String clientID,
-     Hashtable pdown, File toSave, LongOperListener lol)
+     Map pdown, File toSave, LongOperListener lol)
      throws Exception
   {
     int numBlock = StringOper.parse(pdown.get(FileTransfer.TIPAR_NUM_BLOCK), 0);
@@ -228,7 +228,7 @@ public interface FileTransfer
     long vc, cc;
     CRC32 checksum = new CRC32();
 
-    try (FileOutputStream fos = new FileOutputStream(toSave))
+    try(FileOutputStream fos = new FileOutputStream(toSave))
     {
       for(count = 0; count < numBlock; count++)
       {
@@ -240,7 +240,7 @@ public interface FileTransfer
         do
         {
           // richiede il blocco al server
-          Vector vget = getFileBlockCRC32(clientID, idFile, count);
+          List vget = getFileBlockCRC32(clientID, idFile, count);
           vc = ((Double) vget.get(0)).longValue();
           block = (byte[]) vget.get(1);
 
