@@ -127,7 +127,7 @@ public class Classificatore<K, V> extends HashMap<K, List<V>>
     List<V> ls = get(k);
     if(ls == null)
     {
-      ls = new ArrayList<V>();
+      ls = new ArrayList<>();
       put(k, ls);
     }
     return ls;
@@ -140,6 +140,13 @@ public class Classificatore<K, V> extends HashMap<K, List<V>>
       throw new IllegalArgumentException("FunctionTrowException extractor is null: estraiChiave() must be redefined.");
 
     return estrattore.apply(v);
+  }
+
+  public void aggiungiTutti(V[] lsVal)
+     throws Exception
+  {
+    for(V v : lsVal)
+      aggiungi(v);
   }
 
   public void aggiungiTutti(Collection<V> lsVal)
@@ -165,5 +172,24 @@ public class Classificatore<K, V> extends HashMap<K, List<V>>
   {
     List<V> ls = get(k);
     return ls == null ? false : ls.contains(v);
+  }
+
+  public List<V> estraiTutti(K[] arChiavi)
+  {
+    return estraiTutti(Arrays.asList(arChiavi));
+  }
+
+  public List<V> estraiTutti(Collection<K> lsChiavi)
+  {
+    List<V> rv = new ArrayList<>();
+
+    List<V> tmp;
+    for(K k : lsChiavi)
+    {
+      if((tmp = get(k)) != null)
+        rv.addAll(tmp);
+    }
+
+    return rv;
   }
 }
