@@ -16,6 +16,7 @@ package org.commonlib5.utils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
@@ -35,6 +36,7 @@ public class JsonHelper implements Closeable
 {
   protected final URI uri;
   protected final ArrayMap<String, String> headers = new ArrayMap<>();
+  protected boolean wrapException = false;
 
   // Fino alla JDK 8 non era previsto l'http method PATCH. L'errore che si presenta è:
   // java.net.ProtocolException: Invalid HTTP method: PATCH
@@ -89,6 +91,16 @@ public class JsonHelper implements Closeable
   public URI getUri()
   {
     return uri;
+  }
+
+  public boolean isWrapException()
+  {
+    return wrapException;
+  }
+
+  public void setWrapException(boolean wrapException)
+  {
+    this.wrapException = wrapException;
   }
 
   public void addToHeader(String key, String value)
@@ -199,9 +211,7 @@ public class JsonHelper implements Closeable
       conn.setRequestProperty("Content-Type", "application/json");
       headers.forEach((k, v) -> conn.setRequestProperty(k, v));
 
-      ByteBufferOutputStream bos = new ByteBufferOutputStream();
-      CommonFileUtils.copyStream(conn.getInputStream(), bos);
-      return new Pair<>(conn.getResponseCode(), bos.toString("UTF-8"));
+      return processResponse(conn);
     }
     finally
     {
@@ -209,10 +219,35 @@ public class JsonHelper implements Closeable
     }
   }
 
+  protected Pair<Integer, String> processResponse(HttpURLConnection conn)
+     throws IOException, Exception
+  {
+    ByteBufferOutputStream bos = new ByteBufferOutputStream();
+
+    try(InputStream is = conn.getInputStream())
+    {
+      CommonFileUtils.copyStream(is, bos);
+    }
+    catch(Exception ex)
+    {
+      if(wrapException)
+      {
+        try(InputStream is = conn.getErrorStream())
+        {
+          CommonFileUtils.copyStream(is, bos);
+        }
+      }
+      else
+        throw ex;
+    }
+
+    return new Pair<>(conn.getResponseCode(), bos.toString("UTF-8"));
+  }
+
   public URL buildConnection(URI uri1)
      throws Exception
   {
-    return new URL(uri1.toURL(), "", new sun.net.www.protocol.https.Handler());
+    return uri1.toURL();
   }
 
   protected Pair<Integer, String> genericRequest(URI uri, String method, JSONObject req)
@@ -245,9 +280,7 @@ public class JsonHelper implements Closeable
       conn.setFixedLengthStreamingMode(byteInput.length);
       conn.getOutputStream().write(byteInput);
 
-      ByteBufferOutputStream bos = new ByteBufferOutputStream();
-      CommonFileUtils.copyStream(conn.getInputStream(), bos);
-      return new Pair<>(conn.getResponseCode(), bos.toString("UTF-8"));
+      return processResponse(conn);
     }
     finally
     {
@@ -285,9 +318,7 @@ public class JsonHelper implements Closeable
       conn.setFixedLengthStreamingMode(byteInput.length);
       conn.getOutputStream().write(byteInput);
 
-      ByteBufferOutputStream bos = new ByteBufferOutputStream();
-      CommonFileUtils.copyStream(conn.getInputStream(), bos);
-      return new Pair<>(conn.getResponseCode(), bos.toString("UTF-8"));
+      return processResponse(conn);
     }
     finally
     {
