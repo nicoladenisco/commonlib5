@@ -39,6 +39,7 @@ public class JdbcUrlSplitterTest
       assertNull("host must be null", js1.host);
       assertNull("port must be null", js1.port);
       assertNull("params must be null", js1.params);
+      assertEquals(url1, js1.merge());
     }
     {
       String url2 = "jdbc:postgresql://localhost/caleido";
@@ -49,6 +50,7 @@ public class JdbcUrlSplitterTest
       assertEquals("host must be localhost", js2.host, "localhost");
       assertNull("port must be null", js2.port);
       assertNull("params must be null", js2.params);
+      assertEquals(url2, js2.merge());
     }
     {
       String url3 = "jdbc:postgresql://localhost:5432/caleido";
@@ -59,6 +61,7 @@ public class JdbcUrlSplitterTest
       assertEquals("host must be localhost", js3.host, "localhost");
       assertEquals("port must be 5432", js3.port, "5432");
       assertNull("params must be null", js3.params);
+      assertEquals(url3, js3.merge());
     }
   }
 
@@ -73,6 +76,7 @@ public class JdbcUrlSplitterTest
     assertEquals("host must be localhost", js3.host, "localhost");
     assertEquals("port must be 1527", js3.port, "1527");
     assertEquals("params must be ...", js3.params, "collation=TERRITORY_BASED:PRIMARY");
+    assertEquals(url3, js3.merge());
   }
 
   @Test
@@ -83,8 +87,9 @@ public class JdbcUrlSplitterTest
     //host, port, database, params
     assertEquals("driverName must be oracle", js3.driverName, "oracle");
     assertEquals("database must be caspian", js3.database, "caspian");
-    assertEquals("host must be localhost", js3.host, "@localhost");
+    assertEquals("host must be localhost", js3.host, "localhost");
     assertEquals("port must be 1521", js3.port, "1521");
     assertNull("params must be null", js3.params);
+    assertEquals(url3, js3.merge());
   }
 }

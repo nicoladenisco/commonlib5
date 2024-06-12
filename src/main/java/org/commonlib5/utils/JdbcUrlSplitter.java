@@ -42,13 +42,40 @@ public class JdbcUrlSplitter
       throw new IllegalArgumentException("Invalid JDBC url.");
 
     driverName = jdbcUrl.substring(5, pos1);
+    split(jdbcUrl);
+  }
 
-    if("oracle".equalsIgnoreCase(driverName))
-      splitOracle(jdbcUrl);
-    else if("hsqldb".equalsIgnoreCase(driverName))
-      splitHSql(jdbcUrl);
-    else
-      splitClassic(jdbcUrl);
+  public void split(String jdbcUrl)
+  {
+    switch(driverName.toLowerCase())
+    {
+      case "oracle":
+        splitOracle(jdbcUrl);
+        break;
+
+      case "hsqldb":
+        splitHSql(jdbcUrl);
+        break;
+
+      default:
+        splitClassic(jdbcUrl);
+        break;
+    }
+  }
+
+  public String merge()
+  {
+    switch(driverName.toLowerCase())
+    {
+      case "oracle":
+        return mergeOracle();
+
+      case "hsqldb":
+        return mergeHSql();
+
+      default:
+        return mergeClassic();
+    }
   }
 
   /**
@@ -100,6 +127,46 @@ public class JdbcUrlSplitter
   }
 
   /**
+   * Merge della forma classica.
+   * Fonde i componenti di una uri JDBC del tipo: <br>
+   * String url = "jdbc:derby://localhost:1527/netld;collation=TERRITORY_BASED:PRIMARY"; <br>
+   * nelle rispettive variabili pubbliche.
+   * @return
+   */
+  public String mergeClassic()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("jdbc:");
+    sb.append(driverName);
+
+    if(host != null)
+    {
+      sb.append("://");
+      sb.append(host);
+      if(port != null)
+      {
+        sb.append(":");
+        sb.append(port);
+      }
+      sb.append("/");
+      sb.append(database);
+    }
+    else
+    {
+      sb.append(":");
+      sb.append(database);
+    }
+
+    if(params != null)
+    {
+      sb.append(";");
+      sb.append(params);
+    }
+
+    return sb.toString();
+  }
+
+  /**
    * Split della forma oracle thin.
    * Estrae i componenti di una uri JDBC del tipo: <br>
    * String url = "jdbc:oracle:thin:@localhost:1521:caspian"; <br>
@@ -119,7 +186,7 @@ public class JdbcUrlSplitter
     driverName = parts[1];
     if(parts.length > 5)
     {
-      host = parts[3];
+      host = parts[3].substring(1);
       port = parts[4];
       database = parts[5];
     }
@@ -128,6 +195,47 @@ public class JdbcUrlSplitter
       host = parts[3];
       database = parts[4];
     }
+  }
+
+  /**
+   * Merge della forma oracle thin.
+   * Fonde i componenti di una uri JDBC del tipo: <br>
+   * String url = "jdbc:oracle:thin:@localhost:1521:caspian"; <br>
+   * nelle rispettive variabili pubbliche.
+   * @return
+   */
+  public String mergeOracle()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("jdbc:");
+    sb.append(driverName);
+    sb.append(":thin");
+
+    if(host != null)
+    {
+      sb.append(":@");
+      sb.append(host);
+      if(port != null)
+      {
+        sb.append(":");
+        sb.append(port);
+      }
+      sb.append(":");
+      sb.append(database);
+    }
+    else
+    {
+      sb.append(":");
+      sb.append(database);
+    }
+
+    if(params != null)
+    {
+      sb.append(";");
+      sb.append(params);
+    }
+
+    return sb.toString();
   }
 
   /**
@@ -149,6 +257,46 @@ public class JdbcUrlSplitter
     String[] parts = jdbcUrl.split("\\:");
     driverName = parts[1];
     database = parts[2];
+  }
+
+  /**
+   * Merge della forma hsql.
+   * Fonde i componenti di una uri JDBC del tipo: <br>
+   * String url = "jdbc:hsqldb:data/tutorial"; <br>
+   * nelle rispettive variabili pubbliche.
+   * @return
+   */
+  public String mergeHSql()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("jdbc:");
+    sb.append(driverName);
+
+    if(host != null)
+    {
+      sb.append("://");
+      sb.append(host);
+      if(port != null)
+      {
+        sb.append(":");
+        sb.append(port);
+      }
+      sb.append("/");
+      sb.append(database);
+    }
+    else
+    {
+      sb.append(":");
+      sb.append(database);
+    }
+
+    if(params != null)
+    {
+      sb.append(";");
+      sb.append(params);
+    }
+
+    return sb.toString();
   }
 
   @Override
@@ -189,6 +337,12 @@ public class JdbcUrlSplitter
   @Override
   public String toString()
   {
-    return "JdbcUrlSplitter{" + "driverName=" + driverName + ", host=" + host + ", port=" + port + ", database=" + database + ", params=" + params + '}';
+    return "JdbcUrlSplitter{"
+       + "driverName=" + driverName
+       + ", host=" + host
+       + ", port=" + port
+       + ", database=" + database
+       + ", params=" + params
+       + '}';
   }
 }
