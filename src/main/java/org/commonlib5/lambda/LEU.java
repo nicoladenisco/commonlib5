@@ -97,6 +97,12 @@ public class LEU
     };
   }
 
+  public static <T, E extends Exception> Consumer<T> c(Consumer_WithExceptions<T, E> consumer)
+     throws E
+  {
+    return rethrowConsumer(consumer);
+  }
+
   /**
    * .map(rethrowFunction(name -> Class.forName(name))) or .map(rethrowFunction(Class::forName))
    */
@@ -115,6 +121,15 @@ public class LEU
         return null;
       }
     };
+  }
+
+  /**
+   * .map(rethrowFunction(name -> Class.forName(name))) or .map(rethrowFunction(Class::forName))
+   */
+  public static <T, R, E extends Exception> Function<T, R> f(Function_WithExceptions<T, R, E> function)
+     throws E
+  {
+    return rethrowFunction(function);
   }
 
   /**
@@ -137,6 +152,12 @@ public class LEU
     };
   }
 
+  public static <T, E extends Exception> ToIntFunction<T> fi(ToIntFunction_WithExceptions<T, E> function)
+     throws E
+  {
+    return rethrowFunctionInt(function);
+  }
+
   public static <T, E extends Exception> ToLongFunction<T> rethrowFunctionLong(ToLongFunction_WithExceptions<T, E> function)
      throws E
   {
@@ -154,6 +175,12 @@ public class LEU
     };
   }
 
+  public static <T, E extends Exception> ToLongFunction<T> fl(ToLongFunction_WithExceptions<T, E> function)
+     throws E
+  {
+    return rethrowFunctionLong(function);
+  }
+
   public static <T, E extends Exception> ToDoubleFunction<T> rethrowFunctionDouble(ToDoubleFunction_WithExceptions<T, E> function)
      throws E
   {
@@ -169,6 +196,12 @@ public class LEU
         return 0;
       }
     };
+  }
+
+  public static <T, E extends Exception> ToDoubleFunction<T> fd(ToDoubleFunction_WithExceptions<T, E> function)
+     throws E
+  {
+    return rethrowFunctionDouble(function);
   }
 
   /**
@@ -191,6 +224,12 @@ public class LEU
     };
   }
 
+  public static <T, E extends Exception> Predicate<T> p(Predicate_WithExceptions<T, E> predicate)
+     throws E
+  {
+    return rethrowPredicate(predicate);
+  }
+
   /**
    * executor.execute(rethrowRunnable(() -> System.out.println(Class.forName(name))));
    */
@@ -208,6 +247,12 @@ public class LEU
         throwActualException(exception);
       }
     };
+  }
+
+  public static <E extends Exception> Runnable r(Runnable_WithExceptions<E> runnable)
+     throws E
+  {
+    return rethrowRunnable(runnable);
   }
 
   @SuppressWarnings("unchecked")

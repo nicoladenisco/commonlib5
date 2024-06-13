@@ -59,7 +59,7 @@ public class ProcessHelper
   public static ProcessHelper exec(Collection<String> cmdArray)
      throws IOException
   {
-    String[] cmd = cmdArray.toArray(new String[cmdArray.size()]);
+    String[] cmd = cmdArray.toArray(new String[0]);
     return new ProcessHelper(Runtime.getRuntime().exec(cmd));
   }
 
@@ -67,6 +67,14 @@ public class ProcessHelper
      throws IOException
   {
     return new ProcessHelper(Runtime.getRuntime().exec(cmdArray, env));
+  }
+
+  public static ProcessHelper exec(Collection<String> cmdArray, Collection<String> envArray)
+     throws IOException
+  {
+    String[] cmd = cmdArray.toArray(new String[0]);
+    String[] env = envArray.toArray(new String[0]);
+    return new ProcessHelper(Runtime.getRuntime().exec(cmd, env));
   }
 
   public static ProcessHelper execUsingShell(String command)
@@ -93,6 +101,39 @@ public class ProcessHelper
       };
 
     return new ProcessHelper(Runtime.getRuntime().exec(cmdarray));
+  }
+
+  public static ProcessHelper execUsingShell(String command, String[] env)
+     throws IOException
+  {
+    if(command == null)
+      throw new NullPointerException();
+    String[] cmdarray;
+    String os = System.getProperty("os.name");
+    if(os.equals("Windows 95") || os.equals("Windows 98") || os.equals("Windows ME"))
+      cmdarray = new String[]
+      {
+        "command.exe", "/C", command
+      };
+    else if(os.startsWith("Windows"))
+      cmdarray = new String[]
+      {
+        "cmd.exe", "/C", command
+      };
+    else
+      cmdarray = new String[]
+      {
+        "/bin/sh", "-c", command
+      };
+
+    return new ProcessHelper(Runtime.getRuntime().exec(cmdarray, env));
+  }
+
+  public static ProcessHelper execUsingShell(String command, Collection<String> envArray)
+     throws IOException
+  {
+    String[] env = envArray.toArray(new String[0]);
+    return execUsingShell(command, env);
   }
 
   /**
