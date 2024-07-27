@@ -220,11 +220,11 @@ public class JsonHelper implements Closeable
   }
 
   protected Pair<Integer, String> processResponse(HttpURLConnection conn)
-     throws IOException, Exception
+     throws Exception
   {
     ByteBufferOutputStream bos = new ByteBufferOutputStream();
 
-    try(InputStream is = conn.getInputStream())
+    try (InputStream is = conn.getInputStream())
     {
       CommonFileUtils.copyStream(is, bos);
     }
@@ -232,7 +232,7 @@ public class JsonHelper implements Closeable
     {
       if(wrapException)
       {
-        try(InputStream is = conn.getErrorStream())
+        try (InputStream is = conn.getErrorStream())
         {
           CommonFileUtils.copyStream(is, bos);
         }
