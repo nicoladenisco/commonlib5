@@ -198,27 +198,6 @@ public class JsonHelper implements Closeable
     }
   }
 
-  protected Pair<Integer, String> genericRequest(URI uri, String method)
-     throws Exception
-  {
-    URL url = buildConnection(uri);
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-    try
-    {
-      conn.setDoOutput(true);
-      conn.setRequestMethod(method);
-      conn.setRequestProperty("Content-Type", "application/json");
-      headers.forEach((k, v) -> conn.setRequestProperty(k, v));
-
-      return processResponse(conn);
-    }
-    finally
-    {
-      conn.disconnect();
-    }
-  }
-
   protected Pair<Integer, String> processResponse(HttpURLConnection conn)
      throws Exception
   {
@@ -250,7 +229,7 @@ public class JsonHelper implements Closeable
     return uri1.toURL();
   }
 
-  protected Pair<Integer, String> genericRequest(URI uri, String method, JSONObject req)
+  protected Pair<Integer, String> genericRequest(URI uri, String method)
      throws Exception
   {
     URL url = buildConnection(uri);
@@ -259,26 +238,9 @@ public class JsonHelper implements Closeable
     try
     {
       conn.setDoOutput(true);
-      conn.setRequestProperty("Content-Type", "application/json");
-      conn.setRequestProperty("Accept", "application/json");
-
-//      if("PATCH".equals(method))
-//      {
-//        // Per l'http method PATCH siamo obbligati a fare questo.
-//        // Andare qui per i dettagli: https://medium.com/javarevisited/invalid-http-method-patch-e12ba62ddd9f
-//        conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
-//        conn.setRequestMethod("POST");
-//      }
-//      else
       conn.setRequestMethod(method);
-
+      conn.setRequestProperty("Content-Type", "application/json");
       headers.forEach((k, v) -> conn.setRequestProperty(k, v));
-
-      String input = req.toString();
-      byte[] byteInput = input.getBytes("UTF-8");
-
-      conn.setFixedLengthStreamingMode(byteInput.length);
-      conn.getOutputStream().write(byteInput);
 
       return processResponse(conn);
     }
@@ -288,7 +250,31 @@ public class JsonHelper implements Closeable
     }
   }
 
+  protected Pair<Integer, String> genericRequest(URI uri, String method, JSONObject req)
+     throws Exception
+  {
+    String input = req.toString();
+    byte[] byteInput = input.getBytes("UTF-8");
+
+    if(byteInput.length == 0)
+      return genericRequest(uri, method);
+
+    return genericRequest(uri, method, byteInput);
+  }
+
   protected Pair<Integer, String> genericRequest(URI uri, String method, JSONArray req)
+     throws Exception
+  {
+    String input = req.toString();
+    byte[] byteInput = input.getBytes("UTF-8");
+
+    if(byteInput.length == 0)
+      return genericRequest(uri, method);
+
+    return genericRequest(uri, method, byteInput);
+  }
+
+  protected Pair<Integer, String> genericRequest(URI uri, String method, byte[] byteInput)
      throws Exception
   {
     URL url = buildConnection(uri);
@@ -311,9 +297,6 @@ public class JsonHelper implements Closeable
       conn.setRequestMethod(method);
 
       headers.forEach((k, v) -> conn.setRequestProperty(k, v));
-
-      String input = req.toString();
-      byte[] byteInput = input.getBytes("UTF-8");
 
       conn.setFixedLengthStreamingMode(byteInput.length);
       conn.getOutputStream().write(byteInput);
