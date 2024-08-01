@@ -213,7 +213,8 @@ public class JsonHelper implements Closeable
       {
         try (InputStream is = conn.getErrorStream())
         {
-          CommonFileUtils.copyStream(is, bos);
+          if(is != null)
+            CommonFileUtils.copyStream(is, bos);
         }
       }
       else
