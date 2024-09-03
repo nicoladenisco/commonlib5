@@ -102,6 +102,13 @@ public class HtmlComboHelper<T>
       return "<option value=\"" + codStr + "\">" + StringOper.okStr(descrizione, "&nbsp;") + "</option>";
   }
 
+  public String builCombo(T defVal)
+  {
+    StringBuilder sb = new StringBuilder(1024);
+    formatHtmlCombo(sb, defVal);
+    return sb.toString();
+  }
+
   /**
    * Produce l'HTML completo della tabella.
    * @return HTML della tabella
@@ -109,8 +116,6 @@ public class HtmlComboHelper<T>
   @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder(1024);
-    formatHtmlCombo(sb, null);
-    return sb.toString();
+    return builCombo(null);
   }
 }
