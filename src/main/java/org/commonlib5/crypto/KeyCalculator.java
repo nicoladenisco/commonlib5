@@ -7,6 +7,10 @@
  */
 package org.commonlib5.crypto;
 
+import java.util.Arrays;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Calcolo della chiave a partire dai parametri indicati.
  *
@@ -14,7 +18,9 @@ package org.commonlib5.crypto;
  */
 public class KeyCalculator
 {
-  private long sed1, sed2;
+  private static final Log log = LogFactory.getLog(KeyCalculator.class);
+
+  private final long sed1, sed2;
 
   public KeyCalculator()
   {
@@ -41,7 +47,17 @@ public class KeyCalculator
     }
 
     sum = sumAdd(sum, system_password);
-    return scramble(sum);
+    long rv = scramble(sum);
+
+    if(log.isDebugEnabled())
+      log.debug(String.format("user=%s password=%s time=%d params=%s rv=%d sed1=%d sed2=%d",
+         user_id, system_password, time, Arrays.toString(params), rv, sed1, sed2
+      ));
+
+//    System.out.println(String.format("user=%s password=%s time=%d params=%s rv=%d sed1=%d sed2=%d",
+//       user_id, system_password, time, Arrays.toString(params), rv, sed1, sed2
+//    ));
+    return rv;
   }
 
   public long sumAdd(long sum, String str)
