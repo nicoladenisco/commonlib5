@@ -33,6 +33,10 @@ public class DoubleUtils
   public double EPSI_3D = 0.001;
   public double EPSI_4D = 0.0001;
 
+  public double ROUND_2D = 100;
+  public double ROUND_3D = 1000;
+  public double ROUND_4D = 10000;
+
   public int compareEpsi(double a, double b, double epsilon)
   {
     if(Math.abs(a - b) < epsilon)
@@ -165,5 +169,26 @@ public class DoubleUtils
   public boolean zeroEpsi4D(double val)
   {
     return compareEpsi4D(val, 0) == 0;
+  }
+
+  public double roundto(double value, int numCifre)
+  {
+    double exp = Math.pow(10, numCifre);
+    return Math.round(value * exp) / exp;
+  }
+
+  public double round2D(double value)
+  {
+    return Math.round(value * ROUND_2D) / ROUND_2D;
+  }
+
+  public double round3D(double value)
+  {
+    return Math.round(value * ROUND_3D) / ROUND_3D;
+  }
+
+  public double round4D(double value)
+  {
+    return Math.round(value * ROUND_4D) / ROUND_4D;
   }
 }
