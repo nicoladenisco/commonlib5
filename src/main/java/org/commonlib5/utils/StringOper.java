@@ -1654,10 +1654,10 @@ public class StringOper
    */
   public static List<String> string2List(String s, String delim, boolean removeEmpty)
   {
-    ArrayList<String> l = new ArrayList<String>();
     if(s == null || delim == null)
-      return l;
+      return Collections.EMPTY_LIST;
 
+    ArrayList<String> l = new ArrayList<String>();
     StringTokenizer st = new StringTokenizer(s, delim);
     while(st.hasMoreTokens())
     {
