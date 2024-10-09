@@ -27,8 +27,8 @@ import java.util.regex.Pattern;
  */
 public class HtmlTableJsonConverter
 {
-  public static final Pattern tdPattern = Pattern.compile("<td.+?>(.*?)</td>");
-  public static final Pattern trPattern = Pattern.compile("<tr.+?>(.*?)</tr>");
+  public static final Pattern TD_PATTERN = Pattern.compile("<td.*?>(.*?)</td>");
+  public static final Pattern TR_PATTERN = Pattern.compile("<tr.*?>(.*?)</tr>");
 
   /**
    * Riceve in input HTML del corpo tabella e produce l'equivalente Json.
@@ -43,8 +43,8 @@ public class HtmlTableJsonConverter
     if(rv.isEmpty())
       return rv;
 
-    rv = resolveMacroTD(tdPattern, rv, "\"", "\",");
-    rv = resolveMacroTR(trPattern, rv, "[", "],");
+    rv = resolveMacroTD(TD_PATTERN, rv, "\"", "\",");
+    rv = resolveMacroTR(TR_PATTERN, rv, "[", "],");
 
     rv = rv.replaceAll(",\\]", "]");
     if(rv.endsWith(","))
