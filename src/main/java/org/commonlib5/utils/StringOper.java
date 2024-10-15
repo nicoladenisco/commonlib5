@@ -9,18 +9,9 @@ import java.util.regex.Pattern;
 import org.commonlib5.lambda.FunctionTrowException;
 
 /**
- * <p>
- * Title: Commonlib</p>
- * <p>
- * Description: Libreria di utilizzo comune.
- * StringOper
- * Una serie di funzioni statiche per la manipolazione delle stringhe.</p>
- * <p>
- * Copyright: Copyright (c) 2001</p>
- * <p>
- * Company: WinSOFT</p>
+ * Una serie di funzioni statiche per la manipolazione delle stringhe.
+ *
  * @author Nicola De Nisco
- * @version 1.0
  */
 public class StringOper
 {
