@@ -23,6 +23,7 @@ package org.commonlib5.utils;
 
 import java.util.*;
 import java.util.function.Predicate;
+import org.commonlib5.lambda.FunctionTrowException;
 import org.commonlib5.lambda.LEU;
 
 /**
@@ -40,9 +41,7 @@ public class ArrayOper
    */
   public static String[] toArrayString(Collection<String> ls)
   {
-    String[] rv = new String[ls.size()];
-    ls.toArray(rv);
-    return rv;
+    return ls.toArray(String[]::new);
   }
 
   /**
@@ -748,5 +747,24 @@ public class ArrayOper
        .sorted()
        .boxed()
        .toArray(Integer[]::new);
+  }
+
+  public static <K, T> Map<K, T> getMap(Collection<T> lsObject, FunctionTrowException<T, K> fun)
+     throws Exception
+  {
+    return getMap(lsObject, fun, new HashMap<>(lsObject.size()));
+  }
+
+  public static <K, T> Map<K, T> getMap(Collection<T> lsObject, FunctionTrowException<T, K> fun, Map<K, T> theMap)
+     throws Exception
+  {
+    for(T obj : lsObject)
+    {
+      K key = fun.apply(obj);
+      if(key != null)
+        theMap.put(key, obj);
+    }
+
+    return theMap;
   }
 }
