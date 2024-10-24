@@ -36,8 +36,8 @@ public class MacroResolver
   protected final HashMap<String, String> mapValues = new HashMap<>();
   protected final HashMap<String, FunctionTrowException<String, String>> mapFunction = new HashMap<>();
   protected final Date today = new Date();
-  public static final Pattern macroPattern = Pattern.compile("\\$\\{([a-z|A-Z|0-9|_]+)\\}");
-  public static final Pattern macroPatternParams = Pattern.compile("\\$\\{([a-z|A-Z|0-9|_]+)\\((.+)\\)\\}");
+  public static final Pattern macroPattern = Pattern.compile("\\$\\{([a-z|A-Z|0-9|_|\\.]+)\\}");
+  public static final Pattern macroPatternParams = Pattern.compile("\\$\\{([a-z|A-Z|0-9|_|\\.]+)\\((.+)\\)\\}");
 
   public void putAll(Map params)
   {
