@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -655,5 +656,17 @@ public class DateTime
     }
 
     return 0;
+  }
+
+  public static long getDifferenzaGiorni(Date d1, Date d2)
+  {
+    long diff = d2.getTime() - d1.getTime();
+    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+  }
+
+  public static long getDifferenzaGiorniAbs(Date d1, Date d2)
+  {
+    long diff = Math.abs(d2.getTime() - d1.getTime());
+    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
   }
 }
