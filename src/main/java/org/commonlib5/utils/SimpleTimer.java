@@ -8,6 +8,7 @@
 package org.commonlib5.utils;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Semplice timer di verifica tempo trascorso.
@@ -50,8 +51,25 @@ public class SimpleTimer implements Serializable
 
   /**
    * Vero se è trascorso il tempo specificato.
+   * @param durata numero di periodi
+   * @param periodo tipo di periodo (vedi TimeUnit)
+   * @return vero se dall'ultimo reset sono trascorsi i periodi indicati
+   */
+  public boolean isElapsed(long durata, TimeUnit periodo)
+  {
+    if(explicitSignaled || durata <= 0)
+    {
+      explicitSignaled = false;
+      return true;
+    }
+
+    return isElapsed(periodo.toMillis(durata));
+  }
+
+  /**
+   * Vero se è trascorso il tempo specificato.
    * @param tstop tempo timer in millisecondi (se minore o uguale a 0 torna subito)
-   * @return vero se dall'ultimo reset sono trascorti tstop millisecondi
+   * @return vero se dall'ultimo reset sono trascorsi tstop millisecondi
    */
   public boolean isElapsed(long tstop)
   {
