@@ -392,8 +392,8 @@ abstract public class GenericTableModel<T> extends AbstractTableModel
    * classi derivate, al fine di implementare
    * qualche logica al momento della cancellazione
    * di un elemento.
-   * @param idx
-   * @return
+   * @param toDel oggetto da cancellare
+   * @return vero se l'oggetto esiste e cancellato
    */
   public boolean removeData(T toDel)
   {
@@ -406,8 +406,8 @@ abstract public class GenericTableModel<T> extends AbstractTableModel
    * classi derivate, al fine di implementare
    * qualche logica al momento della cancellazione
    * di un elemento.
-   * @param idx
-   * @return
+   * @param toDel oggetto da cancellare
+   * @return vero se l'oggetto esiste e cancellato
    */
   public boolean removeData(List<T> toDel)
   {

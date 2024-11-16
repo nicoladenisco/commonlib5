@@ -61,7 +61,7 @@ public class Zip
   public static void zipFiles(File fileZip, File[] src, int compLevel, ZipListener ul)
      throws Exception
   {
-    try ( ZipOutputStream fos = new ZipOutputStream(new FileOutputStream(fileZip)))
+    try (ZipOutputStream fos = new ZipOutputStream(new FileOutputStream(fileZip)))
     {
       fos.setLevel(compLevel);
 
@@ -143,7 +143,7 @@ public class Zip
         continue;
 
       // apre file input per la lettura
-      try ( FileInputStream in = new FileInputStream(f))
+      try (FileInputStream in = new FileInputStream(f))
       {
         // determina il nome della entry nel file zip
         String name = f.getName();
@@ -185,7 +185,7 @@ public class Zip
      throws IOException
   {
     byte[] buffer = new byte[BUFFER_SIZE];
-    try ( ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
+    try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
     {
       zip(zos, directory, directory, buffer, true);
       zos.finish();
@@ -199,7 +199,6 @@ public class Zip
    * Ricorsivamente vengono incluse tutte le sottodirectory
    * se recurseSubdir è vero.
    * @param zos stream zip di output
-   * @param compLevel livello di compressione richiesta
    * @param directory contenuto dei files da zippare
    * @param base path di base da rimuovere nel file zip
    * @param buffer buffer di servizio per la compressione
@@ -227,7 +226,7 @@ public class Zip
       {
         String path = files[i].getPath().substring(lenBase).replace('\\', '/');
 
-        try ( FileInputStream in = new FileInputStream(files[i]))
+        try (FileInputStream in = new FileInputStream(files[i]))
         {
           ZipEntry entry = new ZipEntry(path);
           zos.putNextEntry(entry);
@@ -270,7 +269,7 @@ public class Zip
     String[] alternateNames = new String[1];
     alternateNames[0] = alternateName;
 
-    try ( ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
+    try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
     {
       zos.setLevel(compLevel);
       zipEntries(zos, files, alternateNames, null);

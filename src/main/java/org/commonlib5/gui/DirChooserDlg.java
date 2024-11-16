@@ -21,18 +21,18 @@
  */
 package org.commonlib5.gui;
 
-import javax.swing.*;
-import javax.swing.filechooser.*;
-import javax.swing.tree.*;
-import javax.swing.event.*;
+import java.awt.Component;
 import java.io.File;
 import java.io.FileFilter;
-import java.awt.Component;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.filechooser.*;
 import javax.swing.text.Position;
+import javax.swing.tree.*;
 
 /**
  * Dialog per il directory chooser.
@@ -144,50 +144,50 @@ public class DirChooserDlg extends javax.swing.JDialog
 
     private void jbAnnullaActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbAnnullaActionPerformed
     {//GEN-HEADEREND:event_jbAnnullaActionPerformed
-      // annulla
-      returnValue = CANCEL_OPTION;
-      dispose();
+    // annulla
+    returnValue = CANCEL_OPTION;
+    dispose();
     }//GEN-LAST:event_jbAnnullaActionPerformed
 
     private void jbOkActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbOkActionPerformed
     {//GEN-HEADEREND:event_jbOkActionPerformed
-      // conferma
-      returnValue = OK_OPTION;
-      dispose();
+    // conferma
+    returnValue = OK_OPTION;
+    dispose();
     }//GEN-LAST:event_jbOkActionPerformed
 
     private void jbNewDirActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbNewDirActionPerformed
     {//GEN-HEADEREND:event_jbNewDirActionPerformed
-      // crea nuova directory nella directory corrente
-      TreePath path = tree.getSelectionPath();
+    // crea nuova directory nella directory corrente
+    TreePath path = tree.getSelectionPath();
 
-      if(path == null)
-      {
-        JOptionPane.showMessageDialog(this, "Selezionare una directory padre.");
-        return;
-      }
+    if(path == null)
+    {
+      JOptionPane.showMessageDialog(this, "Selezionare una directory padre.");
+      return;
+    }
 
-      // Get the last element of the path which we know to be an instance of Directory
-      Directory dir = (Directory) path.getLastPathComponent();
+    // Get the last element of the path which we know to be an instance of Directory
+    Directory dir = (Directory) path.getLastPathComponent();
 
-      // return the File object which specifies this Directory
-      File current = dir.getDirectory();
+    // return the File object which specifies this Directory
+    File current = dir.getDirectory();
 
-      String val = JOptionPane.showInputDialog(this, "Specificare il nome della directory da creare:");
-      if(val == null)
-        return;
+    String val = JOptionPane.showInputDialog(this, "Specificare il nome della directory da creare:");
+    if(val == null)
+      return;
 
-      File newDir = new File(current, val);
-      newDir.mkdirs();
+    File newDir = new File(current, val);
+    newDir.mkdirs();
 
-      // ricostruisce il modello e l'albero per aggiornare la visualizzazione
-      spTree.getViewport().removeAll();
-      dirModel = new DirectoryTreeModel();
-      initTree(root.getDirectory());
+    // ricostruisce il modello e l'albero per aggiornare la visualizzazione
+    spTree.getViewport().removeAll();
+    dirModel = new DirectoryTreeModel();
+    initTree(root.getDirectory());
 
-      // rende la nuova directory quella corrente
-      setSelectedDirectory(newDir);
-      tree.repaint();
+    // rende la nuova directory quella corrente
+    setSelectedDirectory(newDir);
+    tree.repaint();
 
     }//GEN-LAST:event_jbNewDirActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -259,7 +259,7 @@ public class DirChooserDlg extends javax.swing.JDialog
   /**
    * Gets the string that goes in the <code>JDirectoryChooser</code>'s title bar.
    *
-   * @return  */
+   * @return */
   public String getDialogTitle()
   {
     return dialogTitle;
@@ -267,7 +267,7 @@ public class DirChooserDlg extends javax.swing.JDialog
 
   /**
    * Pops up a "Select Directory" directory chooser dialog. Note that the text the appears in the
-   * approve button is determined by the L&F.
+   * approve button is determined by the Look and Feel.
    *
    * <p>
    *
@@ -430,7 +430,7 @@ public class DirChooserDlg extends javax.swing.JDialog
   /**
    * Returns the current file view.
    *
-   * @return  */
+   * @return */
   public FileView getFileView()
   {
     return chooser.getFileView();

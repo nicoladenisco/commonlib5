@@ -571,8 +571,8 @@ abstract public class GenericTableModelVisibility<T> extends AbstractTableModel
    * classi derivate, al fine di implementare
    * qualche logica al momento della cancellazione
    * di un elemento.
-   * @param idx
-   * @return
+   * @param toDel oggetto da cancellare
+   * @return vero se l'oggetto esiste e cancellato
    */
   public boolean removeData(T toDel)
   {
@@ -585,8 +585,8 @@ abstract public class GenericTableModelVisibility<T> extends AbstractTableModel
    * classi derivate, al fine di implementare
    * qualche logica al momento della cancellazione
    * di un elemento.
-   * @param idx
-   * @return
+   * @param toDel oggetto da cancellare
+   * @return vero se l'oggetto esiste e cancellato
    */
   public boolean removeData(List<T> toDel)
   {
@@ -617,7 +617,6 @@ abstract public class GenericTableModelVisibility<T> extends AbstractTableModel
    * opportunamente in quello del modello in base al sorting attivo.
    * L'oggetto tbl serve appunto per operare la conversione.
    * @param row indice riga di tabella
-   * @param tbl tabella di riferimento
    * @return
    */
   public T deleteRow(int row)
@@ -637,7 +636,6 @@ abstract public class GenericTableModelVisibility<T> extends AbstractTableModel
    * L'oggetto tbl serve appunto per operare la conversione.
    * @param firstRow
    * @param lastRow
-   * @param tbl
    * @return
    */
   public synchronized List<T> deleteRows(int firstRow, int lastRow)
@@ -654,7 +652,6 @@ abstract public class GenericTableModelVisibility<T> extends AbstractTableModel
    * opportunamente in quello del modello in base al sorting attivo.
    * L'oggetto tbl serve appunto per operare la conversione.
    * @param rows
-   * @param tbl
    * @return
    */
   public synchronized List<T> deleteRows(int[] rows)
@@ -718,11 +715,10 @@ abstract public class GenericTableModelVisibility<T> extends AbstractTableModel
   }
 
   /**
-   * Recupera un blocco di righe.
+   * Recupera una riga.
    * L'indice di riga è quello di tabella che viene convertito
    * opportunamente in quello del modello in base al sorting attivo.
-   * @param firstRow
-   * @param lastRow
+   * @param row
    * @return
    */
   public synchronized T getRow(int row)

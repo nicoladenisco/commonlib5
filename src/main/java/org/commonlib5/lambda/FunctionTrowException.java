@@ -41,6 +41,7 @@ public interface FunctionTrowException<T, R>
    *
    * @param t the function argument
    * @return the function result
+   * @throws java.lang.Exception
    */
   R apply(T t)
      throws Exception;
@@ -56,9 +57,8 @@ public interface FunctionTrowException<T, R>
    * @param before the function to apply before this function is applied
    * @return a composed function that first applies the {@code before}
    * function and then applies this function
+   * @throws java.lang.Exception
    * @throws NullPointerException if before is null
-   *
-   * @see #andThen(FunctionTrow)
    */
   default <V> FunctionTrowException<V, R> compose(FunctionTrowException<? super V, ? extends T> before)
      throws Exception
@@ -78,9 +78,8 @@ public interface FunctionTrowException<T, R>
    * @param after the function to apply after this function is applied
    * @return a composed function that first applies this function and then
    * applies the {@code after} function
+   * @throws java.lang.Exception
    * @throws NullPointerException if after is null
-   *
-   * @see #compose(FunctionTrow)
    */
   default <V> FunctionTrowException<T, V> andThen(FunctionTrowException<? super R, ? extends V> after)
      throws Exception

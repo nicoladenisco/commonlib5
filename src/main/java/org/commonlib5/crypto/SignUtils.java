@@ -291,8 +291,7 @@ public class SignUtils
   /**
    * Estrae il contenuto di un file P7M.
    * @param p7m file da leggere
-   * @param output contenuto del p7m
-   * @return
+   * @return contenuto del file
    * @throws Exception
    */
   public static byte[] extractDocument(File p7m)

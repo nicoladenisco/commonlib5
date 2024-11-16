@@ -40,9 +40,9 @@ import org.apache.commons.lang3.mutable.MutableInt;
  * OPERATORI
  * expTest ? exp1 : exp2         se expTest != 0 assegna exp1 altrimenti exp2
  * "^", "%", "/", "*", "+", "-"  classici operatori aritmentici
- * ">", "<", "==", ">=", "<=", "!=" operatori di confronto: ritornano 0 o 1 se è verificato
- * "<|"                          assegna il minimo di due operandi
- * "|>"                          assegna il massimo di due operandi
+ * "&gt;", "&lt;", "==", "&gt;=", "&lt;=", "!=" operatori di confronto: ritornano 0 o 1 se è verificato
+ * "&lt;|"                          assegna il minimo di due operandi
+ * "|&gt;"                          assegna il massimo di due operandi
  *
  *
  * FUNZIONI BUILT IN

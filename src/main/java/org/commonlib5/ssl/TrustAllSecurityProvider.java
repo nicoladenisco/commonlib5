@@ -21,12 +21,10 @@ import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.*;
 import org.commonlib5.utils.StringOper;
-import sun.security.jca.Providers;
 
 /**
  * Questo provider consente di creare socket SSL che accettano i
@@ -171,12 +169,12 @@ public class TrustAllSecurityProvider extends Provider
         prevAlgo = prevAlgoTest;
       }
 
-      List<Provider> lsProv = Providers.getFullProviderList().providers();
-      for(int i = 0; i < lsProv.size(); i++)
-      {
-        Provider p = lsProv.get(i);
-        logger.info(String.format("Provider %d: %s %f", i, p.getName(), p.getVersion()));
-      }
+//      List<Provider> lsProv = Providers.getFullProviderList().providers();
+//      for(int i = 0; i < lsProv.size(); i++)
+//      {
+//        Provider p = lsProv.get(i);
+//        logger.info(String.format("Provider %d: %s %f", i, p.getName(), p.getVersion()));
+//      }
     }
   }
 

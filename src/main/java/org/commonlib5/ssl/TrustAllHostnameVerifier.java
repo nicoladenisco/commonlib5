@@ -25,7 +25,7 @@ import javax.net.ssl.SSLSession;
 
 /**
  * Verificatore di host name per HttpsURLConnection con passaggio totale.
- * @deprecated usare {@link TrustAllSecurityProvider.registerHttpsURL}
+ * @deprecated usare TrustAllSecurityProvider.registerHttpsURL
  * @author Nicola De Nisco
  */
 public class TrustAllHostnameVerifier

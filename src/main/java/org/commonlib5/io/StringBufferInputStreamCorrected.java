@@ -24,21 +24,17 @@ public class StringBufferInputStreamCorrected extends InputStream
   protected byte[] buffer = null;
   /**
    * The index of the next character to read from the input stream buffer.
-   *
-   * @see        java.io.StringBufferInputStreamCorrected#buffer
    */
   protected int pos = 0;
   /**
    * The number of valid characters in the input stream buffer.
-   *
-   * @see        java.io.StringBufferInputStreamCorrected#buffer
    */
   protected int count = 0;
 
   /**
    * Creates a string input stream to read data from the specified string.
    *
-   * @param      s   the underlying input buffer.
+   * @param s the underlying input buffer.
    */
   public StringBufferInputStreamCorrected(String s)
   {
@@ -49,7 +45,7 @@ public class StringBufferInputStreamCorrected extends InputStream
   /**
    * Creates a string input stream to read data from the specified string.
    *
-   * @param      s   the underlying input buffer.
+   * @param s the underlying input buffer.
    * @param charsetName
    * @throws java.io.UnsupportedEncodingException
    */
@@ -71,8 +67,8 @@ public class StringBufferInputStreamCorrected extends InputStream
    * <code>StringBufferInputStreamCorrected</code> cannot block. It returns the
    * low eight bits of the next character in this input stream's buffer.
    *
-   * @return     the next byte of data, or <code>-1</code> if the end of the
-   *             stream is reached.
+   * @return the next byte of data, or <code>-1</code> if the end of the
+   * stream is reached.
    */
   @Override
   public synchronized int read()
@@ -89,12 +85,12 @@ public class StringBufferInputStreamCorrected extends InputStream
    * low eight bits from the characters in this input stream's buffer into
    * the byte array argument.
    *
-   * @param      b     the buffer into which the data is read.
-   * @param      off   the start offset of the data.
-   * @param      len   the maximum number of bytes read.
-   * @return     the total number of bytes read into the buffer, or
-   *             <code>-1</code> if there is no more data because the end of
-   *             the stream has been reached.
+   * @param b the buffer into which the data is read.
+   * @param off the start offset of the data.
+   * @param len the maximum number of bytes read.
+   * @return the total number of bytes read into the buffer, or
+   * <code>-1</code> if there is no more data because the end of
+   * the stream has been reached.
    */
   @Override
   public synchronized int read(byte b[], int off, int len)
@@ -130,8 +126,8 @@ public class StringBufferInputStreamCorrected extends InputStream
    * Skips <code>n</code> bytes of input from this input stream. Fewer
    * bytes might be skipped if the end of the input stream is reached.
    *
-   * @param      n   the number of bytes to be skipped.
-   * @return     the actual number of bytes skipped.
+   * @param n the number of bytes to be skipped.
+   * @return the actual number of bytes skipped.
    */
   @Override
   public synchronized long skip(long n)
@@ -152,8 +148,8 @@ public class StringBufferInputStreamCorrected extends InputStream
    * Returns the number of bytes that can be read from the input
    * stream without blocking.
    *
-   * @return     the value of <code>count&nbsp;-&nbsp;pos</code>, which is the
-   *             number of bytes remaining to be read from the input buffer.
+   * @return the value of <code>count&nbsp;-&nbsp;pos</code>, which is the
+   * number of bytes remaining to be read from the input buffer.
    */
   @Override
   public synchronized int available()

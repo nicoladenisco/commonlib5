@@ -62,7 +62,6 @@ public class SignatureEngine extends CryptoBaseEngine
    * sottoposto.
    * @param aDocument documento sotto forma di byte
    * @throws DocumentSignException
-   * @see prepareSmartCardAndData(String aPinCode)
    */
   public void signDocument(byte[] aDocument)
      throws DocumentSignException
@@ -77,7 +76,6 @@ public class SignatureEngine extends CryptoBaseEngine
    * @param fileDocument file su disco da firmare
    * @throws DocumentSignException
    * @throws java.io.FileNotFoundException
-   * @see prepareSmartCardAndData(String aPinCode)
    */
   public void signDocument(File fileDocument)
      throws DocumentSignException, FileNotFoundException
@@ -93,7 +91,6 @@ public class SignatureEngine extends CryptoBaseEngine
    * caso di errore (eccezione sollevata).
    * @param is Stream di dati da firmare
    * @throws DocumentSignException
-   * @see prepareSmartCardAndData(String aPinCode)
    */
   public void signDocument(InputStream is)
      throws DocumentSignException

@@ -104,7 +104,7 @@ public class CadesSignatureEngine extends SignatureEngine
   /**
    * Firma il file specificato dalla path generando
    * nella stessa directory un file con lo stesso nome
-   * ed estensione p7m (ES: file.txt -> file.txt.p7m)
+   * ed estensione p7m (ES: file.txt diventa file.txt.p7m)
    * @param fileDaFirmarePath path del file da firmare
    * @throws Exception
    */

@@ -154,7 +154,7 @@ public class JDirectoryChooser extends JComponent
 
   /**
    * Pops up a "Select Directory" directory chooser dialog. Note that the text the appears in the
-   * approve button is determined by the L&F.
+   * approve button is determined by the Look and Feel.
    *
    * <p>
    *
