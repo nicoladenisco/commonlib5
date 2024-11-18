@@ -79,7 +79,7 @@ public class LEU
   }
 
   /**
-   * .forEach(rethrowConsumer(name -> System.out.println(Class.forName(name))));
+   * .forEach(rethrowConsumer((name) -&gt; System.out.println(Class.forName(name))));
    */
   public static <T, E extends Exception> Consumer<T> rethrowConsumer(Consumer_WithExceptions<T, E> consumer)
      throws E
@@ -104,7 +104,7 @@ public class LEU
   }
 
   /**
-   * .map(rethrowFunction(name -> Class.forName(name))) or .map(rethrowFunction(Class::forName))
+   * .map(rethrowFunction(name -&gt; Class.forName(name))) or .map(rethrowFunction(Class::forName))
    */
   public static <T, R, E extends Exception> Function<T, R> rethrowFunction(Function_WithExceptions<T, R, E> function)
      throws E
@@ -124,7 +124,7 @@ public class LEU
   }
 
   /**
-   * .map(rethrowFunction(name -> Class.forName(name))) or .map(rethrowFunction(Class::forName))
+   * .map(rethrowFunction(name -&gt; Class.forName(name))) or .map(rethrowFunction(Class::forName))
    */
   public static <T, R, E extends Exception> Function<T, R> f(Function_WithExceptions<T, R, E> function)
      throws E
@@ -133,7 +133,7 @@ public class LEU
   }
 
   /**
-   * .mapToInt(LEU.rethrowFunctionInt((r) -> r.getValue(indexInRecord).asInt()))
+   * .mapToInt(LEU.rethrowFunctionInt((r) -&gt; r.getValue(indexInRecord).asInt()))
    */
   public static <T, E extends Exception> ToIntFunction<T> rethrowFunctionInt(ToIntFunction_WithExceptions<T, E> function)
      throws E
@@ -205,7 +205,7 @@ public class LEU
   }
 
   /**
-   * .forEach(rethrowConsumer(name -> System.out.println(Class.forName(name))));
+   * .forEach(rethrowConsumer(name -&gt; System.out.println(Class.forName(name))));
    */
   public static <T, E extends Exception> Predicate<T> rethrowPredicate(Predicate_WithExceptions<T, E> predicate)
      throws E
@@ -231,7 +231,7 @@ public class LEU
   }
 
   /**
-   * executor.execute(rethrowRunnable(() -> System.out.println(Class.forName(name))));
+   * executor.execute(rethrowRunnable(() -&gt; System.out.println(Class.forName(name))));
    */
   public static <E extends Exception> Runnable rethrowRunnable(Runnable_WithExceptions<E> runnable)
      throws E

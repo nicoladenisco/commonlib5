@@ -23,9 +23,6 @@ import java.nio.BufferOverflowException;
  * <p>
  * This class is thread safe.
  *
- * @see CircularCharBuffer
- * @see CircularObjectBuffer
- *
  * @author Stephen Ostermiller http://ostermiller.org/contact.pl?regarding=Java+Utilities
  * @since ostermillerutils 1.00.00
  */
@@ -48,18 +45,18 @@ public class CircularByteBuffer
    * <p>
    * The actual capacity of the buffer is one less than the actual length
    * of the buffer so that an empty and a full buffer can be
-   * distinguished.  An empty buffer will have the markPostion and the
-   * writePosition equal to each other.  A full buffer will have
+   * distinguished. An empty buffer will have the markPostion and the
+   * writePosition equal to each other. A full buffer will have
    * the writePosition one less than the markPostion.
    * <p>
    * There are three important indexes into the buffer:
    * The readPosition, the writePosition, and the markPosition.
    * If the InputStream has never been marked, the readPosition and
-   * the markPosition should always be the same.  The bytes
+   * the markPosition should always be the same. The bytes
    * available to be read go from the readPosition to the writePosition,
-   * wrapping around the end of the buffer.  The space available for writing
+   * wrapping around the end of the buffer. The space available for writing
    * goes from the write position to one less than the markPosition,
-   * wrapping around the end of the buffer.  The bytes that have
+   * wrapping around the end of the buffer. The bytes that have
    * been saved to support a reset() of the InputStream go from markPosition
    * to readPosition, wrapping around the end of the buffer.
    *
@@ -130,7 +127,7 @@ public class CircularByteBuffer
   protected boolean outputStreamClosed = false;
 
   /**
-   * Make this buffer ready for reuse.  The contents of the buffer
+   * Make this buffer ready for reuse. The contents of the buffer
    * will be cleared and the streams associated with this buffer
    * will be reopened if they had been closed.
    *
@@ -153,7 +150,7 @@ public class CircularByteBuffer
    * this buffer.
    * <p>
    * Write methods may throw a BufferOverflowException if
-   * the buffer is not large enough.  A large enough buffer
+   * the buffer is not large enough. A large enough buffer
    * size must be chosen so that this does not happen or
    * the caller must be prepared to catch the exception and
    * try again once part of the buffer has been consumed.
@@ -384,8 +381,8 @@ public class CircularByteBuffer
    * given blocking behavior.
    *
    * @param blockingWrite true writing to a full buffer should block
-   *        until space is available, false if an exception should
-   *        be thrown instead.
+   * until space is available, false if an exception should
+   * be thrown instead.
    *
    * @since ostermillerutils 1.00.00
    */
@@ -408,8 +405,8 @@ public class CircularByteBuffer
    *
    * @param size desired capacity of the buffer in bytes or CircularByteBuffer.INFINITE_SIZE.
    * @param blockingWrite true writing to a full buffer should block
-   *        until space is available, false if an exception should
-   *        be thrown instead.
+   * until space is available, false if an exception should
+   * be thrown instead.
    *
    * @since ostermillerutils 1.00.00
    */
@@ -446,7 +443,8 @@ public class CircularByteBuffer
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public int available() throws IOException
+    public int available()
+       throws IOException
     {
       synchronized(CircularByteBuffer.this)
       {
@@ -466,7 +464,8 @@ public class CircularByteBuffer
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public void close() throws IOException
+    public void close()
+       throws IOException
     {
       synchronized(CircularByteBuffer.this)
       {
@@ -482,8 +481,8 @@ public class CircularByteBuffer
      * this method has no effect.
      *
      * @param readAheadLimit Limit on the number of bytes that may be read while
-     *    still preserving the mark. After reading this many bytes, attempting to
-     *    reset the stream will fail.
+     * still preserving the mark. After reading this many bytes, attempting to
+     * reset the stream will fail.
      *
      * @since ostermillerutils 1.00.00
      */
@@ -520,13 +519,14 @@ public class CircularByteBuffer
      * or the end of the stream is reached.
      *
      * @return The byte read, as an integer in the range 0 to 255 (0x00-0xff),
-     *     or -1 if the end of the stream has been reached
+     * or -1 if the end of the stream has been reached
      * @throws IOException if the stream is closed.
      *
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public int read() throws IOException
+    public int read()
+       throws IOException
     {
       while(true)
       {
@@ -569,13 +569,14 @@ public class CircularByteBuffer
      *
      * @param cbuf Destination buffer.
      * @return The number of bytes read, or -1 if the end of
-     *   the stream has been reached
+     * the stream has been reached
      * @throws IOException if the stream is closed.
      *
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public int read(byte[] cbuf) throws IOException
+    public int read(byte[] cbuf)
+       throws IOException
     {
       return read(cbuf, 0, cbuf.length);
     }
@@ -589,13 +590,14 @@ public class CircularByteBuffer
      * @param off Offset at which to start storing bytes.
      * @param len Maximum number of bytes to read.
      * @return The number of bytes read, or -1 if the end of
-     *   the stream has been reached
+     * the stream has been reached
      * @throws IOException if the stream is closed.
      *
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public int read(byte[] cbuf, int off, int len) throws IOException
+    public int read(byte[] cbuf, int off, int len)
+       throws IOException
     {
       while(true)
       {
@@ -653,7 +655,8 @@ public class CircularByteBuffer
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public void reset() throws IOException
+    public void reset()
+       throws IOException
     {
       synchronized(CircularByteBuffer.this)
       {
@@ -676,7 +679,8 @@ public class CircularByteBuffer
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public long skip(long n) throws IOException, IllegalArgumentException
+    public long skip(long n)
+       throws IOException, IllegalArgumentException
     {
       while(true)
       {
@@ -745,7 +749,8 @@ public class CircularByteBuffer
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public void close() throws IOException
+    public void close()
+       throws IOException
     {
       synchronized(CircularByteBuffer.this)
       {
@@ -765,7 +770,8 @@ public class CircularByteBuffer
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public void flush() throws IOException
+    public void flush()
+       throws IOException
     {
       if(outputStreamClosed)
         throw new IOException("OutputStream has been closed; cannot flush a closed OutputStream.");
@@ -781,14 +787,15 @@ public class CircularByteBuffer
      *
      * @param cbuf Array of bytes to be written
      * @throws BufferOverflowException if buffer does not allow blocking writes
-     *   and the buffer is full.  If the exception is thrown, no data
-     *   will have been written since the buffer was set to be non-blocking.
+     * and the buffer is full. If the exception is thrown, no data
+     * will have been written since the buffer was set to be non-blocking.
      * @throws IOException if the stream is closed, or the write is interrupted.
      *
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public void write(byte[] cbuf) throws IOException
+    public void write(byte[] cbuf)
+       throws IOException
     {
       write(cbuf, 0, cbuf.length);
     }
@@ -802,14 +809,15 @@ public class CircularByteBuffer
      * @param off Offset from which to start writing bytes
      * @param len - Number of bytes to write
      * @throws BufferOverflowException if buffer does not allow blocking writes
-     *   and the buffer is full.  If the exception is thrown, no data
-     *   will have been written since the buffer was set to be non-blocking.
+     * and the buffer is full. If the exception is thrown, no data
+     * will have been written since the buffer was set to be non-blocking.
      * @throws IOException if the stream is closed, or the write is interrupted.
      *
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public void write(byte[] cbuf, int off, int len) throws IOException
+    public void write(byte[] cbuf, int off, int len)
+       throws IOException
     {
       while(len > 0)
       {
@@ -876,13 +884,14 @@ public class CircularByteBuffer
      *
      * @param c number of bytes to be written
      * @throws BufferOverflowException if buffer does not allow blocking writes
-     *   and the buffer is full.
+     * and the buffer is full.
      * @throws IOException if the stream is closed, or the write is interrupted.
      *
      * @since ostermillerutils 1.00.00
      */
     @Override
-    public void write(int c) throws IOException
+    public void write(int c)
+       throws IOException
     {
       boolean written = false;
       while(!written)
@@ -929,4 +938,3 @@ public class CircularByteBuffer
     }
   }
 }
-

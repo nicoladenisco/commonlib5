@@ -26,7 +26,7 @@ import java.util.Objects;
  * La path UNC può essere ambigua in quanto risorsa può essere una directory
  * o un file; se la path termina con '/' viene considerata parte della directory.
  * Lo stesso si ottiene se alwaysDirectory è vero.
- * <code><pre>
+ * <pre><code>
  *  //mioserver/condiviso/uno/due/tre
  *  server = mioserver
  *  condivisione = condiviso
@@ -38,7 +38,7 @@ import java.util.Objects;
  *  condivisione = condiviso
  *  directory = uno/due/tre
  *  risorsa = null
- * </pre></code>
+ * </code></pre>
  *
  * @author Nicola De Nisco
  */

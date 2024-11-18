@@ -25,7 +25,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -42,7 +41,7 @@ import org.commonlib5.utils.PropertyManager;
  * have been translated via the internal mapping array. This way,
  * the TableSorter appears to hold another copy of the table
  * with the rows in a different order.
- * <p/>
+ * <br>
  * TableSorter registers itself as a listener to the underlying model,
  * just as the JTable itself would. Events recieved from the model
  * are examined, sometimes manipulated (typically widened), and then
@@ -50,7 +49,7 @@ import org.commonlib5.utils.PropertyManager;
  * If a change to the model has invalidated the order of TableSorter's
  * rows, a note of this is made and the sorter will resort the
  * rows the next time a value is requested.
- * <p/>
+ * <br>
  * When the tableHeader property is set, either by using the
  * setTableHeader() method or the two argument constructor, the
  * table header may be used as a complete UI for TableSorter.
@@ -73,14 +72,16 @@ import org.commonlib5.utils.PropertyManager;
  * that are already sorting - giving a way to initiate a compound
  * sort.
  * </ul>
- * <p/>
+ * <br>
  * This is a long overdue rewrite of a class of the same name that
  * first appeared in the swing table demos in 1997.
  *
- * <p>E' possibile salvare e ripristinare lo stato di ordinamento
+ * <p>
+ * E' possibile salvare e ripristinare lo stato di ordinamento
  * attraverso i metodi saveSortOrder() loadSortOrder().</p>
  *
- * <p>Si possono convertire le righe fra i l'ordine di visualizzazione
+ * <p>
+ * Si possono convertire le righe fra i l'ordine di visualizzazione
  * e quello del table model con modelIndex() e viewIndex().</p>
  *
  * @author Philip Milne

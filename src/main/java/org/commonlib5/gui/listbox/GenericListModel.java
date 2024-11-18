@@ -202,8 +202,8 @@ public class GenericListModel<T> extends AbstractListModel<T>
    * classi derivate, al fine di implementare
    * qualche logica al momento della cancellazione
    * di un elemento.
-   * @param idx
-   * @return
+   * @param toDel oggetto da cancellare
+   * @return vero se l'oggetto esiste e cancellato
    */
   public boolean removeData(T toDel)
   {
@@ -216,8 +216,8 @@ public class GenericListModel<T> extends AbstractListModel<T>
    * classi derivate, al fine di implementare
    * qualche logica al momento della cancellazione
    * di un elemento.
-   * @param idx
-   * @return
+   * @param toDel oggetto da cancellare
+   * @return vero se l'oggetto esiste e cancellato
    */
   public boolean removeData(List<T> toDel)
   {
@@ -248,7 +248,7 @@ public class GenericListModel<T> extends AbstractListModel<T>
    * L'indice di riga è quello di tabella che viene convertito
    * opportunamente in quello del modello in base al sorting attivo.
    * L'oggetto tbl serve appunto per operare la conversione.
-   * @param row indice riga di tabella
+   * @param mrow indice riga di tabella
    * @param tbl tabella di riferimento
    * @return
    */
@@ -267,7 +267,6 @@ public class GenericListModel<T> extends AbstractListModel<T>
    * L'oggetto tbl serve appunto per operare la conversione.
    * @param firstRow
    * @param lastRow
-   * @param tbl
    * @return
    */
   public synchronized List<T> deleteRows(int firstRow, int lastRow)
@@ -284,7 +283,6 @@ public class GenericListModel<T> extends AbstractListModel<T>
    * opportunamente in quello del modello in base al sorting attivo.
    * L'oggetto tbl serve appunto per operare la conversione.
    * @param rows
-   * @param tbl
    * @return
    */
   public synchronized List<T> deleteRows(int[] rows)
@@ -355,7 +353,6 @@ public class GenericListModel<T> extends AbstractListModel<T>
    * L'oggetto tbl serve appunto per operare la conversione.
    * @param firstRow
    * @param lastRow
-   * @param tbl
    * @return
    */
   public synchronized List<T> getRows(int firstRow, int lastRow)

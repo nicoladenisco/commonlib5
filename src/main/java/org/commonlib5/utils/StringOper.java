@@ -207,7 +207,7 @@ public class StringOper
    * @param c carattere da convertire
    * @return vero se ha effettuato una conversione
    */
-  public static boolean appendJavascriptChar(StringBuffer sb, int c)
+  public static boolean appendJavascriptChar(StringBuilder sb, int c)
   {
     switch(c)
     {
@@ -231,7 +231,7 @@ public class StringOper
    * @param c carattere da convertire
    * @return vero se ha effettuato una conversione
    */
-  public static boolean appendSQLchar(StringBuffer sb, int c)
+  public static boolean appendSQLchar(StringBuilder sb, int c)
   {
     switch(c)
     {
@@ -254,7 +254,7 @@ public class StringOper
    * @param c carattere da convertire
    * @return vero se ha effettuato una conversione
    */
-  public static boolean appendWEBstring(StringBuffer sb, int c)
+  public static boolean appendWEBstring(StringBuilder sb, int c)
   {
     String tmp = unicode2HtmlMap.get((char) c);
     if(tmp != null)
@@ -268,7 +268,7 @@ public class StringOper
    * @param c carattere da convertire
    * @return vero se ha effettuato una conversione
    */
-  public static boolean appendXMLstring(StringBuffer sb, int c)
+  public static boolean appendXMLstring(StringBuilder sb, int c)
   {
     switch(c)
     {
@@ -289,7 +289,7 @@ public class StringOper
   {
     int len = s.length();
     char[] arChar = s.toCharArray();
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder(len);
 
     for(int i = 0; i < len; i++)
     {
@@ -309,7 +309,7 @@ public class StringOper
   {
     int len = s.length();
     char[] arChar = s.toCharArray();
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder(len);
 
     for(int i = 0; i < len; i++)
     {
@@ -329,7 +329,7 @@ public class StringOper
   {
     int len = s.length();
     char[] arChar = s.toCharArray();
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder(len);
 
     for(int i = 0; i < len; i++)
     {
@@ -352,7 +352,7 @@ public class StringOper
   {
     int len = s.length();
     char[] arChar = s.toCharArray();
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder(len);
 
     for(int i = 0; i < len; i++)
     {
@@ -374,7 +374,7 @@ public class StringOper
   {
     int len = s.length();
     char[] arChar = s.toCharArray();
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder(len);
 
     for(int i = 0; i < len; i++)
     {
@@ -468,7 +468,7 @@ public class StringOper
   {
     // applico l'espressione regolare,
     // sostituendo i caratteri speciali &#x...; con il loro valore unicode
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     Matcher m = esaHtmlPattern.matcher(str);
     while(m.find())
     {
@@ -481,7 +481,7 @@ public class StringOper
 
     // applico l'espressione regolare,
     // sostituendo i caratteri speciali &#...; con il loro valore unicode
-    sb = new StringBuffer();
+    sb = new StringBuilder();
     m = decHtmlPattern.matcher(str);
     while(m.find())
     {
@@ -494,7 +494,7 @@ public class StringOper
 
     // applico l'espressione regolare,
     // sostituendo i caratteri speciali &...; con il loro valore unicode
-    sb = new StringBuffer();
+    sb = new StringBuilder();
     m = specialHtmlPattern.matcher(str);
     while(m.find())
     {
@@ -2479,7 +2479,7 @@ public class StringOper
     // applico l'espressione regolare,
     // sostituendo i caratteri speciali con la stringa vuota
     Matcher m = htmlRemovePattern.matcher(html);
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     while(m.find())
     {
       m.appendReplacement(sb, "");
