@@ -391,4 +391,12 @@ public final class ExecHelper
   {
     return status;
   }
+
+  public void getReportError(StringBuilder sb)
+  {
+    sb.append("-STDOUT-------------------------------------\n");
+    sb.append(getOutput()).append("\n");
+    sb.append("-STDERR-------------------------------------\n");
+    sb.append(getError()).append("\n");
+  }
 }
