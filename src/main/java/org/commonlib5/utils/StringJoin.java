@@ -17,10 +17,12 @@
  */
 package org.commonlib5.utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,7 +34,7 @@ import static org.commonlib5.lambda.LEU.*;
  *
  * @author Nicola De Nisco
  */
-public class StringJoin
+public class StringJoin implements Serializable, Cloneable
 {
   protected final List<String> stringhe = new ArrayList<>();
   protected String separatore, delimitatore;
@@ -63,17 +65,17 @@ public class StringJoin
     return new StringJoin(separatore, delimitatore);
   }
 
-  public static StringJoin buildSQL(int[] cs)
+  public static StringJoin buildForSQL(int[] cs)
   {
     return new StringJoin(",").add(cs);
   }
 
-  public static StringJoin buildSQL(long[] cs)
+  public static StringJoin buildForSQL(long[] cs)
   {
     return new StringJoin(",").add(cs);
   }
 
-  public static StringJoin buildSQL(String[] cs)
+  public static StringJoin buildForSQL(String[] cs)
   {
     return new StringJoin(",", "'").add(cs);
   }
@@ -132,7 +134,9 @@ public class StringJoin
 
   public StringJoin add(Collection<String> cs)
   {
-    stringhe.addAll(cs);
+    for(String c : cs)
+      if(c != null)
+        stringhe.add(c);
     return this;
   }
 
@@ -144,7 +148,7 @@ public class StringJoin
     return this;
   }
 
-  public StringJoin add(Collection<String> cs, FunctionTrowException<String, String> fun)
+  public StringJoin addEx(Collection<String> cs, FunctionTrowException<String, String> fun)
      throws Exception
   {
     for(String c : cs)
@@ -157,7 +161,7 @@ public class StringJoin
   {
     for(Object c : cs)
       if(c != null)
-        stringhe.add(cs.toString());
+        stringhe.add(c.toString());
     return this;
   }
 
@@ -169,7 +173,7 @@ public class StringJoin
     return this;
   }
 
-  public <T> StringJoin addObjects(Collection<T> cs, FunctionTrowException<T, String> fun)
+  public <T> StringJoin addObjectsEx(Collection<T> cs, FunctionTrowException<T, String> fun)
      throws Exception
   {
     for(T c : cs)
@@ -198,7 +202,7 @@ public class StringJoin
     return this;
   }
 
-  public <T> StringJoin addObjects(Stream<T> cs, FunctionTrowException<T, String> fun)
+  public <T> StringJoin addObjectsEx(Stream<T> cs, FunctionTrowException<T, String> fun)
      throws Exception
   {
     cs.forEach(c((o) ->
@@ -238,7 +242,72 @@ public class StringJoin
     return this;
   }
 
+  public StringJoin clear()
+  {
+    stringhe.clear();
+    return this;
+  }
+
+  public StringJoin copyFrom(StringJoin origin)
+  {
+    stringhe.clear();
+    stringhe.addAll(origin.stringhe);
+
+    delimitatore = origin.delimitatore;
+    separatore = origin.separatore;
+    return this;
+  }
+
+  @Override
+  public Object clone()
+     throws CloneNotSupportedException
+  {
+    StringJoin oc = (StringJoin) super.clone();
+    return oc.copyFrom(this);
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+    hash = 73 * hash + Objects.hashCode(this.stringhe);
+    hash = 73 * hash + Objects.hashCode(this.separatore);
+    hash = 73 * hash + Objects.hashCode(this.delimitatore);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if(this == obj)
+      return true;
+    if(obj == null)
+      return false;
+    if(getClass() != obj.getClass())
+      return false;
+    final StringJoin other = (StringJoin) obj;
+    if(!Objects.equals(this.separatore, other.separatore))
+      return false;
+    if(!Objects.equals(this.delimitatore, other.delimitatore))
+      return false;
+    return Objects.equals(this.stringhe, other.stringhe);
+  }
+
+  @Override
+  public String toString()
+  {
+    return "StringJoin{"
+       + "stringhe=" + stringhe
+       + ", separatore=" + separatore
+       + ", delimitatore=" + delimitatore + '}';
+  }
+
   public String join()
+  {
+    return join(128);
+  }
+
+  public String join(int sizeBuffer)
   {
     if(stringhe.isEmpty())
       return "";
@@ -247,7 +316,7 @@ public class StringJoin
       return StringOper.okStr(stringhe.get(0));
 
     int i = 0;
-    StringBuilder rv = new StringBuilder();
+    StringBuilder rv = new StringBuilder(sizeBuffer);
     for(String s : stringhe)
     {
       if(s == null)
