@@ -1088,6 +1088,7 @@ public class StringOper
    * @param arStrings array delle stringhe da unire
    * @param separator carattere separatore fra le stringhe
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static String join(String[] arStrings, char separator)
   {
@@ -1119,6 +1120,7 @@ public class StringOper
    * @param separator carattere separatore fra le stringhe
    * @param delimiter delimitatore di ogni stringa
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static String join(String[] arStrings, char separator, char delimiter)
   {
@@ -1150,6 +1152,7 @@ public class StringOper
    * @param separator carattere separatore fra le stringhe
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static String join(String[] arStrings, String separator, String delimiter)
   {
@@ -1185,6 +1188,7 @@ public class StringOper
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
    * @throws java.lang.Exception
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static <T> String join(T[] arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
      throws Exception
@@ -1220,6 +1224,7 @@ public class StringOper
    * @param separator carattere separatore fra le stringhe
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static <T> String join2(T[] arStrings, Function<T, String> fn, String separator, String delimiter)
   {
@@ -1255,6 +1260,7 @@ public class StringOper
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
    * @throws java.lang.Exception
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static <T> String join(Collection<T> arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
      throws Exception
@@ -1294,6 +1300,7 @@ public class StringOper
    * @param separator carattere separatore fra le stringhe
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static <T> String join2(Collection<T> arStrings, Function<T, String> fn, String separator, String delimiter)
   {
@@ -1331,6 +1338,7 @@ public class StringOper
    * @param fn funzione che ritorna il valore per ogni oggetto
    * @param separator carattere separatore fra le stringhe
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static <T> String join2int(Collection<T> arStrings, Function<T, Integer> fn, String separator)
   {
@@ -1365,6 +1373,7 @@ public class StringOper
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
    * @throws java.lang.Exception
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static <T> String joinNotNull(Collection<T> arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
      throws Exception
@@ -1410,6 +1419,7 @@ public class StringOper
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
    * @throws java.lang.Exception
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static <T> String joinNotNull(T[] arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
      throws Exception
@@ -1445,7 +1455,7 @@ public class StringOper
 
   /**
    * Fonde un array di stringhe in una unica stringa
-   * utilizzando il separatore e' il delimitatore specificato.
+   * utilizzando il separatore e il delimitatore specificato.
    * Specifico per funzione Lambda di estrazione del valore.
    * Se la funzione ritorna null o stringa vuota il valore viene ignorato.
    * @param <T> tipo di oggetto generico
@@ -1454,6 +1464,7 @@ public class StringOper
    * @param separator carattere separatore fra le stringhe
    * @param delimiter delimitatore di ogni stringa (può essere null)
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static <T> String join2NotNull(Collection<T> arStrings, Function<T, String> fn, String separator, String delimiter)
   {
@@ -1486,6 +1497,15 @@ public class StringOper
     return rv.toString();
   }
 
+  /**
+   * Fonde un array di stringhe in una unica stringa
+   * utilizzando il separatore e il delimitatore specificato.
+   * @param separator
+   * @param delimiter
+   * @param arStrings
+   * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
+   */
   public static String joinNotEmpty(String separator, String delimiter, String... arStrings)
   {
     if(arStrings == null || arStrings.length < 1)
@@ -1514,16 +1534,48 @@ public class StringOper
     return rv.toString();
   }
 
+  /**
+   * Fonde un array di stringhe in una unica stringa
+   * utilizzando il separatore specificato.
+   * @param arStrings
+   * @param separator
+   * @param min
+   * @param max
+   * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
+   */
   public static String join(String[] arStrings, char separator, int min, int max)
   {
     return join(Arrays.copyOfRange(arStrings, min, max), separator);
   }
 
+  /**
+   * Fonde un array di stringhe in una unica stringa
+   * utilizzando il separatore e il delimitatore specificato.
+   * @param arStrings
+   * @param separator
+   * @param delimiter
+   * @param min
+   * @param max
+   * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
+   */
   public static String join(String[] arStrings, char separator, char delimiter, int min, int max)
   {
     return join(Arrays.copyOfRange(arStrings, min, max), separator, delimiter);
   }
 
+  /**
+   * Fonde un array di stringhe in una unica stringa
+   * utilizzando il separatore e il delimitatore specificato.
+   * @param arStrings
+   * @param separator
+   * @param delimiter
+   * @param min
+   * @param max
+   * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
+   */
   public static String join(String[] arStrings, String separator, String delimiter, int min, int max)
   {
     return join(Arrays.copyOfRange(arStrings, min, max), separator, delimiter);
@@ -1537,6 +1589,7 @@ public class StringOper
    * @param itr iteratore generico
    * @param separator carattere separatore fra le stringhe
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static String join(Iterator itr, char separator)
   {
@@ -1563,6 +1616,7 @@ public class StringOper
    * @param separator carattere separatore fra le stringhe
    * @param delimiter delimitatore di ogni stringa
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static String join(Iterator itr, char separator, char delimiter)
   {
@@ -1589,6 +1643,7 @@ public class StringOper
    * @param separator carattere separatore fra le stringhe
    * @param delimiter delimitatore di stringa (può essere null)
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static String join(Iterator itr, String separator, String delimiter)
   {
@@ -1618,6 +1673,7 @@ public class StringOper
    * @param arInt array di interi da unire
    * @param separator carattere separatore fra le stringhe
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static String join(int[] arInt, char separator)
   {
@@ -1629,6 +1685,15 @@ public class StringOper
     return rv.substring(1);
   }
 
+  /**
+   *
+   * @param arInt
+   * @param separator
+   * @param min
+   * @param max
+   * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
+   */
   public static String join(int[] arInt, char separator, int min, int max)
   {
     return join(Arrays.copyOfRange(arInt, min, max), separator);
@@ -2833,6 +2898,7 @@ public class StringOper
    * ES: joinCommand(stringhe) restituisce "c:\program files\my app\pippo.exe" c:\tmp\mio.txt "c:\tmp\mio file.txt"
    * @param arStrings array delle stringhe da unire
    * @return
+   * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
   public static String joinCommand(String[] arStrings)
   {

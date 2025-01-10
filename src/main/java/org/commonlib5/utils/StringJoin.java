@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.commonlib5.lambda.FunctionTrowException;
@@ -31,6 +32,11 @@ import static org.commonlib5.lambda.LEU.*;
 
 /**
  * Join di stringhe in varie salse.
+ * Il valore di default di sizeBuffer è 128 caratteri.
+ * <br>
+ * ES: String result = StringJoin.build().add("1","2","3").join();
+ * <br>
+ * Vedi StringJoinTest per ulteriori esempi.
  *
  * @author Nicola De Nisco
  */
@@ -38,6 +44,8 @@ public class StringJoin implements Serializable, Cloneable
 {
   protected final List<String> stringhe = new ArrayList<>();
   protected String separatore, delimitatore;
+  protected int sizeBuffer = 128;
+  public static final Pattern respazi = Pattern.compile("\\s+");
 
   public StringJoin(String separatore)
   {
@@ -99,6 +107,17 @@ public class StringJoin implements Serializable, Cloneable
   public StringJoin setDelimitatore(String delimitatore)
   {
     this.delimitatore = delimitatore;
+    return this;
+  }
+
+  public int getSizeBuffer()
+  {
+    return sizeBuffer;
+  }
+
+  public StringJoin setSizeBuffer(int sizeBuffer)
+  {
+    this.sizeBuffer = sizeBuffer;
     return this;
   }
 
@@ -302,12 +321,12 @@ public class StringJoin implements Serializable, Cloneable
        + ", delimitatore=" + delimitatore + '}';
   }
 
+  /**
+   * Fonde le sringhe.
+   * Stringhe nulle o vuote vengono ignorate.
+   * @return la stringa concatenata
+   */
   public String join()
-  {
-    return join(128);
-  }
-
-  public String join(int sizeBuffer)
   {
     if(stringhe.isEmpty())
       return "";
@@ -330,6 +349,46 @@ public class StringJoin implements Serializable, Cloneable
         rv.append(separatore);
 
       if(delimitatore == null)
+        rv.append(val);
+      else
+        rv.append(delimitatore).append(val).append(delimitatore);
+    }
+
+    return rv.toString();
+  }
+
+  /**
+   * Fonde una array di stringhe in una unica stringa
+   * da utilizzare come stringa comando per l'attivazione di un eseguibile.
+   * Ovvero gli elementi che contengono stringhe sono racchiusi in "" e il separatore è lo spazio.<br>
+   * ES: joinCommand() restituisce "c:\program files\my app\pippo.exe" c:\tmp\mio.txt "c:\tmp\mio file.txt"<br>
+   * Stringhe nulle o vuote vengono ignorate.
+   * I precedenti valori di separatore e delimitatore vengono ignorati.
+   * @return la stringa concatenata
+   */
+  public String joinCommand()
+  {
+    if(stringhe.isEmpty())
+      return "";
+
+    separatore = " ";
+    delimitatore = "\"";
+
+    int i = 0;
+    StringBuilder rv = new StringBuilder(sizeBuffer);
+    for(String s : stringhe)
+    {
+      if(s == null)
+        continue;
+
+      String val = s.trim();
+      if(val.isEmpty())
+        continue;
+
+      if(i++ > 0)
+        rv.append(separatore);
+
+      if(!respazi.matcher(val).find())
         rv.append(val);
       else
         rv.append(delimitatore).append(val).append(delimitatore);

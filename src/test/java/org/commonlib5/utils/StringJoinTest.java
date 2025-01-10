@@ -341,4 +341,17 @@ public class StringJoinTest
     StringJoin result = (StringJoin) instance.clone();
     assertEquals(instance, result);
   }
+
+  /**
+   * Test of clone method, of class StringJoin.
+   */
+  @Test
+  public void testJoinCommand()
+     throws Exception
+  {
+    System.out.println("joinCommand");
+    String result = StringJoin.build().add("aa", "b b", "c  c", "dd").joinCommand();
+    String expected = "aa \"b b\" \"c  c\" dd";
+    assertEquals(expected, result);
+  }
 }
