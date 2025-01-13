@@ -196,37 +196,19 @@
       <artifactId>javax.mail</artifactId>
       <version>1.6.2</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/log4j/log4j -->
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
-    <!--dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>1.69</version>
-    </dependency-->
-
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcutil-jdk15on</artifactId>
       <version>1.69</version>
     </dependency>
-
-    <!--dependency>
-      <groupId>org.apache.santuario</groupId>
-      <artifactId>xmlsec</artifactId>
-      <version>2.2.2</version>
-      <type>bundle</type>
-    </dependency-->
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20190722</version>
       <type>jar</type>
     </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -237,6 +219,13 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-core</artifactId>
       <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/log4j/log4j -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
