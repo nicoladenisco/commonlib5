@@ -7,9 +7,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import javax.swing.UIManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Interfaccia specifica verso le funzionalita di Mac OS X.
+ * Adatta barra dei menu e consente di installare gli handler
+ * per accettare funzionalità specifiche di mac.
+ * <br>
+ * Nel caso Java >= 11 alcune di queste funzionalità
+ * sono già presenti in java.awt.Desktop e occorre far riferimento
+ * a queste (nel proxy sono disattivate).
+ * @author Nicola De Nisco
+ */
 public class OSXProxy implements InvocationHandler
 {
   private static final Log log = LogFactory.getLog(OSXProxy.class);
@@ -30,7 +41,45 @@ public class OSXProxy implements InvocationHandler
     this.source = source;
   }
 
-  public void init()
+  /**
+   * Inizializza proxy.
+   * Attiva modifiche alle property ottimali per mac os x.
+   * Il nome appicazione viene impostato (appare nella barra menu a sinistra).
+   * @param appName
+   */
+  public void init(String appName)
+  {
+    if(!OsIdent.isMac())
+      return;
+
+    try
+    {
+      System.setProperty("apple.laf.useScreenMenuBar", "true");
+      System.setProperty("apple.graphics.UseQuartz", "true");
+      System.setProperty("apple.awt.application.name", appName);
+      System.setProperty("apple.awt.application.appearance", "system");
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+      if(OsIdent.getJavaVersionNumber() >= 11)
+      {
+        initJava11();
+      }
+      else
+      {
+        initJava8();
+      }
+    }
+    catch(Exception ex)
+    {
+      log.error("Unavailable system look and feel.");
+    }
+  }
+
+  /**
+   * Inizializzazione con Java 8.
+   * Vengono attivati gli handler opportuni per le funzionalita presenti in com.apple.eawt.ApplicationListener.
+   */
+  public void initJava8()
   {
     try
     {
@@ -48,6 +97,30 @@ public class OSXProxy implements InvocationHandler
       }, this);
 
       addListenerMethod.invoke(macOSXApplication, osxAdapterProxy);
+    }
+    catch(ClassNotFoundException cnfe)
+    {
+      log.error("This version of Mac OS X does not support the Apple EAWT.  ApplicationEvent handling has been disabled (" + cnfe + ")");
+    }
+    catch(Exception ex)
+    {
+      // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
+      log.error("Mac OS X Adapter could not talk to EAWT:", ex);
+    }
+  }
+
+  /**
+   * Inizializza con Java11.
+   * In java 11 server solo la classe com.apple.eawt.Application.
+   * Altre funzionalita sono disponibili in java.awt.Desktop.
+   */
+  public void initJava11()
+  {
+    try
+    {
+      Class applicationClass = Class.forName("com.apple.eawt.Application");
+      if(macOSXApplication == null)
+        macOSXApplication = applicationClass.getConstructor().newInstance();
     }
     catch(ClassNotFoundException cnfe)
     {
@@ -78,9 +151,9 @@ public class OSXProxy implements InvocationHandler
    * The method passed should return a boolean stating whether or not the quit should occur.
    * @param fun implementation
    */
-  public void setQuitHandler(Function<ActionEvent, Boolean> fun)
+  public void setQuitHandler(Consumer<ActionEvent> fun)
   {
-    funMap2.put("handleQuit", fun);
+    funMap1.put("handleQuit", fun);
   }
 
   /**
@@ -89,9 +162,9 @@ public class OSXProxy implements InvocationHandler
    * They will be called when the About menu item is selected from the application menu
    * @param fun implementation
    */
-  public void setAboutHandler(Function<ActionEvent, Boolean> fun)
+  public void setAboutHandler(Consumer<ActionEvent> fun)
   {
-    funMap2.put("handleAbout", fun);
+    funMap1.put("handleAbout", fun);
 
     // If we're setting a handler, enable the About menu item by calling
     // com.apple.eawt.Application reflectively
@@ -113,9 +186,9 @@ public class OSXProxy implements InvocationHandler
    * They will be called when the Preferences menu item is selected from the application menu
    * @param fun implementation
    */
-  public void setPreferencesHandler(Function<ActionEvent, Boolean> fun)
+  public void setPreferencesHandler(Consumer<ActionEvent> fun)
   {
-    funMap2.put("handlePreferences", fun);
+    funMap1.put("handlePreferences", fun);
 
     // If we're setting a handler, enable the Preferences menu item by calling
     // com.apple.eawt.Application reflectively
@@ -186,15 +259,25 @@ public class OSXProxy implements InvocationHandler
      throws Throwable
   {
     String name = method.getName();
-    Function<ActionEvent, Boolean> fun = funMap2.get(name);
-    if(fun != null)
+
+    Consumer<ActionEvent> fun1 = funMap1.get(name);
+    if(fun1 != null)
     {
       Object params = args.length > 0 ? args[0] : source;
-      boolean handled = fun.apply(new ActionEvent(params, 0, name));
-      setApplicationEventHandled(args[0], handled);
+      fun1.accept(new ActionEvent(params, 0, name));
+      setApplicationEventHandled(args[0], true);
+      return null;
     }
 
-    // All of the ApplicationListener methods are void; return null regardless of what happens
+    Function<ActionEvent, Boolean> fun2 = funMap2.get(name);
+    if(fun2 != null)
+    {
+      Object params = args.length > 0 ? args[0] : source;
+      boolean handled = fun2.apply(new ActionEvent(params, 0, name));
+      setApplicationEventHandled(args[0], handled);
+      return null;
+    }
+
     return null;
   }
 
