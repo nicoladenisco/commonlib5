@@ -137,7 +137,7 @@ public class OSXProxy implements InvocationHandler
   {
     try
     {
-      return macOSXApplication.getClass().getDeclaredMethod("setEnabledAboutMenu", parameterTypes);
+      return macOSXApplication.getClass().getDeclaredMethod(name, parameterTypes);
     }
     catch(Throwable ex)
     {
