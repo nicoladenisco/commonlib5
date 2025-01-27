@@ -386,11 +386,11 @@ public class ItalianParser implements ValidatorParserInterface
       case SimpleValidator.ERROR_DATETIME:
         return String.format("Il campo '%s' non contiene una data/ora valida.", fldName);
       case SimpleValidator.ERROR_INT:
-        return String.format("Il campo '%s' non contiene un valore valido.", fldName);
+        return String.format("Il campo '%s' non contiene un valore numerico valido.", fldName);
       case SimpleValidator.ERROR_INT_RANGE:
         return String.format("Il valore del campo '%s' deve essere compreso fra i valori %d e %d.", fldName, min, max);
       case SimpleValidator.ERROR_DOUBLE:
-        return String.format("Il campo '%s' non contiene un valore valido.", fldName);
+        return String.format("Il campo '%s' non contiene un valore numerico valido.", fldName);
       case SimpleValidator.ERROR_DOUBLE_RANGE:
         return String.format("Il valore del campo '%s' deve essere compreso fra i valori %f e %f.", fldName, dmin, dmax);
       case SimpleValidator.ERROR_FILE_NOT_EXIST:
@@ -399,9 +399,12 @@ public class ItalianParser implements ValidatorParserInterface
         return String.format("Il campo '%s' non contiene una directory esistente.", fldName);
       case SimpleValidator.ERROR_REGEXP:
         return String.format("Il campo '%s' non contiene una espressione regolare valida.", fldName);
-    }
 
-    return String.format("Il campo '%s' non contiene un valore valido.", fldName);
+      default:
+      case SimpleValidator.ERROR_REGEXP_TEST:
+      case SimpleValidator.ERROR_CUSTOM:
+        return String.format("Il campo '%s' non contiene un valore valido.", fldName);
+    }
   }
 
   private Date adjust(int flags, Date date)
