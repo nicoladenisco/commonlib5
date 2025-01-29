@@ -98,8 +98,8 @@ abstract public class GenericTableModel<T> extends AbstractTableModel
       this.name = name;
     }
   }
-  protected ArrayList<T> arData = new ArrayList<T>();
-  protected ArrayList<ColumnDescriptor> arColumns = new ArrayList<ColumnDescriptor>();
+  protected ArrayList<T> arData = new ArrayList<>();
+  protected ArrayList<ColumnDescriptor> arColumns = new ArrayList<>();
 
   public void addColumn(ColumnDescriptor cd)
   {
