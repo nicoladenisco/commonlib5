@@ -88,6 +88,21 @@ public class StringJoin implements Serializable, Cloneable
     return new StringJoin(",", "'").add(cs);
   }
 
+  public static String joinForSQL(int[] cs)
+  {
+    return new StringJoin(",").add(cs).join();
+  }
+
+  public static String joinForSQL(long[] cs)
+  {
+    return new StringJoin(",").add(cs).join();
+  }
+
+  public static String joinForSQL(String[] cs)
+  {
+    return new StringJoin(",", "'").add(cs).join();
+  }
+
   public String getSeparatore()
   {
     return separatore;
