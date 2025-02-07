@@ -2149,7 +2149,7 @@ public class StringOper
   public static boolean isEquNocase(Object o1, String[] values)
   {
     String sVal1 = okStr(o1, null);
-    if(o1 == null)
+    if(sVal1 == null)
       return false;
 
     for(String sTest : values)
