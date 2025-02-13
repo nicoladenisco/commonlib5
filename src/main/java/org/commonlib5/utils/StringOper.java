@@ -2148,6 +2148,9 @@ public class StringOper
    */
   public static boolean isEquNocase(Object o1, String[] values)
   {
+    if(values == null || values.length == 0)
+      return false;
+
     String sVal1 = okStr(o1, null);
     if(sVal1 == null)
       return false;
