@@ -18,16 +18,13 @@
 package org.commonlib5.utils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.commonlib5.lambda.FunctionTrowException;
+
 import static org.commonlib5.lambda.LEU.*;
 
 /**
@@ -40,7 +37,7 @@ import static org.commonlib5.lambda.LEU.*;
  *
  * @author Nicola De Nisco
  */
-public class StringJoin implements Serializable, Cloneable
+public class StringJoin implements Serializable, Cloneable, Iterable<String>
 {
   protected final List<String> stringhe = new ArrayList<>();
   protected String separatore, delimitatore;
@@ -410,5 +407,11 @@ public class StringJoin implements Serializable, Cloneable
     }
 
     return rv.toString();
+  }
+
+  @Override
+  public Iterator<String> iterator()
+  {
+    return stringhe.iterator();
   }
 }

@@ -17,9 +17,13 @@
  */
 package org.commonlib5.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+
 import static junit.framework.Assert.*;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -353,5 +357,48 @@ public class StringJoinTest
     String result = StringJoin.build().add("aa", "b b", "c  c", "dd").joinCommand();
     String expected = "aa \"b b\" \"c  c\" dd";
     assertEquals(expected, result);
+  }
+
+  @Test
+  public void testOverall()
+     throws Exception
+  {
+    System.out.println("overall");
+    StringJoin sj = new StringJoin(",");
+    assertEquals("", sj.join());
+
+    sj.add(1, 2, 3, 4, 5);
+    assertEquals("1,2,3,4,5", sj.join());
+
+    Collection<String> cs = Arrays.asList("1", "2", "3", "4", "5");
+    sj.add(cs);
+    assertEquals("1,2,3,4,5,1,2,3,4,5", sj.join());
+
+    List<Pair<Integer, Long>> lsObj = new ArrayList<>();
+    lsObj.add(new Pair<>(0, 10L));
+    lsObj.add(new Pair<>(1, 11L));
+    lsObj.add(new Pair<>(2, 12L));
+    lsObj.add(new Pair<>(3, 13L));
+    lsObj.add(new Pair<>(4, 14L));
+
+    sj.clear();
+    sj.setSeparatore("/");
+    sj.addObjects(lsObj);
+    assertEquals("0=10/1=11/2=12/3=13/4=14", sj.join());
+
+    sj.clear();
+    sj.setSeparatore("-");
+    sj.addObjects(lsObj, (p) -> Integer.toString(p.first));
+    assertEquals("0-1-2-3-4", sj.join());
+
+    sj.clear();
+    sj.setSeparatore("-");
+    sj.addObjects(lsObj.stream(), (p) -> Long.toString(p.second));
+    assertEquals("10-11-12-13-14", sj.join());
+
+    sj.clear();
+    sj.setSeparatore("-");
+    sj.addObjects(lsObj.stream().filter((p) -> p.second > 10), (p) -> Long.toString(p.second));
+    assertEquals("11-12-13-14", sj.join());
   }
 }
