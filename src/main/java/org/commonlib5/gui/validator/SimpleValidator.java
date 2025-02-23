@@ -20,6 +20,8 @@ package org.commonlib5.gui.validator;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.Date;
+import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
@@ -42,9 +44,12 @@ public class SimpleValidator
   public static final int ERROR_FILE_NOT_EXIST = 8;
   public static final int ERROR_DIRECTORY_NOT_EXIST = 9;
   public static final int ERROR_REGEXP = 10;
+  public static final int ERROR_REGEXP_TEST = 11;
+  public static final int ERROR_CUSTOM = 12;
   //
   protected ValidatorParserInterface parser = null;
   public static final String LABELED_BY_PROPERTY = "labeledBy";
+  protected String defaultLabel = "undefined";
 
   public SimpleValidator()
   {
@@ -66,15 +71,32 @@ public class SimpleValidator
     this.parser = parser;
   }
 
+  public String getDefaultLabel()
+  {
+    return defaultLabel;
+  }
+
+  public void setDefaultLabel(String defaultLabel)
+  {
+    this.defaultLabel = defaultLabel;
+  }
+
   public String verifyTextField(JTextComponent cmp)
+     throws InvalidValueException
+  {
+    return verifyTextField(cmp, 0, 0);
+  }
+
+  public String verifyTextField(JTextComponent cmp, int minLen, int maxLen)
      throws InvalidValueException
   {
     String rv;
 
-    if((rv = StringOper.okStrNull(cmp.getText())) == null)
+    if((rv = StringOper.okStrNull(cmp.getText())) == null
+       || (minLen > 0 && rv.length() < minLen)
+       || (maxLen > 0 && rv.length() > maxLen))
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_TEXT, nome, 0, 0, 0, 0, rv),
@@ -94,8 +116,7 @@ public class SimpleValidator
     String val = verifyTextField(cmp);
     if((parsed = parser.parseDate(val, null)) == null)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DATE, nome, 0, 0, 0, 0, val),
@@ -115,8 +136,7 @@ public class SimpleValidator
     String val = verifyTextField(cmp);
     if((parsed = parser.parseDate(val, null)) == null)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DATETIME, nome, 0, 0, 0, 0, val),
@@ -140,8 +160,7 @@ public class SimpleValidator
     }
     catch(Exception e)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_INT, nome, 0, 0, 0, 0, val),
@@ -166,8 +185,7 @@ public class SimpleValidator
     }
     catch(Exception e)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_INT, nome, 0, 0, 0, 0, val), ERROR_INT, nome);
@@ -175,8 +193,7 @@ public class SimpleValidator
 
     if(parsed < min || parsed > max)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_INT_RANGE, nome, min, max, 0, 0, val),
@@ -201,8 +218,7 @@ public class SimpleValidator
     }
     catch(Exception e)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DOUBLE, nome, 0, 0, 0, 0, val),
@@ -227,8 +243,7 @@ public class SimpleValidator
     }
     catch(Exception e)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DOUBLE, nome, 0, 0, 0, 0, val),
@@ -237,8 +252,7 @@ public class SimpleValidator
 
     if(parsed < min || parsed > max)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DOUBLE_RANGE, nome, 0, 0, min, max, val),
@@ -263,8 +277,7 @@ public class SimpleValidator
     }
     catch(Exception e)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DOUBLE, nome, 0, 0, 0, 0, val),
@@ -289,8 +302,7 @@ public class SimpleValidator
     }
     catch(Exception e)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DOUBLE, nome, 0, 0, 0, 0, val),
@@ -299,8 +311,7 @@ public class SimpleValidator
 
     if(parsed < min || parsed > max)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DOUBLE_RANGE, nome, 0, 0, min, max, val),
@@ -321,8 +332,7 @@ public class SimpleValidator
     File f = new File(val);
     if(mustExist && !f.exists())
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_FILE_NOT_EXIST, nome, 0, 0, 0, 0, val),
@@ -331,8 +341,7 @@ public class SimpleValidator
 
     if(mustExistDir && !f.isDirectory())
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_DIRECTORY_NOT_EXIST, nome, 0, 0, 0, 0, val),
@@ -362,8 +371,7 @@ public class SimpleValidator
     }
     catch(Exception e)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_REGEXP, nome, 0, 0, 0, 0, val),
@@ -390,8 +398,7 @@ public class SimpleValidator
     }
     catch(Exception e)
     {
-      JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
-      String nome = label == null ? "" : label.getText() + " ";
+      String nome = getLabelString(cmp);
 
       cmp.requestFocus();
       throw new InvalidValueException(parser.getErrorMessage(ERROR_REGEXP, nome, 0, 0, 0, 0, val),
@@ -399,5 +406,66 @@ public class SimpleValidator
     }
 
     return val;
+  }
+
+  public String verifyContentByRegExpField(JTextComponent cmp, Pattern test, boolean useMatch)
+     throws InvalidValueException
+  {
+    return verifyContentByRegExpField(cmp, test, useMatch, null);
+  }
+
+  public String verifyContentByRegExpField(JTextComponent cmp, Pattern test, boolean useMatch, String replaceModel)
+     throws InvalidValueException
+  {
+    String val = verifyTextField(cmp);
+    Matcher m = test.matcher(val);
+
+    if((useMatch == false && !m.find()) || ((useMatch == true && !m.matches())))
+    {
+      String nome = getLabelString(cmp);
+
+      cmp.requestFocus();
+      throw new InvalidValueException(parser.getErrorMessage(ERROR_REGEXP_TEST, nome, 0, 0, 0, 0, val),
+         ERROR_REGEXP_TEST, nome);
+    }
+
+    if(replaceModel != null)
+    {
+      val = replaceModel;
+      for(int i = 0; i < m.groupCount(); i++)
+      {
+        String gsu = m.group(i + 1);
+        val = val.replaceAll("\\$1", gsu);
+      }
+    }
+
+    return val;
+  }
+
+  public String verifyCustomField(JTextComponent cmp, Function<String, String> fun)
+     throws InvalidValueException
+  {
+    String rv = fun.apply(cmp.getText());
+
+    if(rv == null)
+    {
+      String nome = getLabelString(cmp);
+
+      cmp.requestFocus();
+      throw new InvalidValueException(parser.getErrorMessage(ERROR_CUSTOM, nome, 0, 0, 0, 0, rv),
+         ERROR_CUSTOM, nome);
+    }
+
+    // reinserisce il valore senza spazi
+    cmp.setText(rv);
+
+    return rv;
+  }
+
+  public String getLabelString(JTextComponent cmp)
+  {
+    JLabel label = (JLabel) cmp.getClientProperty(LABELED_BY_PROPERTY);
+    String nome = label == null ? defaultLabel : label.getText();
+    return nome + " ";
   }
 }

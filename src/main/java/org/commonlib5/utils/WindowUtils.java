@@ -338,6 +338,18 @@ public class WindowUtils
   }
 
   /**
+   * Aggiunge una funzione generica alla dialog con tasto INVIO.
+   * @param dialog dialog a cui aggiungere la funzione
+   * @param enterListener azione da intraprendere alla pressione di INVIO
+   */
+  public static void addEnterListener(JDialog dialog, ActionListener enterListener)
+  {
+    dialog.getRootPane().registerKeyboardAction(enterListener,
+       KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+       JComponent.WHEN_IN_FOCUSED_WINDOW);
+  }
+
+  /**
    * Abilita/disabilita un pannello e tutti i controlli che contiene in modo ricorsivo.
    * @param panel pannello da modificare
    * @param isEnabled vero per abilitare altrimenti false

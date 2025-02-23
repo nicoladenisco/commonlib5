@@ -18,6 +18,7 @@
 package org.commonlib5.gui.table;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -98,8 +99,8 @@ abstract public class GenericTableModel<T> extends AbstractTableModel
       this.name = name;
     }
   }
-  protected ArrayList<T> arData = new ArrayList<T>();
-  protected ArrayList<ColumnDescriptor> arColumns = new ArrayList<ColumnDescriptor>();
+  protected ArrayList<T> arData = new ArrayList<>();
+  protected ArrayList<ColumnDescriptor> arColumns = new ArrayList<>();
 
   public void addColumn(ColumnDescriptor cd)
   {
@@ -126,7 +127,7 @@ abstract public class GenericTableModel<T> extends AbstractTableModel
     arColumns.add(new ColumnDescriptor(name, cls, cmp, valfunc));
   }
 
-  public void setData(List<T> data)
+  public void setData(Collection<T> data)
   {
     arData.clear();
     arData.addAll(data);
@@ -147,7 +148,7 @@ abstract public class GenericTableModel<T> extends AbstractTableModel
     fireTableDataChanged();
   }
 
-  public void addData(List<T> d)
+  public void addData(Collection<T> d)
   {
     arData.addAll(d);
     fireTableDataChanged();
