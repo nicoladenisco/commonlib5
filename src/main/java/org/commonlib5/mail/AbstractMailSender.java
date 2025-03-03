@@ -93,6 +93,7 @@ public abstract class AbstractMailSender
   /**
    * Aggiunge un destinatario.
    * @param rcpt info destinatario
+   * @throws javax.mail.internet.AddressException
    */
   public void addRecipient(String rcpt)
      throws AddressException

@@ -148,7 +148,7 @@ public class SimpleMultiMailSender extends AbstractMailSender
 
     MimeMessage message = new MimeMessage(mailSession);
     message.setFrom(new InternetAddress(from));
-    InternetAddress[] arDest = destinatari.toArray(new InternetAddress[destinatari.size()]);
+    InternetAddress[] arDest = destinatari.toArray(new InternetAddress[0]);
     message.setRecipients(Message.RecipientType.TO, arDest);
     message.setSubject(subject, "UTF-8");
 
@@ -176,9 +176,9 @@ public class SimpleMultiMailSender extends AbstractMailSender
     if(messaggi.isEmpty())
       return;
 
-    Transport transport = (protocollo == SMTP_PROTOCOL_TLS || protocollo == SMTP_PROTOCOL_SSL)
-                             ? mailSession.getTransport("smtps") : mailSession.getTransport("smtp");
-    try
+    try(Transport transport
+       = (protocollo == SMTP_PROTOCOL_TLS || protocollo == SMTP_PROTOCOL_SSL)
+            ? mailSession.getTransport("smtps") : mailSession.getTransport("smtp"))
     {
       transport.connect(host, porta, utente, password);
 
@@ -186,10 +186,6 @@ public class SimpleMultiMailSender extends AbstractMailSender
       {
         transport.sendMessage(msg, msg.getAllRecipients());
       }
-    }
-    finally
-    {
-      transport.close();
     }
   }
 }
