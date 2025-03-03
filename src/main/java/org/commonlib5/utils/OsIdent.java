@@ -27,6 +27,8 @@ public class OsIdent
   private static int osType = OS_UNDEFINED;
   private static boolean vm64bit = false;
   private static String javaVersion;
+  private static File dirTmp;
+  private static final Object semaforo = new Object();
 
   /**
    * Idendifica il sistema operativo ospite.
@@ -36,26 +38,56 @@ public class OsIdent
   {
     if(osType == OS_UNDEFINED)
     {
-      String os = (System.getProperty("os.name")).toLowerCase();
-
-      if(os.contains("windows"))
-        osType = OS_WINDOWS;
-      else if(os.contains("linux"))
-        osType = OS_LINUX;
-      else if(os.contains("mac os x"))
-        osType = OS_MACOSX;
-      else if(os.contains("solaris"))
-        osType = OS_SOLARIS;
-      else if(os.contains("freebsd"))
-        osType = OS_FREEBSD;
-      else
-        osType = OS_UNKNOW;
-
-      javaVersion = System.getProperty("java.version");
-
-      // verifica per architetture a 64 bit
-      vm64bit = System.getProperty("sun.arch.data.model").equals("64");
+      synchronized(semaforo)
+      {
+        if(osType == OS_UNDEFINED)
+        {
+          __checkOStypePrivate();
+        }
+      }
     }
+
+    return osType;
+  }
+
+  private static int __checkOStypePrivate()
+  {
+    String os = (System.getProperty("os.name")).toLowerCase();
+
+    if(os.contains("windows"))
+      osType = OS_WINDOWS;
+    else if(os.contains("linux"))
+      osType = OS_LINUX;
+    else if(os.contains("mac os x"))
+      osType = OS_MACOSX;
+    else if(os.contains("solaris"))
+      osType = OS_SOLARIS;
+    else if(os.contains("freebsd"))
+      osType = OS_FREEBSD;
+    else
+      osType = OS_UNKNOW;
+
+    javaVersion = System.getProperty("java.version");
+
+    // verifica per architetture a 64 bit
+    vm64bit = System.getProperty("sun.arch.data.model").equals("64");
+
+    switch(osType)
+    {
+      case OS_WINDOWS:
+        dirTmp = new File("c:\\windows\\temp");
+        break;
+      case OS_LINUX:
+      case OS_MACOSX:
+      case OS_SOLARIS:
+      case OS_FREEBSD:
+        dirTmp = new File("/tmp");
+        break;
+    }
+
+    if(dirTmp != null)
+      dirTmp.mkdirs();
+
     return osType;
   }
 
@@ -241,25 +273,8 @@ public class OsIdent
 
   public static File getSystemTemp()
   {
-    File rv = null;
-
-    switch(checkOStype())
-    {
-      case OS_WINDOWS:
-        rv = new File("c:\\windows\\temp");
-        break;
-      case OS_LINUX:
-      case OS_MACOSX:
-      case OS_SOLARIS:
-      case OS_FREEBSD:
-        rv = new File("/tmp");
-        break;
-    }
-
-    if(rv != null)
-      rv.mkdirs();
-
-    return rv;
+    checkOStype();
+    return dirTmp;
   }
 
   /**
@@ -407,5 +422,11 @@ public class OsIdent
   {
     checkOStype();
     return javaVersion.startsWith("17.");
+  }
+
+  public static boolean isJava21()
+  {
+    checkOStype();
+    return javaVersion.startsWith("21.");
   }
 }
