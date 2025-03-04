@@ -1,16 +1,19 @@
-/*
- *  XmlRpcUtils.java
- *  Creato il 21-dic-2011, 16.44.38
+/* 
+ * Copyright (C) 2025 Nicola De Nisco
  *
- *  Copyright (C) 2011 WinSOFT di Nicola De Nisco
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
- *  Questo software è proprietà di Nicola De Nisco.
- *  I termini di ridistribuzione possono variare in base
- *  al tipo di contratto in essere fra Nicola De Nisco e
- *  il fruitore dello stesso.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  Fare riferimento alla documentazione associata al contratto
- *  di committenza per ulteriori dettagli.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package org.commonlib5.xmlrpc;
 

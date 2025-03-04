@@ -1,9 +1,5 @@
-/*
- * SignUtils.java
- *
- * Created on 22 ottobre 2008, 11.06
- *
- * Copyright (C) 2011 Nicola De Nisco
+/* 
+ * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

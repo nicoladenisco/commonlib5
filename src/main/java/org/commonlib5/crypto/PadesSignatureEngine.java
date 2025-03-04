@@ -1,9 +1,5 @@
-/*
- * PadesSignatureEngine.java
- *
- * Created on 7 Giugno 2014, 19.40.36
- *
- * Copyright (C) 2014 Nicola De Nisco
+/* 
+ * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

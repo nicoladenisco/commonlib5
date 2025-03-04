@@ -1,16 +1,19 @@
-/*
- *  SingleHostHelper.java
- *  Creato il Apr 11, 2019, 1:22:12 PM
+/* 
+ * Copyright (C) 2025 Nicola De Nisco
  *
- *  Copyright (C) 2019 Informatica Medica s.r.l.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
- *  Questo software è proprietà di Informatica Medica s.r.l.
- *  Tutti gli usi non esplicitimante autorizzati sono da
- *  considerarsi tutelati ai sensi di legge.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  Informatica Medica s.r.l.
- *  Viale dei Tigli, 19
- *  Casalnuovo di Napoli (NA)
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package org.commonlib5.utils;
 
