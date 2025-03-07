@@ -98,6 +98,11 @@ public class JsonHelper implements Closeable
     }
   }
 
+  public static boolean isJavaPatchApplied()
+  {
+    return javaPatchApplied;
+  }
+
   @Override
   public void close()
      throws IOException
