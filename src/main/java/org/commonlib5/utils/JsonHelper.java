@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -40,49 +40,62 @@ public class JsonHelper implements Closeable
   protected final URI uri;
   protected final ArrayMap<String, String> headers = new ArrayMap<>();
   protected boolean wrapException = false;
+  protected static boolean javaPatchApplied = false;
 
-  // Fino alla JDK 8 non era previsto l'http method PATCH. L'errore che si presenta è:
-  // java.net.ProtocolException: Invalid HTTP method: PATCH
-  // La seguente soluzione, precedentemente adottata, non veniva accettata dall'endpoint invocato:
-  // HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-  // conn.setRequestMethod("POST");
-  // conn.setRequestProperty ("X-HTTP-Method-Override", "PATCH");
-  // (vedi porzione commentata nei metodi genericRequest)
-  // Per ovviare al problema forziamo tramite reflection i metodi http consentiti
-  static
+  public JsonHelper(URI uri)
+  {
+    this.uri = uri;
+  }
+
+  public JsonHelper(URI uri, boolean applayJavaPatchWorkaround)
+  {
+    this.uri = uri;
+
+    if(applayJavaPatchWorkaround && !javaPatchApplied)
+      javaPatchWorkaround();
+  }
+
+  /**
+   * Aggiunta del motodo PATCH alla JVM ove fosse richiesto.
+   * Per default non è previsto l'http method PATCH. L'errore che si presenta è:
+   * java.net.ProtocolException: Invalid HTTP method: PATCH
+   * La seguente soluzione, precedentemente adottata, non veniva accettata dall'endpoint invocato:
+   * HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+   * conn.setRequestMethod("POST");
+   * conn.setRequestProperty ("X-HTTP-Method-Override", "PATCH");
+   * (vedi porzione commentata nei metodi genericRequest)
+   * Per ovviare al problema forziamo tramite reflection i metodi http consentiti
+   */
+  public static void javaPatchWorkaround()
   {
     try
     {
-      if(OsIdent.getJavaVersionNumber() <= 1.8f)
+      Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
+      methodsField.setAccessible(true);
+
+      // get the methods field modifiers
+      Field modifiersField = Field.class.getDeclaredField("modifiers");
+      // bypass the "private" modifier
+      modifiersField.setAccessible(true);
+
+      // remove the "final" modifier
+      modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+
+      // valid HTTP methods
+      String[] methods =
       {
-        Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
-        methodsField.setAccessible(true);
-        // get the methods field modifiers
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        // bypass the "private" modifier
-        modifiersField.setAccessible(true);
+        "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE", "PATCH"
+      };
 
-        // remove the "final" modifier
-        modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+      // set the new methods - including patch
+      methodsField.set(null, methods);
 
-        /* valid HTTP methods */
-        String[] methods =
-        {
-          "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE", "PATCH"
-        };
-        // set the new methods - including patch
-        methodsField.set(null, methods);
-      }
+      javaPatchApplied = true;
     }
     catch(IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex)
     {
       throw new RuntimeException(ex);
     }
-  }
-
-  public JsonHelper(URI uri)
-  {
-    this.uri = uri;
   }
 
   @Override
@@ -206,7 +219,7 @@ public class JsonHelper implements Closeable
   {
     ByteBufferOutputStream bos = new ByteBufferOutputStream();
 
-    try (InputStream is = conn.getInputStream())
+    try(InputStream is = conn.getInputStream())
     {
       CommonFileUtils.copyStream(is, bos);
     }
@@ -214,7 +227,7 @@ public class JsonHelper implements Closeable
     {
       if(wrapException)
       {
-        try (InputStream is = conn.getErrorStream())
+        try(InputStream is = conn.getErrorStream())
         {
           if(is != null)
             CommonFileUtils.copyStream(is, bos);
