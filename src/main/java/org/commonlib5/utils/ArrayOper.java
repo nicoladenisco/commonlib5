@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -267,12 +267,12 @@ public class ArrayOper
    */
   public static <T> List<T> asList(T[] is)
   {
-    return new ListArray<T>(is);
+    return new ListArray<>(is);
   }
 
   public static class ListArray<T> extends AbstractList<T>
   {
-    private T[] array;
+    private final T[] array;
 
     public ListArray(T[] array)
     {
@@ -337,6 +337,88 @@ public class ArrayOper
     return Arrays.copyOf(result, c);
   }
 
+  /**
+   * Ritorna intersezione univoca dei valori dei due array.
+   * @param s1 array da verificare
+   * @param s2 array da verificare
+   * @return i valori (univoci) che esistono in entrambi gli array
+   */
+  public static String[] arraysMatchingString(String[] s1, String[] s2)
+  {
+    if(s1.length > s2.length)
+      return arraysMatchingString(s2, s1);
+
+    int c = 0, q = 0;
+    String[] result = new String[s1.length];
+
+    for(int i = 0; i < s1.length; i++)
+    {
+      String test = s1[i];
+      if(test == null)
+        continue;
+
+      for(int j = 0; j < s2.length; j++)
+      {
+        if(s2[j] == null)
+          continue;
+
+        if(s2[j].equals(test))
+        {
+          for(q = 0; q < c; q++)
+            if(result[q].equals(test))
+              break;
+
+          if(q == c)
+            result[c++] = test;
+          break;
+        }
+      }
+    }
+
+    return Arrays.copyOf(result, c);
+  }
+
+  /**
+   * Ritorna intersezione univoca dei valori dei due array.
+   * @param s1 array da verificare
+   * @param s2 array da verificare
+   * @return i valori (univoci) che esistono in entrambi gli array
+   */
+  public static String[] arraysMatchingStringIgnoreCase(String[] s1, String[] s2)
+  {
+    if(s1.length > s2.length)
+      return arraysMatchingStringIgnoreCase(s2, s1);
+
+    int c = 0, q = 0;
+    String[] result = new String[s1.length];
+
+    for(int i = 0; i < s1.length; i++)
+    {
+      String test = s1[i];
+      if(test == null)
+        continue;
+
+      for(int j = 0; j < s2.length; j++)
+      {
+        if(s2[j] == null)
+          continue;
+
+        if(s2[j].equalsIgnoreCase(test))
+        {
+          for(q = 0; q < c; q++)
+            if(result[q].equalsIgnoreCase(test))
+              break;
+
+          if(q == c)
+            result[c++] = test;
+          break;
+        }
+      }
+    }
+
+    return Arrays.copyOf(result, c);
+  }
+
   public static Set<Integer> asSet(final int[] is)
   {
     return new HashSet<>(asList(is));
@@ -349,7 +431,7 @@ public class ArrayOper
 
   public static <T extends Number> Set<T> asSet(T[] is, Comparator<? super T> comparator)
   {
-    return new SetArray<T>(is, comparator);
+    return new SetArray<>(is, comparator);
   }
 
   public static class SetArray<T extends Number> extends AbstractSet<T>
