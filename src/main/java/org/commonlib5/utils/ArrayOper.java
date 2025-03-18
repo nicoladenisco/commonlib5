@@ -845,4 +845,46 @@ public class ArrayOper
 
     return theMap;
   }
+
+  /**
+   * Da una map estrae solo le chiavi specificate creando una nuova map.
+   * Vengono ritornati solo gli oggetti presenti in origin.
+   * @param origin una mappa con dati generici
+   * @param keys elenco delle chiavi da estrarre da origin
+   * @return una mappa con le chiavi specificate e il valore di origin
+   */
+  public static Map asMapFromMap(Map origin, Object... keys)
+  {
+    ArrayMap rv = new ArrayMap();
+
+    for(Object key : keys)
+    {
+      Object value = origin.get(key);
+      if(value != null)
+        rv.put(key, value);
+    }
+
+    return rv;
+  }
+
+  /**
+   * Da una map estrae solo le chiavi specificate creando una nuova map.
+   * Vengono ritornate solo le stringhe presenti in origin e <b>non vuote</b>.
+   * @param origin una mappa con dati generici
+   * @param keys elenco delle chiavi da estrarre da origin
+   * @return una mappa con le chiavi specificate e il valore di origin
+   */
+  public static Map<String, String> asMapFromMapString(Map<String, String> origin, String... keys)
+  {
+    ArrayMap<String, String> rv = new ArrayMap<>();
+
+    for(String key : keys)
+    {
+      String value = StringOper.okStrNull(origin.get(key));
+      if(value != null)
+        rv.put(key, value);
+    }
+
+    return rv;
+  }
 }
