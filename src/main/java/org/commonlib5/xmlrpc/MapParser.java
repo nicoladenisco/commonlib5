@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ public class MapParser extends AbstractMap<Object, Object>
 
   public MapParser(Map t)
   {
-    this.t = t;
+    this.t = (t == null) ? Collections.EMPTY_MAP : t;
   }
 
   public String getAsString(String key)
