@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -127,6 +127,9 @@ public class ItalianParser implements ValidatorParserInterface
   public Date parseDate(String s, Date defVal, int flags)
   {
     Date rv = parseDateInternal(s, defVal, flags);
+
+    if(rv == null)
+      return null;
 
     if(flags == FLAG_ALWAIS_BEGIN_DAY)
       return DateTime.mergeDataOra(rv, 0, 0, 0, 0);
