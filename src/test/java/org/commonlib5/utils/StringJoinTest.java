@@ -21,9 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import static junit.framework.Assert.*;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -72,7 +70,7 @@ public class StringJoinTest
     StringJoin expResult = null;
     StringJoin result = StringJoin.build();
     assertEquals(",", result.getSeparatore());
-    assertEquals(null, result.getDelimitatore());
+    assertEquals(null, result.getDelimitatoreInizio());
   }
 
   /**
@@ -400,5 +398,12 @@ public class StringJoinTest
     sj.setSeparatore("-");
     sj.addObjects(lsObj.stream().filter((p) -> p.second > 10), (p) -> Long.toString(p.second));
     assertEquals("11-12-13-14", sj.join());
+
+    sj.clear();
+    sj.setSeparatore("-");
+    sj.setDelimitatoreInizio("(");
+    sj.setDelimitatoreFine(")");
+    sj.addObjects(lsObj.stream().filter((p) -> p.second > 10), (p) -> Long.toString(p.second));
+    assertEquals("(11)-(12)-(13)-(14)", sj.join());
   }
 }

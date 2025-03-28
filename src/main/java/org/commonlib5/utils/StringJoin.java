@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.commonlib5.lambda.FunctionTrowException;
-
 import static org.commonlib5.lambda.LEU.*;
 
 /**
@@ -40,7 +39,7 @@ import static org.commonlib5.lambda.LEU.*;
 public class StringJoin implements Serializable, Cloneable, Iterable<String>
 {
   protected final List<String> stringhe = new ArrayList<>();
-  protected String separatore, delimitatore;
+  protected String separatore, delimitatoreInizio, delimitatoreFine;
   protected int sizeBuffer = 128;
   public static final Pattern respazi = Pattern.compile("\\s+");
 
@@ -52,7 +51,14 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   public StringJoin(String separatore, String delimitatore)
   {
     this.separatore = separatore;
-    this.delimitatore = delimitatore;
+    this.delimitatoreInizio = this.delimitatoreFine = delimitatore;
+  }
+
+  public StringJoin(String separatore, String delimitatoreInizio, String delimitatoreFine)
+  {
+    this.separatore = separatore;
+    this.delimitatoreInizio = delimitatoreInizio;
+    this.delimitatoreFine = delimitatoreFine;
   }
 
   public static StringJoin build()
@@ -68,6 +74,11 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   public static StringJoin build(String separatore, String delimitatore)
   {
     return new StringJoin(separatore, delimitatore);
+  }
+
+  public static StringJoin build(String separatore, String delimitatoreInizio, String delimitatoreFine)
+  {
+    return new StringJoin(separatore, delimitatoreInizio, delimitatoreFine);
   }
 
   public static StringJoin buildForSQL(int[] cs)
@@ -111,14 +122,31 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     return this;
   }
 
-  public String getDelimitatore()
+  public String getDelimitatoreInizio()
   {
-    return delimitatore;
+    return delimitatoreInizio;
+  }
+
+  public String getDelimitatoreFine()
+  {
+    return delimitatoreFine;
   }
 
   public StringJoin setDelimitatore(String delimitatore)
   {
-    this.delimitatore = delimitatore;
+    this.delimitatoreInizio = this.delimitatoreFine = delimitatore;
+    return this;
+  }
+
+  public StringJoin setDelimitatoreInizio(String delimitatoreInizio)
+  {
+    this.delimitatoreInizio = delimitatoreInizio;
+    return this;
+  }
+
+  public StringJoin setDelimitatoreFine(String delimitatoreFine)
+  {
+    this.delimitatoreFine = delimitatoreFine;
     return this;
   }
 
@@ -284,7 +312,8 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     stringhe.clear();
     stringhe.addAll(origin.stringhe);
 
-    delimitatore = origin.delimitatore;
+    delimitatoreInizio = origin.delimitatoreInizio;
+    delimitatoreFine = origin.delimitatoreFine;
     separatore = origin.separatore;
     return this;
   }
@@ -303,7 +332,8 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     int hash = 7;
     hash = 73 * hash + Objects.hashCode(this.stringhe);
     hash = 73 * hash + Objects.hashCode(this.separatore);
-    hash = 73 * hash + Objects.hashCode(this.delimitatore);
+    hash = 73 * hash + Objects.hashCode(this.delimitatoreInizio);
+    hash = 73 * hash + Objects.hashCode(this.delimitatoreFine);
     return hash;
   }
 
@@ -319,7 +349,9 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     final StringJoin other = (StringJoin) obj;
     if(!Objects.equals(this.separatore, other.separatore))
       return false;
-    if(!Objects.equals(this.delimitatore, other.delimitatore))
+    if(!Objects.equals(this.delimitatoreInizio, other.delimitatoreInizio))
+      return false;
+    if(!Objects.equals(this.delimitatoreFine, other.delimitatoreFine))
       return false;
     return Objects.equals(this.stringhe, other.stringhe);
   }
@@ -330,7 +362,9 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     return "StringJoin{"
        + "stringhe=" + stringhe
        + ", separatore=" + separatore
-       + ", delimitatore=" + delimitatore + '}';
+       + ", delimitatoreInizio=" + delimitatoreInizio
+       + ", delimitatoreFine=" + delimitatoreFine
+       + '}';
   }
 
   /**
@@ -343,7 +377,7 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     if(stringhe.isEmpty())
       return "";
 
-    if(stringhe.size() == 1 && delimitatore == null)
+    if(stringhe.size() == 1 && delimitatoreInizio == null && delimitatoreFine == null)
       return StringOper.okStr(stringhe.get(0));
 
     int i = 0;
@@ -360,10 +394,13 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
       if(i++ > 0)
         rv.append(separatore);
 
-      if(delimitatore == null)
-        rv.append(val);
-      else
-        rv.append(delimitatore).append(val).append(delimitatore);
+      if(delimitatoreInizio != null)
+        rv.append(delimitatoreInizio);
+
+      rv.append(val);
+
+      if(delimitatoreFine != null)
+        rv.append(delimitatoreFine);
     }
 
     return rv.toString();
@@ -384,7 +421,7 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
       return "";
 
     separatore = " ";
-    delimitatore = "\"";
+    delimitatoreInizio = delimitatoreFine = "\"";
 
     int i = 0;
     StringBuilder rv = new StringBuilder(sizeBuffer);
@@ -403,7 +440,7 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
       if(!respazi.matcher(val).find())
         rv.append(val);
       else
-        rv.append(delimitatore).append(val).append(delimitatore);
+        rv.append(delimitatoreInizio).append(val).append(delimitatoreFine);
     }
 
     return rv.toString();
