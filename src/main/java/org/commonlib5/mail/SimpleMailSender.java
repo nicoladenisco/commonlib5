@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -132,7 +132,7 @@ public class SimpleMailSender extends AbstractMailSender
   {
     MimeMessage message = new MimeMessage(mailSession);
     message.setFrom(new InternetAddress(from));
-    InternetAddress[] arDest = destinatari.toArray(new InternetAddress[destinatari.size()]);
+    InternetAddress[] arDest = destinatari.toArray(new InternetAddress[0]);
     message.setRecipients(Message.RecipientType.TO, arDest);
     message.setSubject(subject, "UTF-8");
 
