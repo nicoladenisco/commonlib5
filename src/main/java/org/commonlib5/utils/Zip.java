@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -71,7 +71,7 @@ public class Zip
   public static void zipFiles(File fileZip, File[] src, int compLevel, ZipListener ul)
      throws Exception
   {
-    try (ZipOutputStream fos = new ZipOutputStream(new FileOutputStream(fileZip)))
+    try(ZipOutputStream fos = new ZipOutputStream(new FileOutputStream(fileZip)))
     {
       fos.setLevel(compLevel);
 
@@ -153,7 +153,7 @@ public class Zip
         continue;
 
       // apre file input per la lettura
-      try (FileInputStream in = new FileInputStream(f))
+      try(FileInputStream in = new FileInputStream(f))
       {
         // determina il nome della entry nel file zip
         String name = f.getName();
@@ -195,7 +195,7 @@ public class Zip
      throws IOException
   {
     byte[] buffer = new byte[BUFFER_SIZE];
-    try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
+    try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
     {
       zip(zos, directory, directory, buffer, true);
       zos.finish();
@@ -236,7 +236,7 @@ public class Zip
       {
         String path = files[i].getPath().substring(lenBase).replace('\\', '/');
 
-        try (FileInputStream in = new FileInputStream(files[i]))
+        try(FileInputStream in = new FileInputStream(files[i]))
         {
           ZipEntry entry = new ZipEntry(path);
           zos.putNextEntry(entry);
@@ -279,7 +279,7 @@ public class Zip
     String[] alternateNames = new String[1];
     alternateNames[0] = alternateName;
 
-    try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
+    try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
     {
       zos.setLevel(compLevel);
       zipEntries(zos, files, alternateNames, null);
@@ -297,5 +297,29 @@ public class Zip
      throws IOException
   {
     zipSingleFile(fileZip, tozip, null, Deflater.DEFAULT_COMPRESSION);
+  }
+
+  /**
+   * Crea un file zip contenente un gruppo di file.
+   * @param fileZip file da creare
+   * @param toZip files da inserire nello zip
+   * @param compLevel livello di compressione richiesto (vedi Deflater)
+   * @throws IOException
+   */
+  public static void zipMultipleFiles(File fileZip, int compLevel, File... toZip)
+     throws IOException
+  {
+    for(int i = 0; i < toZip.length; i++)
+    {
+      if(!toZip[i].isFile())
+        throw new IOException("This function need only files to zip.");
+    }
+
+    try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileZip)))
+    {
+      zos.setLevel(compLevel);
+      zipEntries(zos, toZip, null, null);
+      zos.finish();
+    }
   }
 }

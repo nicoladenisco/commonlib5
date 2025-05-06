@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -173,14 +174,6 @@ public class ClassOper
   }
 
   /**
-   * Parameters of the method to add an URL to the System classes.
-   */
-  private static final Class<?>[] parameters = new Class[]
-  {
-    URL.class
-  };
-
-  /**
    * Adds a file to the classpath.
    * @param s a String pointing to the file
    * @throws IOException
@@ -200,7 +193,16 @@ public class ClassOper
   public static void addFileToLoader(File f)
      throws IOException
   {
-    addURLToLoader(f.toURI().toURL());
+    try
+    {
+      // jdk 8
+      addURLToLoaderJ8(f.toURI().toURL());
+    }
+    catch(Exception e)
+    {
+      // jdk 11++
+      addFileToLoaderJ11(f);
+    }
   }
 
   /**
@@ -208,14 +210,14 @@ public class ClassOper
    * @param u the URL pointing to the content to be added
    * @throws IOException
    */
-  public static void addURLToLoader(URL u)
+  public static void addURLToLoaderJ8(URL u)
      throws IOException
   {
     URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
     Class<?> sysclass = URLClassLoader.class;
     try
     {
-      Method method = sysclass.getDeclaredMethod("addURL", parameters);
+      Method method = sysclass.getDeclaredMethod("addURL", URL.class);
       method.setAccessible(true);
       method.invoke(sysloader, u);
     }
@@ -225,6 +227,47 @@ public class ClassOper
     }
   }
 
+  /**
+   * Adds the content pointed by the URL to the classpath.
+   * @param f the File pointing to the content to be added
+   * @throws IOException
+   */
+  public static void addFileToLoaderJ11(File f)
+     throws IOException
+  {
+    ClassLoader sysloader = ClassLoader.getSystemClassLoader();
+    Class<?> sysclass = sysloader.getClass();
+    try
+    {
+      Method method = sysclass.getDeclaredMethod("appendToClassPathForInstrumentation", String.class);
+      method.setAccessible(true);
+      method.invoke(sysloader, f.getAbsolutePath());
+    }
+    catch(Throwable t)
+    {
+      throw new IOException("Error, could not add URL to system classloader.", t);
+    }
+  }
+
+//  public static void addToClasspath(String jarPath)
+//  {
+//    ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+//    try
+//    {
+//      // jdk 8
+//      Method method = classLoader.getClass().getDeclaredMethod("addURL", URL.class);
+//      method.setAccessible(true);
+//      method.invoke(classLoader, new File(jarPath).toURI().toURL());
+//    }
+//    catch(NoSuchMethodException e)
+//    {
+//      // jdk 11++
+//      Method method = classLoader.getClass()
+//         .getDeclaredMethod("appendToClassPathForInstrumentation", String.class);
+//      method.setAccessible(true);
+//      method.invoke(classLoader, jarPath);
+//    }
+//  }
   /**
    * Imposta path per caricamento liberie native.
    * La vecchia definizione di java.library.path viene distrutta
@@ -255,6 +298,25 @@ public class ClassOper
   public static void addLibraryPath(String pathToAdd)
      throws Exception
   {
+    if(OsIdent.isJava8())
+      addLibraryPathJ8(pathToAdd);
+    else if(OsIdent.isJava11())
+      addLibraryPathJ11(pathToAdd);
+    else
+      addLibraryPathModernJava(pathToAdd);
+  }
+
+  /**
+   * Adds the specified path to the java library path (Java 8).
+   * A differenza di setLibraryPath() che sostituisce il valore precedente
+   * qui la nuova path viene aggiunta al contenuto attuale di java.library.path.
+   *
+   * @param pathToAdd the path to add
+   * @throws Exception
+   */
+  public static void addLibraryPathJ8(String pathToAdd)
+     throws Exception
+  {
     final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
     usrPathsField.setAccessible(true);
 
@@ -273,6 +335,235 @@ public class ClassOper
     // aggiunge la nuova path in testa (sarà valutata per prima)
     String[] newPaths = (String[]) ArrayUtils.add(paths, 0, pathToAdd);
     usrPathsField.set(null, newPaths);
+  }
+
+  /**
+   * Adds the specified path to the java library path (Java 11).
+   * A differenza di setLibraryPath() che sostituisce il valore precedente
+   * qui la nuova path viene aggiunta al contenuto attuale di java.library.path.
+   *
+   * @param pathToAdd the path to add
+   * @throws Exception
+   */
+  public static void addLibraryPathJ11(String pathToAdd)
+     throws Exception
+  {
+    Module baseModule = ClassLoader.class.getModule(), unnamedModule = ClassOper.class.getModule();
+
+    if(log.isDebugEnabled())
+    {
+      log.debug("ClassLoader.class.getModule() " + ClassLoader.class.getModule());
+      log.debug("ModularSampleProject.class.getModule() " + ClassOper.class.getModule());
+      log.debug("module names: " + baseModule.getName() + " " + unnamedModule.getName());
+    }
+
+    baseModule.addOpens("java.lang", unnamedModule);
+
+    final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
+    usrPathsField.setAccessible(true);
+
+    // get array of paths
+    final String[] paths = (String[]) usrPathsField.get(null);
+
+    // check if the path to add is already present
+    for(String path : paths)
+    {
+      if(path.equals(pathToAdd))
+      {
+        return;
+      }
+    }
+
+    // aggiunge la nuova path in testa (sarà valutata per prima)
+    String[] newPaths = (String[]) ArrayUtils.insert(0, paths, pathToAdd);
+    usrPathsField.set(null, newPaths);
+  }
+
+  /**
+   * Adds the specified path to the java library path (Java 14+).
+   * A differenza di setLibraryPath() che sostituisce il valore precedente
+   * qui la nuova path viene aggiunta al contenuto attuale di java.library.path.
+   *
+   * @param pathToAdd the path to add
+   * @throws Exception
+   */
+  public static void addLibraryPathModernJava(String pathToAdd)
+     throws Exception
+  {
+    if(ClassLoader.class.getDeclaredFields().length == 0)
+    {
+      // modern new Java via reflection up to Java 14
+
+      try
+      {
+        //Lookup cl = MethodHandles.privateLookupIn(ClassLoader.class, MethodHandles.lookup());
+        //VarHandle sys_paths = cl.findStaticVarHandle(ClassLoader.class, "usr_paths", String[].class);
+
+        Class<?> clsMHandles = Class.forName("java.lang.invoke.MethodHandles");
+
+        Method mStaticLookup = clsMHandles.getMethod("lookup");
+        Object oStaticLookup = mStaticLookup.invoke(null);
+
+        Method mLookup = clsMHandles.getMethod("privateLookupIn", Class.class, Class.forName("java.lang.invoke.MethodHandles$Lookup"));
+        Object oLookup = mLookup.invoke(null, ClassLoader.class, oStaticLookup);
+
+        Method mFindStatic = oLookup.getClass().getMethod("findStaticVarHandle", Class.class, String.class, Class.class);
+
+        Object oVarHandle = mFindStatic.invoke(oLookup, ClassLoader.class, "usr_paths", String[].class);
+
+        //MethodHandle mh = MethodHandles.lookup().findVirtual(VarHandle.class, "get", MethodType.methodType(Object.class));
+        //mh.invoke(oVarHandle);
+        Method mFindVirtual = oStaticLookup.getClass().getMethod("findVirtual", Class.class, String.class, Class.forName("java.lang.invoke.MethodType"));
+
+        Class<?> clsMethodType = Class.forName("java.lang.invoke.MethodType");
+        Method mMethodType = clsMethodType.getMethod("methodType", Class.class);
+
+        Object oMethodHandleGet = mFindVirtual.invoke(oStaticLookup, Class.forName("java.lang.invoke.VarHandle"), "get", mMethodType.invoke(null, Object.class));
+
+        Method mMethodHandleGet = oMethodHandleGet.getClass().getMethod("invokeWithArguments", Object[].class);
+
+        String[] saPath = (String[]) mMethodHandleGet.invoke(oMethodHandleGet, new Object[]
+        {
+          new Object[]
+          {
+            oVarHandle
+          }
+        });
+
+        //check if the path to add is already present
+        for(String path : saPath)
+        {
+          if(path.equals(pathToAdd))
+          {
+            return;
+          }
+        }
+
+        //add the new path
+        String[] saNewPaths = (String[]) ArrayUtils.insert(0, saPath, pathToAdd);
+
+        //MethodHandle mh = MethodHandles.lookup().findVirtual(VarHandle.class, "set", MethodType.methodType(Void.class, Object[].class));
+        //mh.invoke(oVarHandle, new String[] {"GEHT"});
+        mMethodType = clsMethodType.getMethod("methodType", Class.class, Class.class);
+
+        Object oMethodHandleSet = mFindVirtual.invoke(oStaticLookup, Class.forName("java.lang.invoke.VarHandle"),
+           "set",
+           mMethodType.invoke(null, Void.class, Object[].class));
+
+        Method mMethodHandleSet = oMethodHandleSet.getClass().getMethod("invokeWithArguments", Object[].class);
+
+        mMethodHandleSet.invoke(oMethodHandleSet, new Object[]
+        {
+          new Object[]
+          {
+            oVarHandle, saNewPaths
+          }
+        });
+      }
+      catch(Exception ex)
+      {
+        //--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
+        //
+        //or -Djava.library.path=...
+
+        //useful doc
+        //
+        //https://stackoverflow.com/questions/56039341/get-declared-fields-of-java-lang-reflect-fields-in-jdk12/56043252#56043252
+        //https://stackoverflow.com/questions/15409223/adding-new-paths-for-native-libraries-at-runtime-in-java
+        //https://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection
+        Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+        getDeclaredFields0.setAccessible(true);
+
+        Field[] fieldsClassLoader = (Field[]) getDeclaredFields0.invoke(ClassLoader.class, Boolean.FALSE);
+
+        for(Field fldClassLoader : fieldsClassLoader)
+        {
+          if("libraries".equals(fldClassLoader.getName()))
+          {
+            fldClassLoader.setAccessible(true);
+
+            Class<?>[] classesClassLoader = fldClassLoader.getType().getDeclaredClasses();
+
+            for(Class<?> clLibraryPaths : classesClassLoader)
+            {
+              if("jdk.internal.loader.NativeLibraries$LibraryPaths".equals(clLibraryPaths.getName()))
+              {
+                Field[] fieldsLibraryPaths = (Field[]) getDeclaredFields0.invoke(clLibraryPaths, Boolean.FALSE);
+
+                for(Field fldLibPath : fieldsLibraryPaths)
+                {
+                  if("USER_PATHS".equals(fldLibPath.getName()))
+                  {
+                    final Field fldUsrPaths = fldLibPath;
+                    fldUsrPaths.setAccessible(true);
+
+                    //get array of paths
+                    final String[] saPath = (String[]) fldUsrPaths.get(null);
+
+                    //check if the path to add is already present
+                    for(String path : saPath)
+                    {
+                      if(path.equals(pathToAdd))
+                      {
+                        return;
+                      }
+                    }
+
+                    //add the new path
+                    String[] saNewPaths = (String[]) ArrayUtils.insert(0, saPath, pathToAdd);
+
+                    Object unsafe;
+
+                    //Unsafe is a hack
+                    Class<?> clsUnsafe = Class.forName("sun.misc.Unsafe");
+
+                    final Field unsafeField = clsUnsafe.getDeclaredField("theUnsafe");
+                    unsafeField.setAccessible(true);
+                    unsafe = unsafeField.get(null);
+
+                    Method m1 = clsUnsafe.getMethod("staticFieldBase", Field.class);
+                    Method m2 = clsUnsafe.getMethod("staticFieldOffset", Field.class);
+
+                    Object fieldBase = m1.invoke(unsafe, fldUsrPaths);
+                    Long fieldOffset = (Long) m2.invoke(unsafe, fldUsrPaths);
+
+                    Method m3 = clsUnsafe.getMethod("putObject", Object.class, long.class, Object.class);
+
+                    m3.invoke(unsafe, fieldBase, fieldOffset, saNewPaths);
+                  }
+                }
+              }
+            }
+
+            return;
+          }
+        }
+      }
+    }
+    else
+    {
+      // good old Java via reflection
+
+      final Field fldUsrPaths = ClassLoader.class.getDeclaredField("usr_paths");
+      fldUsrPaths.setAccessible(true);
+
+      //get array of paths
+      final String[] saPath = (String[]) fldUsrPaths.get(null);
+
+      //check if the path to add is already present
+      for(String path : saPath)
+      {
+        if(path.equals(pathToAdd))
+        {
+          return;
+        }
+      }
+
+      //add the new path
+      final String[] saNewPaths = Arrays.copyOf(saPath, saPath.length + 1);
+      saNewPaths[saNewPaths.length - 1] = pathToAdd;
+      fldUsrPaths.set(null, saNewPaths);
+    }
   }
 
   /**
