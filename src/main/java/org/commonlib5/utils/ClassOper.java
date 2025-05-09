@@ -383,7 +383,14 @@ public class ClassOper
    * Adds the specified path to the java library path (Java 14+).
    * A differenza di setLibraryPath() che sostituisce il valore precedente
    * qui la nuova path viene aggiunta al contenuto attuale di java.library.path.
-   *
+   * <br>
+   * <b>IMPORTANTE!!</b><br>
+   * Aggiungere alla linea di comando che lancia Java le seguenti opzioni:
+   * <ul>
+   * <li>--add-opens java.base/java.lang=ALL-UNNAMED</li>
+   * <li>--add-opens java.base/java.util=ALL-UNNAMED</li>
+   * <li>--add-opens java.base/jdk.internal.loader=ALL-UNNAMED</li>
+   * </ul>
    * @param pathToAdd the path to add
    * @throws Exception
    */
