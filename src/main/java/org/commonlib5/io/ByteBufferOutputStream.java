@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@ package org.commonlib5.io;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * Output stream che scrive in un array di bytes.
@@ -277,6 +278,11 @@ public class ByteBufferOutputStream extends OutputStream
 
   public synchronized String toString(String encoding)
      throws UnsupportedEncodingException
+  {
+    return new String(buffer, 0, count, encoding);
+  }
+
+  public synchronized String toString(Charset encoding)
   {
     return new String(buffer, 0, count, encoding);
   }
