@@ -287,6 +287,30 @@ public class ByteBufferOutputStream extends OutputStream
     return new String(buffer, 0, count, encoding);
   }
 
+  public synchronized String toString(int offset, int lenght, Charset encoding)
+  {
+    return new String(buffer, offset, lenght, encoding);
+  }
+
+  public synchronized int indexOf(byte test)
+  {
+    return indexOf(test, 0);
+  }
+
+  public synchronized int indexOf(byte test, int fromIndex)
+  {
+    if(fromIndex < count)
+    {
+      for(int i = fromIndex; i < count; i++)
+      {
+        if(buffer[i] == test)
+          return i;
+      }
+    }
+
+    return -1;
+  }
+
   /**
    * Cerca la prima occorrenza dell'array indicato all'interno del buffer.
    * @param test array da cercare
