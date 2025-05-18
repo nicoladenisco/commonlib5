@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -70,18 +70,7 @@ public class AutodeleteDir implements Closeable
   public void close()
      throws IOException
   {
-    try
-    {
-      CommonFileUtils.deleteDir(dir, deleteItself);
-    }
-    catch(IOException ex)
-    {
-      throw ex;
-    }
-    catch(Exception ex)
-    {
-      throw new IOException(ex);
-    }
+    CommonFileUtils.deleteDir(dir, deleteItself);
   }
 
   public File getDir()
