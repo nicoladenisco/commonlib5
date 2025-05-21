@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ import java.util.Map.Entry;
  * Generico contenitore per due valori.
  *
  * @author Nicola De Nisco
+ * @param <K>
  * @param <V>
  */
 public class Pair<K, V> implements Entry<K, V>
