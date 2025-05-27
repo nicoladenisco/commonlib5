@@ -451,4 +451,28 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   {
     return stringhe.iterator();
   }
+
+  /**
+   * Fonde le stringhe e le riframmenta usando il delimitatore.
+   * Il delimitatore ha la sintassi di StringTokenizer.
+   * @param delimiter delimitatore per spezzare la stringa fusione
+   * @return lista di stringhe
+   */
+  public List<String> joinAndSplit(String delimiter)
+  {
+    String tmp = join();
+    return StringOper.string2List(tmp, delimiter, true);
+  }
+
+  /**
+   * Fonde le stringhe e le riframmenta usando il delimitatore.
+   * Il delimitatore ha la sintassi di StringTokenizer.
+   * I duplicati vengono rimossi.
+   * @param delimiter delimitatore per spezzare la stringa fusione
+   * @return set di stringhe
+   */
+  public Set<String> joinAndSplitUnique(String delimiter)
+  {
+    return new ArraySet<>(joinAndSplit(delimiter));
+  }
 }
