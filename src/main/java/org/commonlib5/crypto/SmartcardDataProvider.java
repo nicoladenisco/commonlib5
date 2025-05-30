@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@ import org.bouncycastle.asn1.x500.X500NameStyle;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.commonlib5.utils.ArrayMap;
 import org.commonlib5.utils.StringOper;
 import xades4j.providers.KeyingDataProvider;
 import xades4j.providers.SigningCertChainException;
@@ -69,6 +70,7 @@ public class SmartcardDataProvider implements KeyingDataProvider
   protected String mUserCertificate = null;
   protected String currentAlias = null;
   protected final List<X509Certificate> originalChain = new ArrayList<>();
+  protected final Map<String, X509Certificate> mapAliasCerts = new ArrayMap<>();
 
   /**
    * Costruttore di default.
@@ -310,6 +312,7 @@ public class SmartcardDataProvider implements KeyingDataProvider
       String alias = (String) aliasesEnum.nextElement();
       X509Certificate cert = (X509Certificate) userKeyStore.getCertificate(alias);
       originalChain.add(cert);
+      mapAliasCerts.put(alias, cert);
     }
 
     // usa i flags (opzionali) per scegliere il certificato giusto ...
@@ -584,6 +587,7 @@ public class SmartcardDataProvider implements KeyingDataProvider
    * Imposta certificato da usare per la firma attraverso
    * il suo alias.
    * @param alias certificato selezionato
+   * @throws java.security.GeneralSecurityException
    * @throws org.commonlib5.crypto.DocumentSignException
    */
   public void setCurrentAlias(String alias)
@@ -619,5 +623,10 @@ public class SmartcardDataProvider implements KeyingDataProvider
   public List<X509Certificate> getOriginalChain()
   {
     return Collections.unmodifiableList(originalChain);
+  }
+
+  public Map<String, X509Certificate> getMapAliasCerts()
+  {
+    return Collections.unmodifiableMap(mapAliasCerts);
   }
 }
