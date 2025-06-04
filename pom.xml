@@ -183,12 +183,18 @@
       <groupId>com.googlecode.xades4j</groupId>
       <artifactId>xades4j</artifactId>
       <version>1.6.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
     <dependency>
       <groupId>com.itextpdf</groupId>
       <artifactId>itextpdf</artifactId>
-      <version>5.5.13.2</version>
+      <version>5.5.13.4</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
     <dependency>
