@@ -26,20 +26,38 @@ import org.commonlib5.utils.DateTime;
 import org.commonlib5.utils.StringOper;
 
 /**
- * Hashtable con controllo sui valori inseriti.
+ * Map con controllo sui valori inseriti.
  * I valori null non vengono inseriti e provocano
  * una rimozione della chiave.
  * Tutti i tipi semplici vengono convertiti in stringa,
  * compresi i valori Date (formattati ISO).
  *
  * @author Nicola De Nisco
- * @deprecate usa MapRpcString
  */
-public class HashtableRpcString extends Hashtable<String, String>
+public class MapRpcString extends Hashtable<String, String>
 {
-  public HashtableRpcString()
+  public MapRpcString()
   {
     super(64);
+  }
+
+  public MapRpcString(Object... params)
+  {
+    putPair(params);
+  }
+
+  public void putPair(Object... params)
+  {
+    if((params.length & 1) != 0)
+      throw new IllegalArgumentException("Params list must be pair.");
+
+    for(int i = 0; i < params.length; i++, i++)
+    {
+      Object key = params[i];
+      Object val = params[i + 1];
+
+      put(key.toString(), val);
+    }
   }
 
   public Object put(String key, Object value)
@@ -76,7 +94,7 @@ public class HashtableRpcString extends Hashtable<String, String>
     }
   }
 
-  public HashtableRpcString append(String key, Object value)
+  public MapRpcString append(String key, Object value)
   {
     put(key, value);
     return this;

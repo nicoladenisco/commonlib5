@@ -17,12 +17,11 @@
  */
 package org.commonlib5.xmlrpc;
 
-import java.util.Map;
+import java.util.Collection;
 
 /**
- * Map con controllo sui valori inseriti.
- * I valori null non vengono inseriti e provocano
- * una rimozione della chiave.
+ * Lista con controllo sui valori inseriti.
+ * I valori null non vengono inseriti.
  * Tutti i tipi semplici vengono convertiti in stringa,
  * compresi i valori Date (formattati ISO).
  * Map sono inserite sempre come hashtable.
@@ -30,34 +29,26 @@ import java.util.Map;
  * Set sono inseriti sempre come vector.
  *
  * @author Nicola De Nisco
+ * @deprecate usa ListRpc
  */
-public class MapRpc extends HashtableRpc
+public class ListRpc extends VectorRpc
 {
-  public MapRpc()
+  public ListRpc()
   {
   }
 
-  public MapRpc(Map<? extends String, ? extends Object> map)
+  public ListRpc(int initialCapacity)
   {
-    super(map);
+    super(initialCapacity);
   }
 
-  public MapRpc(Object... params)
+  public ListRpc(int initialCapacity, int capacityIncrement)
   {
-    putPair(params);
+    super(initialCapacity, capacityIncrement);
   }
 
-  public void putPair(Object... params)
+  public ListRpc(Collection c)
   {
-    if((params.length & 1) != 0)
-      throw new IllegalArgumentException("Params list must be pair.");
-
-    for(int i = 0; i < params.length; i++, i++)
-    {
-      Object key = params[i];
-      Object val = params[i + 1];
-
-      put(key.toString(), val);
-    }
+    super(c);
   }
 }

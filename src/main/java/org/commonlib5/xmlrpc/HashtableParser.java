@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@ import org.commonlib5.utils.StringOper;
  * Tabella di hashing con funzioni di parser.
  *
  * @author Nicola De Nisco
+ * @deprecate usa MapParser
  */
 public class HashtableParser extends Hashtable
 {

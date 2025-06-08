@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@ import org.commonlib5.utils.StringOper;
  * Set sono inseriti sempre come vector.
  *
  * @author Nicola De Nisco
+ * @deprecate usa MapRpc
  */
 public class HashtableRpc extends Hashtable<String, Object>
 {
