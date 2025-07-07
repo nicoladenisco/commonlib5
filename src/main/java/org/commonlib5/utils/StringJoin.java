@@ -475,4 +475,14 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   {
     return new ArraySet<>(joinAndSplit(delimiter));
   }
+
+  public boolean isEmpty()
+  {
+    return stringhe.isEmpty();
+  }
+
+  public int size()
+  {
+    return stringhe.size();
+  }
 }
