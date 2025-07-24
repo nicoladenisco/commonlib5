@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import static junit.framework.Assert.*;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -249,6 +250,42 @@ public class StringJoinTest
     String expResult = "01,02,03,04,05";
     String result = StringJoin.build().addObjects(cs, (s) -> "0" + s).join();
     assertEquals(expResult, result);
+  }
+
+  /**
+   * Test of addObjects method, of class StringJoin.
+   */
+  @Test
+  public void testAddNum_Collection()
+  {
+    System.out.println("addNum");
+
+    Set<Integer> si = new ArraySet<>();
+    si.add(1);
+    si.add(2);
+    si.add(3);
+
+    String ei = "1,2,3";
+    String ri = StringJoin.build().addNum(si).join();
+    assertEquals(ei, ri);
+
+    Set<Long> sl = new ArraySet<>();
+    sl.add(1L);
+    sl.add(2L);
+    sl.add(3L);
+
+    String expResult = "1,2,3";
+    String result = StringJoin.build().addNum(sl).join();
+    assertEquals(expResult, result);
+
+    Set<Double> sd = new ArraySet<>();
+    sd.add(1.0);
+    sd.add(2.0);
+    sd.add(3.0);
+
+    String ed = "1.0,2.0,3.0";
+    String rd = StringJoin.build().addNum(sd).join();
+    assertEquals(ed, rd);
   }
 
   /**
