@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -32,13 +32,22 @@ import java.security.cert.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CardTerminals;
 import javax.smartcardio.TerminalFactory;
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSSignedData;
 import org.commonlib5.utils.CommonFileUtils;
+import org.commonlib5.utils.StringOper;
 
 /**
  * Utility per la crittografia e firma digitale.
@@ -92,7 +101,7 @@ public class SignUtils
   public static X509Certificate readX509CertFile(File file)
      throws Exception
   {
-    try (FileInputStream is = new FileInputStream(file))
+    try(FileInputStream is = new FileInputStream(file))
     {
       return readX509CertStream(is);
     }
@@ -145,7 +154,7 @@ public class SignUtils
 
     byte[] signature = readFileFirma(signFile);
 
-    try (FileInputStream datafis = new FileInputStream(fileToVerify))
+    try(FileInputStream datafis = new FileInputStream(fileToVerify))
     {
       verified = verify(pubKey, signature, datafis);
     }
@@ -293,7 +302,7 @@ public class SignUtils
   public static byte[] extractDocument(File p7m)
      throws Exception
   {
-    try (InputStream is = new FileInputStream(p7m))
+    try(InputStream is = new FileInputStream(p7m))
     {
       CMSSignedData sdp = new CMSSignedData(is);
       CMSProcessable cmsp = sdp.getSignedContent();
@@ -317,7 +326,7 @@ public class SignUtils
 
   public static boolean tryLoadCertificate(File f, Collection contentList, CertificateFactory cf)
   {
-    try (FileInputStream fis = new FileInputStream(f))
+    try(FileInputStream fis = new FileInputStream(f))
     {
       contentList.add((X509Certificate) cf.generateCertificate(fis));
       return true;
@@ -331,7 +340,7 @@ public class SignUtils
 
   public static boolean tryLoadCrl(File f, Collection contentList, CertificateFactory cf)
   {
-    try (FileInputStream fis = new FileInputStream(f))
+    try(FileInputStream fis = new FileInputStream(f))
     {
       contentList.add((X509CRL) cf.generateCRL(fis));
       return true;
@@ -341,5 +350,38 @@ public class SignUtils
       // ignore
     }
     return false;
+  }
+
+  /**
+   * Ritorna campi X500 contenuti nel subject del certificato utilizzato per la firma.
+   * @param cert certificato dell'utente
+   * @return mappa nome/valore dei campi del subject
+   * @throws Exception
+   */
+  public static Map<String, String> getUserCertificateSubjectFields(X509Certificate cert)
+     throws Exception
+  {
+    TreeMap<String, String> rv = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
+    ASN1ObjectIdentifier[] attributeTypes = x500name.getAttributeTypes();
+    X500NameStyle style = X500Name.getDefaultStyle();
+
+    for(int i = 0; i < attributeTypes.length; i++)
+    {
+      ASN1ObjectIdentifier oi = attributeTypes[i];
+      String dispName = StringOper.okStrNull(style.oidToDisplayName(oi));
+
+      if(dispName != null)
+      {
+        RDN[] rdNs = x500name.getRDNs(oi);
+        String value = StringOper.join(Arrays.asList(rdNs),
+           (rdn) -> IETFUtils.valueToString(rdn.getFirst().getValue()), ", ", "");
+
+        if(value != null)
+          rv.put(dispName, value);
+      }
+    }
+
+    return rv;
   }
 }
