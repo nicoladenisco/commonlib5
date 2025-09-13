@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.commonlib5.lambda.FunctionTrowException;
 
 /**
@@ -2143,6 +2144,25 @@ public class StringOper
     }
 
     return false;
+  }
+
+  /**
+   * Confronto fra stringhe.
+   * Il valore per il confronto viene estratto con okStr().
+   * @param o1 un qualsiasi oggetto java
+   * @param values uno stream di oggetti da confrontare
+   * @return vero se almeno un confronto va a buon fine
+   */
+  public static boolean isEquStream(Object o1, Stream values)
+  {
+    if(values == null)
+      return false;
+
+    String sVal1 = okStr(o1, null);
+    if(sVal1 == null)
+      return false;
+
+    return values.anyMatch((v) -> sVal1.equals(okStr(v)));
   }
 
   /**
