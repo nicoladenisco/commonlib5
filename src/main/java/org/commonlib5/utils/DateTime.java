@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -370,9 +370,19 @@ public class DateTime
     return elapsed(d1) > elapse;
   }
 
+  public static boolean isElapsed(Date d1, TimeUnit unit, long elapse)
+  {
+    return elapsed(d1) > unit.toMillis(elapse);
+  }
+
   public static boolean isElapsed(Date d1, Date d2, long elapse)
   {
     return elapsed(d1, d2) > elapse;
+  }
+
+  public static boolean isElapsed(Date d1, Date d2, TimeUnit unit, long elapse)
+  {
+    return elapsed(d1, d2) > unit.toMillis(elapse);
   }
 
   /**
