@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -196,7 +196,7 @@ public class SimpleTimer implements Serializable
 
   public long getIntermedioReset()
   {
-    long intermedio = getElapsed() - precedente;
+    long intermedio = getIntermedio();
     resetIntermedio();
     return intermedio;
   }
