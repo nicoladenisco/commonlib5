@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 public class FileScanner
 {
   protected int maxLivello = 999;
-  protected List<File> vFile = new ArrayList<File>();
+  protected List<File> vFile = new ArrayList<>();
   protected FileFilter ff = null;
   protected FilenameFilter fn = null;
   protected ActionListener al = null;
@@ -108,6 +108,9 @@ public class FileScanner
   {
     int count = 0;
     File[] fArr = fDir.listFiles();
+
+    if(fArr == null)
+      return 0;
 
     for(int i = 0; i < fArr.length; i++)
     {
@@ -222,6 +225,40 @@ public class FileScanner
     return count;
   }
 
+  protected int scanDirOnlyInternal(int livello, File fDir)
+  {
+    int count = 0;
+    File[] fArr = fDir.listFiles();
+
+    if(fArr == null)
+      return 0;
+
+    for(int i = 0; i < fArr.length; i++)
+    {
+      final File target = fArr[i];
+
+      if(target.isDirectory())
+      {
+        if(fn.accept(fDir, target.getName()))
+        {
+          vFile.add(target);
+          count++;
+
+          if(onlyOne)
+            return count;
+        }
+
+        if(livello < maxLivello)
+          count += scanDirOnlyInternal(livello + 1, target);
+
+        if(onlyOne && count > 0)
+          return count;
+      }
+    }
+
+    return count;
+  }
+
   public static List<File> scan(File fDir)
   {
     FileScanner fs = new FileScanner();
@@ -294,5 +331,24 @@ public class FileScanner
   {
     List<File> res = scan(fDir, maxLev, wildCard, true);
     return res.isEmpty() ? null : res.get(0);
+  }
+
+  public static File findDir(File fDir, int maxLev, String nomeDirToFind)
+  {
+    FileScanner fs = new FileScanner();
+    fs.maxLivello = maxLev;
+    fs.fn = new WildcardFileFilter(nomeDirToFind);
+    fs.onlyOne = true;
+    fs.scanDirOnlyInternal(0, fDir);
+    return fs.vFile.isEmpty() ? null : fs.vFile.get(0);
+  }
+
+  public static List<File> scanDirectory(File fDir, int maxLev, FilenameFilter fn)
+  {
+    FileScanner fs = new FileScanner();
+    fs.maxLivello = maxLev;
+    fs.fn = fn;
+    fs.scanDirOnlyInternal(0, fDir);
+    return fs.vFile;
   }
 }
