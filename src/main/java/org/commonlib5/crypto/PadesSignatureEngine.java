@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -33,7 +33,6 @@ import com.itextpdf.text.pdf.security.MakeSignature;
 import com.itextpdf.text.pdf.security.MakeSignature.CryptoStandard;
 import com.itextpdf.text.pdf.security.OcspClient;
 import com.itextpdf.text.pdf.security.OcspClientBouncyCastle;
-import com.itextpdf.text.pdf.security.PrivateKeySignature;
 import com.itextpdf.text.pdf.security.TSAClient;
 import com.itextpdf.text.pdf.security.TSAClientBouncyCastle;
 import java.io.File;
@@ -193,14 +192,14 @@ public class PadesSignatureEngine extends SignatureEngine
       ocspClient = new OcspClientBouncyCastle();
       if(crlList == null)
       {
-        crlList = new ArrayList<CrlClient>();
+        crlList = new ArrayList<>();
         crlList.add(new CrlClientOnline(chain));
       }
     }
 
-    // Creating the signature
+    // Creating the javasign
     ExternalDigest digest = new BouncyCastleDigest();
-    ExternalSignature signature = new PrivateKeySignature(pk, digestAlgorithm, null);
+    ExternalSignature signature = new SmartcardPrivateKeySignature(pk, digestAlgorithm, null);
     MakeSignature.signDetached(appearance, digest, signature, chain, crlList,
        ocspClient, tsaClient, 0, subfilter);
   }
