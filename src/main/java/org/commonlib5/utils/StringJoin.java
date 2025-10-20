@@ -231,7 +231,7 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
 
   public <T> StringJoin addObjects(Collection<T> cs)
   {
-    for(Object c : cs)
+    for(T c : cs)
       if(c != null)
         stringhe.add(c.toString());
     return this;
@@ -246,6 +246,31 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   }
 
   public <T> StringJoin addObjectsEx(Collection<T> cs, FunctionTrowException<T, String> fun)
+     throws Exception
+  {
+    for(T c : cs)
+      if(c != null)
+        stringhe.add(fun.apply(c));
+    return this;
+  }
+
+  public <T> StringJoin addObjects(T[] cs)
+  {
+    for(T c : cs)
+      if(c != null)
+        stringhe.add(c.toString());
+    return this;
+  }
+
+  public <T> StringJoin addObjects(T[] cs, Function<T, String> fun)
+  {
+    for(T c : cs)
+      if(c != null)
+        stringhe.add(fun.apply(c));
+    return this;
+  }
+
+  public <T> StringJoin addObjectsEx(T[] cs, FunctionTrowException<T, String> fun)
      throws Exception
   {
     for(T c : cs)
