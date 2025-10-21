@@ -523,4 +523,9 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   {
     return stringhe.size();
   }
+
+  public List<String> getStringhe()
+  {
+    return stringhe;
+  }
 }
