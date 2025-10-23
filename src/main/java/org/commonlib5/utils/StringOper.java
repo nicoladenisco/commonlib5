@@ -1731,7 +1731,7 @@ public class StringOper
     if(s == null || delim == null)
       return Collections.EMPTY_LIST;
 
-    ArrayList<String> l = new ArrayList<String>();
+    ArrayList<String> l = new ArrayList<>();
     StringTokenizer st = new StringTokenizer(s, delim);
     while(st.hasMoreTokens())
     {
@@ -1785,7 +1785,32 @@ public class StringOper
     if(s == null || (l = string2List(s, delim, removeEmpty)) == null || l.isEmpty())
       return EMPTY_STRING_ARRAY;
 
-    return (String[]) l.toArray(new String[l.size()]);
+    return (String[]) l.toArray(new String[0]);
+  }
+
+  /**
+   * Spezza una stringa in base al delimitatore
+   * generando una lista di stringhe.
+   * Viene usata la StringTokenizer per estrarre i componenti.
+   * Le stringhe tornate sono ordinate.
+   * @param s stringa in ingresso
+   * @param delim stringa delimitatore
+   * @param removeEmpty se vero non inserisce stringhe vuote in uscita
+   * @param sortIgnoreCase se vero ordinamento ignore case
+   * @return array di stringhe componenti (null se vuoto)
+   */
+  public static String[] string2ArraySorted(String s, String delim, boolean removeEmpty, boolean sortIgnoreCase)
+  {
+    List<String> l;
+    if(s == null || (l = string2List(s, delim, removeEmpty)) == null || l.isEmpty())
+      return EMPTY_STRING_ARRAY;
+
+    if(sortIgnoreCase)
+      l.sort(String::compareToIgnoreCase);
+    else
+      l.sort(String::compareTo);
+
+    return (String[]) l.toArray(new String[0]);
   }
 
   /**
