@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -190,5 +190,11 @@ public class DoubleUtils
   public double round4D(double value)
   {
     return Math.round(value * ROUND_4D) / ROUND_4D;
+  }
+
+  public double generaRandom(double min, double max)
+  {
+    double range = max - min;
+    return (Math.random() * range) + min;
   }
 }
