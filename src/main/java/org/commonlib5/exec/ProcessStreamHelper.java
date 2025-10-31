@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
  */
 package org.commonlib5.exec;
 
-import org.commonlib5.io.ByteBufferInputStream;
 import java.io.*;
+import org.commonlib5.io.ByteBufferInputStream;
 
 /**
  * Classe di supporto per l'esecuzione sicura di processi.
@@ -35,20 +35,23 @@ public class ProcessStreamHelper
   private boolean errors = false;
   private Thread thRun = null;
   private boolean killOnExit = true;
-  private ByteBufferInputStream out = new ByteBufferInputStream();
-  private ByteBufferInputStream err = new ByteBufferInputStream();
+  private final ByteBufferInputStream out = new ByteBufferInputStream();
+  private final ByteBufferInputStream err = new ByteBufferInputStream();
 
-  public static ProcessStreamHelper exec(String cmd) throws IOException
+  public static ProcessStreamHelper exec(String cmd)
+     throws IOException
   {
     return new ProcessStreamHelper(Runtime.getRuntime().exec(cmd));
   }
 
-  public static ProcessStreamHelper exec(String[] cmdArray) throws IOException
+  public static ProcessStreamHelper exec(String[] cmdArray)
+     throws IOException
   {
     return new ProcessStreamHelper(Runtime.getRuntime().exec(cmdArray));
   }
 
-  public static ProcessStreamHelper exec(String[] cmdArray, String[] env) throws IOException
+  public static ProcessStreamHelper exec(String[] cmdArray, String[] env)
+     throws IOException
   {
     return new ProcessStreamHelper(Runtime.getRuntime().exec(cmdArray, env));
   }
@@ -60,7 +63,8 @@ public class ProcessStreamHelper
    * @param process processo da monitorare
    * @throws IOException
    */
-  public ProcessStreamHelper(Process process) throws IOException
+  public ProcessStreamHelper(Process process)
+     throws IOException
   {
     this.process = process;
     startThread();
@@ -126,9 +130,10 @@ public class ProcessStreamHelper
     }
   }
 
-  protected synchronized void runExecHelper(Process process) throws IOException
+  protected synchronized void runExecHelper(Process process)
+     throws IOException
   {
-    ProcessWatch.watch(process, killOnExit, new ProcessWatchListner()
+    exitValue = ProcessWatch.watch(process, killOnExit, new ProcessWatchListner()
     {
       @Override
       public void notifyStdout(byte[] output, int offset, int length)
@@ -167,4 +172,3 @@ public class ProcessStreamHelper
     return err;
   }
 }
-
