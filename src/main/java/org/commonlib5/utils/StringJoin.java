@@ -174,6 +174,39 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     return this;
   }
 
+  public StringJoin addFromIntexToEnd(int fromIndex, String[] cs)
+  {
+    for(int i = fromIndex; i < cs.length; i++)
+    {
+      String c = cs[i];
+      if(c != null)
+        stringhe.add(c);
+    }
+    return this;
+  }
+
+  public StringJoin addFromIntexToIndex(int fromIndex, int endIndex, String[] cs)
+  {
+    for(int i = fromIndex; i < cs.length && i < endIndex; i++)
+    {
+      String c = cs[i];
+      if(c != null)
+        stringhe.add(c);
+    }
+    return this;
+  }
+
+  public StringJoin addFromIntexToLen(int fromIndex, int numElements, String[] cs)
+  {
+    for(int i = fromIndex; i < cs.length && numElements-- > 0; i++)
+    {
+      String c = cs[i];
+      if(c != null)
+        stringhe.add(c);
+    }
+    return this;
+  }
+
   public StringJoin add(int[] cs)
   {
     for(int c : cs)
