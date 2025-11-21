@@ -23,6 +23,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 import org.commonlib5.lambda.FunctionTrowException;
 import static org.commonlib5.lambda.LEU.*;
 
@@ -340,6 +341,52 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
       if(o != null)
         stringhe.add(fun.apply(o));
     }));
+    return this;
+  }
+
+  public <T> StringJoin addIterator(Iterator<T> cs)
+  {
+    while(cs.hasNext())
+    {
+      T c = cs.next();
+      if(c != null)
+        stringhe.add(c.toString());
+    }
+    return this;
+  }
+
+  public <T> StringJoin addIterator(Iterator<T> cs, Function<T, String> fun)
+  {
+    while(cs.hasNext())
+    {
+      T c = cs.next();
+      if(c != null)
+        stringhe.add(fun.apply(c));
+    }
+    return this;
+  }
+
+  public <T> StringJoin addIteratorEx(Iterator<T> cs, FunctionTrowException<T, String> fun)
+     throws Exception
+  {
+    while(cs.hasNext())
+    {
+      T c = cs.next();
+      if(c != null)
+        stringhe.add(fun.apply(c));
+    }
+    return this;
+  }
+
+  public StringJoin abbreviate(int maxLen)
+  {
+    List<String> tmp = stringhe.stream()
+       .filter((s) -> s != null)
+       .map((s) -> StringUtils.abbreviate(s, maxLen))
+       .collect(Collectors.toList());
+
+    stringhe.clear();
+    stringhe.addAll(tmp);
     return this;
   }
 

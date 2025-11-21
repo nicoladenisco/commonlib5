@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.commonlib5.utils.DateTime;
+import org.commonlib5.utils.StringJoin;
 import org.commonlib5.utils.StringOper;
 
 /**
@@ -54,11 +55,6 @@ public class MapParser extends AbstractMap<Object, Object>
     return new MutableObject(StringOper.okStr(get(key)));
   }
 
-  public void getAsMutableString(String key, MutableObject obj)
-  {
-    obj.setValue(StringOper.okStr(get(key)));
-  }
-
   public String getAsStringNull(String key)
   {
     return StringOper.okStrNull(get(key));
@@ -70,11 +66,20 @@ public class MapParser extends AbstractMap<Object, Object>
     return s == null ? null : new MutableObject(s);
   }
 
-  public void getAsMutableStringNull(String key, MutableObject obj)
+  public void getAsMutableString(String key, MutableObject obj)
+  {
+    obj.setValue(StringOper.okStr(get(key)));
+  }
+
+  public boolean getAsMutableStringNull(String key, MutableObject obj)
   {
     String s = StringOper.okStrNull(get(key));
     if(s != null)
+    {
       obj.setValue(s);
+      return true;
+    }
+    return false;
   }
 
   public int getAsInt(String key)
@@ -201,7 +206,7 @@ public class MapParser extends AbstractMap<Object, Object>
     try
     {
       List emailList = getAsList(key);
-      return StringOper.join(emailList.iterator(), separator);
+      return StringJoin.build(Character.toString(separator)).addObjects(emailList).join();
     }
     catch(Exception ex)
     {
