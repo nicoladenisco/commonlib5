@@ -97,6 +97,11 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     return new StringJoin(",", "'").add(cs);
   }
 
+  public static StringJoin buildForSQL(Collection<String> cs)
+  {
+    return new StringJoin(",", "'").add(cs);
+  }
+
   public static String joinForSQL(int[] cs)
   {
     return new StringJoin(",").add(cs).join();
@@ -113,6 +118,11 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   }
 
   public static String joinForSQL(String[] cs)
+  {
+    return new StringJoin(",", "'").add(cs).join();
+  }
+
+  public static String joinForSQLString(Collection<String> cs)
   {
     return new StringJoin(",", "'").add(cs).join();
   }
