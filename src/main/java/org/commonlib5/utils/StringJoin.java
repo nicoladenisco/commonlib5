@@ -112,14 +112,20 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     return new StringJoin(",").add(cs).join();
   }
 
+  public static String joinForSQL(String[] cs)
+  {
+    return new StringJoin(",", "'").add(cs).join();
+  }
+
+  @Deprecated
   public static String joinForSQL(Collection<? extends Number> cs)
   {
     return new StringJoin(",").addNum(cs).join();
   }
 
-  public static String joinForSQL(String[] cs)
+  public static String joinForSQLNumber(Collection<? extends Number> cs)
   {
-    return new StringJoin(",", "'").add(cs).join();
+    return new StringJoin(",").addNum(cs).join();
   }
 
   public static String joinForSQLString(Collection<String> cs)
