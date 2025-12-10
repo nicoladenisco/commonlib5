@@ -33,7 +33,8 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 public class FileScanner
 {
   protected int maxLivello = 999;
-  protected List<File> vFile = new ArrayList<>();
+  protected int maxFilesReturn = 0;
+  protected final List<File> vFile = new ArrayList<>();
   protected FileFilter ff = null;
   protected FilenameFilter fn = null;
   protected ActionListener al = null;
@@ -99,6 +100,36 @@ public class FileScanner
     this.onlyOne = onlyOne;
   }
 
+  public int getMaxFilesReturn()
+  {
+    return maxFilesReturn;
+  }
+
+  public void setMaxFilesReturn(int maxFilesReturn)
+  {
+    this.maxFilesReturn = maxFilesReturn;
+  }
+
+  public FileFilter getFf()
+  {
+    return ff;
+  }
+
+  public void setFf(FileFilter ff)
+  {
+    this.ff = ff;
+  }
+
+  public FilenameFilter getFn()
+  {
+    return fn;
+  }
+
+  public void setFn(FilenameFilter fn)
+  {
+    this.fn = fn;
+  }
+
   public List<File> getFiles()
   {
     return vFile;
@@ -126,7 +157,7 @@ public class FileScanner
         if(al != null)
           al.actionPerformed(new ActionEvent(this, count, fArr[i].getAbsolutePath()));
 
-        vFile.add(fArr[i]);
+        aggiungiFile(fArr[i]);
         count++;
 
         if(onlyOne)
@@ -135,6 +166,14 @@ public class FileScanner
     }
 
     return count;
+  }
+
+  protected void aggiungiFile(File f)
+  {
+    if(maxFilesReturn != 0 && vFile.size() >= maxFilesReturn)
+      throw new TooManyFilesException();
+
+    vFile.add(f);
   }
 
   protected int scanInternalFileFilter(int livello, File fDir)
@@ -151,7 +190,7 @@ public class FileScanner
           if(al != null)
             al.actionPerformed(new ActionEvent(this, count, fArr[i].getAbsolutePath()));
 
-          vFile.add(fArr[i]);
+          aggiungiFile(fArr[i]);
           count++;
 
           if(onlyOne)
@@ -195,7 +234,7 @@ public class FileScanner
           if(al != null)
             al.actionPerformed(new ActionEvent(this, count, fArr[i].getAbsolutePath()));
 
-          vFile.add(fArr[i]);
+          aggiungiFile(fArr[i]);
           count++;
 
           if(onlyOne)
@@ -241,7 +280,7 @@ public class FileScanner
       {
         if(fn.accept(fDir, target.getName()))
         {
-          vFile.add(target);
+          aggiungiFile(target);
           count++;
 
           if(onlyOne)
@@ -350,5 +389,9 @@ public class FileScanner
     fs.fn = fn;
     fs.scanDirOnlyInternal(0, fDir);
     return fs.vFile;
+  }
+
+  public static class TooManyFilesException extends RuntimeException
+  {
   }
 }

@@ -159,6 +159,11 @@ public class MapParser extends AbstractMap<Object, Object>
     return DateTime.parseIsoFull(rv.toString(), defVal);
   }
 
+  public Number getAsNumber(String key)
+  {
+    return getAsNumber(key, 0.0);
+  }
+
   public Number getAsNumber(String key, Number defVal)
   {
     Object rv = super.get(key);
