@@ -245,4 +245,21 @@ public class MapParser extends AbstractMap<Object, Object>
   {
     return t.entrySet();
   }
+
+  public String[] getAsStringSplit(String key, String defVal, String regexp)
+  {
+    String tmp = StringOper.okStr(get(key), defVal);
+    return tmp.split(regexp);
+  }
+
+  public boolean isEquStringSplit(String key, String defVal, String regexp, String... test)
+  {
+    String[] values = getAsStringSplit(key, defVal, regexp);
+    for(String v : values)
+    {
+      if(StringOper.isEqu(v, test))
+        return true;
+    }
+    return false;
+  }
 }
