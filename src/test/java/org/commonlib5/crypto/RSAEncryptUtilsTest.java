@@ -24,6 +24,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.Key;
 import java.security.KeyPair;
+import java.security.Provider;
+import java.security.Security;
+import java.util.Iterator;
 import javax.crypto.Cipher;
 import org.commonlib5.utils.CommonFileUtils;
 import org.junit.After;
@@ -62,6 +65,63 @@ public class RSAEncryptUtilsTest
   @After
   public void tearDown()
   {
+  }
+
+  @Test
+  public void testGetProviderList()
+     throws Exception
+  {
+    System.out.println("testGetProviderList");
+
+    String tipo = "RSA";
+    Provider prov = Security.getProvider(tipo);
+    if(prov == null)
+      return;
+
+    Iterator it = prov.keySet().iterator();
+    while(it.hasNext())
+    {
+      String entry = (String) it.next();
+      if(entry.startsWith("Alg.Alias."))
+      {
+        entry = entry.substring("Alg.Alias".length());
+      }
+      String factoryClass = entry.substring(0, entry.indexOf('.'));
+      String name = entry.substring(factoryClass.length() + 1);
+      System.out.println(factoryClass + ": " + name);
+    }
+  }
+
+  @Test
+  public void testGetAllProviderList()
+     throws Exception
+  {
+    System.out.println("testGetAllProviderList");
+
+    Provider[] arProvider = Security.getProviders();
+
+    for(Provider prov : arProvider)
+    {
+      System.out.println("===" + prov + "======================================");
+      Iterator it = prov.keySet().iterator();
+      while(it.hasNext())
+      {
+        String entry = (String) it.next();
+        System.out.println(" " + entry + " -> " + prov.getProperty(entry));
+      }
+
+      //      while(it.hasNext())
+//      {
+//        String entry = (String) it.next();
+//        if(entry.startsWith("Alg.Alias."))
+//        {
+//          entry = entry.substring("Alg.Alias".length());
+//        }
+//        String factoryClass = entry.substring(0, entry.indexOf('.'));
+//        String name = entry.substring(factoryClass.length() + 1);
+//        System.out.println(factoryClass + ": " + name);
+//      }
+    }
   }
 
   @Test
@@ -134,13 +194,15 @@ public class RSAEncryptUtilsTest
 
     writeRandom(__inputFile, 2345);
 
-    try (FileInputStream is = new FileInputStream(__inputFile); FileOutputStream os = new FileOutputStream(encryptFile))
+    try(FileInputStream is = new FileInputStream(__inputFile);
+       FileOutputStream os = new FileOutputStream(encryptFile))
     {
       int result = RSAEncryptUtils.encryptDecryptFile(is, os, encrypt, Cipher.ENCRYPT_MODE);
       System.out.println("Generati " + result + " blocchi.");
     }
 
-    try (FileInputStream is = new FileInputStream(encryptFile); FileOutputStream os = new FileOutputStream(decryptFile))
+    try(FileInputStream is = new FileInputStream(encryptFile);
+       FileOutputStream os = new FileOutputStream(decryptFile))
     {
       int result = RSAEncryptUtils.encryptDecryptFile(is, os, decript, Cipher.DECRYPT_MODE);
       System.out.println("Generati " + result + " blocchi.");
@@ -158,7 +220,8 @@ public class RSAEncryptUtilsTest
   private void writeRandom(File f, int numBytes)
      throws Exception
   {
-    try (FileInputStream is = new FileInputStream("/dev/random"); FileOutputStream os = new FileOutputStream(f))
+    try(FileInputStream is = new FileInputStream("/dev/random");
+       FileOutputStream os = new FileOutputStream(f))
     {
       CommonFileUtils.copyStream(is, os, numBytes);
     }
@@ -196,7 +259,7 @@ public class RSAEncryptUtilsTest
      throws Exception
   {
     ClassLoader cl = RSAEncryptUtilsTest.class.getClassLoader();
-    try (InputStream is = cl.getResourceAsStream("HL7.p12"))
+    try(InputStream is = cl.getResourceAsStream("HL7.p12"))
     {
       return KeyUtils.getKeyPairP12(is, null, "root".toCharArray());
     }

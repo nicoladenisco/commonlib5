@@ -26,11 +26,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.cert.*;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -46,6 +49,7 @@ import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSSignedData;
+import org.commonlib5.utils.ClassificatoreOrdinato;
 import org.commonlib5.utils.CommonFileUtils;
 import org.commonlib5.utils.StringOper;
 
@@ -379,6 +383,26 @@ public class SignUtils
 
         if(value != null)
           rv.put(dispName, value);
+      }
+    }
+
+    return rv;
+  }
+
+  public static ClassificatoreOrdinato<String, Provider> getSignProviders()
+  {
+    ClassificatoreOrdinato<String, Provider> rv = new ClassificatoreOrdinato<>(StringOper::compare);
+    Provider[] arProvider = Security.getProviders();
+
+    for(Provider prov : arProvider)
+    {
+      Iterator it = prov.keySet().iterator();
+      while(it.hasNext())
+      {
+        String entry = (String) it.next();
+
+        if(entry.startsWith("Signature."))
+          rv.aggiungi(entry, prov);
       }
     }
 
