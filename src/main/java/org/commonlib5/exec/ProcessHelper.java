@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -87,6 +87,14 @@ public class ProcessHelper
     String[] cmd = cmdArray.toArray(new String[0]);
     String[] env = envArray.toArray(new String[0]);
     return new ProcessHelper(Runtime.getRuntime().exec(cmd, env));
+  }
+
+  public static ProcessHelper exec(Collection<String> cmdArray, Collection<String> envArray, ProcessWatchListner listner)
+     throws IOException
+  {
+    String[] cmd = cmdArray.toArray(new String[0]);
+    String[] env = envArray.toArray(new String[0]);
+    return new ProcessHelper(Runtime.getRuntime().exec(cmd, env), listner);
   }
 
   public static ProcessHelper execUsingShell(String command)

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -438,5 +438,33 @@ public class OsIdent
   {
     checkOStype();
     return javaVersion.startsWith("21.");
+  }
+
+  public static boolean isJava26()
+  {
+    checkOStype();
+    return javaVersion.startsWith("26.");
+  }
+
+  public static boolean isAbsolutePath(String path)
+  {
+    checkOStype();
+
+    switch(osType)
+    {
+      case OS_UNDEFINED:
+        return false;
+
+      case OS_LINUX:
+      case OS_MACOSX:
+      case OS_SOLARIS:
+      case OS_FREEBSD:
+        return path.startsWith("/");
+
+      case OS_WINDOWS:
+        return path.matches("^[a-z|A-Z]:\\\\.+$");
+    }
+
+    return false;
   }
 }
