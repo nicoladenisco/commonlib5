@@ -19,8 +19,6 @@ package org.commonlib5.utils;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Implementazione di LongOperListener con output su writer.
@@ -105,7 +103,7 @@ public class LongOperListenerPrint implements LongOperListener
       }
       catch(IOException ex)
       {
-        Logger.getLogger(LongOperListenerPrint.class.getName()).log(Level.SEVERE, null, ex);
+        throw new RuntimeException(ex);
       }
     }
 
