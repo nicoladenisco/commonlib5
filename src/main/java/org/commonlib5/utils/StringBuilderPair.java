@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -22,10 +22,10 @@ package org.commonlib5.utils;
  *
  * @author Nicola De Nisco
  */
-public class StringBuilderPair
+public class StringBuilderPair implements Comparable<StringBuilderPair>
 {
-  private final int size;
-  private StringBuilder sb;
+  protected final int size;
+  protected StringBuilder sb;
 
   public StringBuilderPair()
   {
@@ -70,6 +70,13 @@ public class StringBuilderPair
     return this;
   }
 
+  public StringBuilderPair appendArray(String... str)
+  {
+    for(String s : str)
+      sb.append(s);
+    return this;
+  }
+
   public StringBuilderPair appendPair(String str, Object obj)
   {
     sb.append(str).append(obj);
@@ -87,5 +94,46 @@ public class StringBuilderPair
   public String toString()
   {
     return sb.toString();
+  }
+
+  public int indexOf(String str)
+  {
+    return sb.indexOf(str);
+  }
+
+  public int indexOf(String str, int fromIndex)
+  {
+    return sb.indexOf(str, fromIndex);
+  }
+
+  public int lastIndexOf(String str)
+  {
+    return sb.lastIndexOf(str);
+  }
+
+  public int lastIndexOf(String str, int fromIndex)
+  {
+    return sb.lastIndexOf(str, fromIndex);
+  }
+
+  @Override
+  public int compareTo(StringBuilderPair o)
+  {
+    return sb.compareTo(o.sb);
+  }
+
+  public boolean contains(String s)
+  {
+    return sb.indexOf(s) != -1;
+  }
+
+  public boolean contains(String s, int fromIndex)
+  {
+    return sb.indexOf(s, fromIndex) != -1;
+  }
+
+  public StringBuilder getStringBuilder()
+  {
+    return sb;
   }
 }
