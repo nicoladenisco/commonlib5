@@ -664,15 +664,22 @@ public class StringOper
 
   /**
    * Verifica se la stringa è contenuta nell'array di tokens.
+   * Nel confronto le stringhe vengono trimmate.
+   * I valori null vengono ignorati.
    * @param lToken lista di stringhe token
    * @param strTest string di test
    * @return vero se almeno una stringa è uguale a strTest
    */
   public static boolean isEqualTokens(List<String> lToken, String strTest)
   {
+    String sok = okStr(strTest);
+
     for(String s : lToken)
     {
-      if(strTest.equals(s))
+      if(s == null)
+        continue;
+
+      if(sok.equals(s.trim()))
         return true;
     }
 
@@ -681,18 +688,47 @@ public class StringOper
 
   /**
    * Verifica se la stringa è contenuta nell'array di tokens.
+   * Nel confronto le stringhe vengono trimmate.
+   * I valori null vengono ignorati.
    * @param vToken lista di stringhe token
    * @param strTest string di test
    * @return vero se almeno una stringa è uguale a strTest
    */
   public static boolean isEqualTokens(String[] vToken, String strTest)
   {
-    for(int i = 0; i < vToken.length; i++)
+    String sok = okStr(strTest);
+
+    for(String s : vToken)
     {
-      if(strTest.equals(vToken[i]))
+      if(s == null)
+        continue;
+
+      if(sok.equals(s.trim()))
         return true;
     }
 
+    return false;
+  }
+
+  /**
+   * Test di contenimento stringa.
+   * Esegue uno split della stringa utilizzando la regexp indicata
+   * e confronta i tronconi con l'elenco delle stringhe di test.
+   * Nel confronto le stringhe vengono trimmate.
+   * I valori null vengono ignorati.
+   * @param value stringa su cui eseguire il test
+   * @param regexp per lo split di value
+   * @param test elenco di confronto
+   * @return vero se almeno una corrispondenza viene trovata
+   */
+  public static boolean isEquStringSplit(String value, String regexp, String... test)
+  {
+    String[] values = value.split(regexp);
+    for(String t : test)
+    {
+      if(t != null && isEqualTokens(values, t))
+        return true;
+    }
     return false;
   }
 

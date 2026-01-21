@@ -210,8 +210,8 @@ public class MapParser extends AbstractMap<Object, Object>
   {
     try
     {
-      List emailList = getAsList(key);
-      return StringJoin.build(Character.toString(separator)).addObjects(emailList).join();
+      List slist = getAsList(key);
+      return StringJoin.build(Character.toString(separator)).addObjects(slist).join();
     }
     catch(Exception ex)
     {
@@ -254,12 +254,7 @@ public class MapParser extends AbstractMap<Object, Object>
 
   public boolean isEquStringSplit(String key, String defVal, String regexp, String... test)
   {
-    String[] values = getAsStringSplit(key, defVal, regexp);
-    for(String v : values)
-    {
-      if(StringOper.isEqu(v, test))
-        return true;
-    }
-    return false;
+    String tmp = StringOper.okStr(get(key), defVal);
+    return StringOper.isEquStringSplit(tmp, regexp, test);
   }
 }
