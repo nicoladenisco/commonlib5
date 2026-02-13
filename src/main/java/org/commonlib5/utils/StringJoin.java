@@ -610,6 +610,14 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     return new ArraySet<>(joinAndSplit(delimiter));
   }
 
+  public StringJoin unique()
+  {
+    ArraySet<String> tmp = new ArraySet<>(stringhe);
+    stringhe.clear();
+    stringhe.addAll(tmp);
+    return this;
+  }
+
   public boolean isEmpty()
   {
     return stringhe.isEmpty();
