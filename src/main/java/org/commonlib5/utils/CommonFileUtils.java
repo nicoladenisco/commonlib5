@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -1620,6 +1621,18 @@ public class CommonFileUtils
   public static boolean isOlderThan(File toTest, long millisTimeout)
   {
     return toTest.exists() && (System.currentTimeMillis() - toTest.lastModified()) > millisTimeout;
+  }
+
+  /**
+   * Verifica per ultima scrittura su file.
+   * @param toTest file da osservare
+   * @param period periodo da verificare
+   * @param tu unita di tempo del periodo specificato
+   * @return vero se il file esiste e non è stato modificato nel periodo indicato
+   */
+  public static boolean isOlderThan(File toTest, long period, TimeUnit tu)
+  {
+    return isOlderThan(toTest, tu.toMillis(period));
   }
 
   /**
