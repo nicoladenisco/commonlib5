@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -88,11 +88,20 @@ public class ArrayMap<K, V> extends AbstractMap<K, V>
   {
     if(key != null)
     {
-      remove(key);
+      for(Entry<K, V> e : theSet)
+      {
+        if(key.equals(e.getKey()))
+        {
+          V rv = e.getValue();
+          e.setValue(value);
+          return rv;
+        }
+      }
+
       add(new Pair<>(key, value));
     }
 
-    return value;
+    return null;
   }
 
   public void add(Pair<K, V> p)
