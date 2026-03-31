@@ -97,7 +97,7 @@ public class JsonHelper implements Closeable
 
       javaPatchApplied = true;
     }
-    catch(IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex)
+    catch(Exception ex)
     {
       throw new RuntimeException(ex);
     }
@@ -321,15 +321,6 @@ public class JsonHelper implements Closeable
       conn.setDoOutput(true);
       conn.setRequestProperty("Content-Type", "application/json");
       conn.setRequestProperty("Accept", "application/json");
-
-//      if("PATCH".equals(method))
-//      {
-//        // siamo obbligati a fare questo per il method PATCH.
-//        // Leggere il link per i dettagli: https://medium.com/javarevisited/invalid-http-method-patch-e12ba62ddd9f
-//        conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
-//        conn.setRequestMethod("POST");
-//      }
-//      else
       conn.setRequestMethod(method);
 
       headers.forEach((k, v) -> conn.setRequestProperty(k, v));
