@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
+import org.apache.commons.lang3.ArrayUtils;
 import org.commonlib5.io.ByteBufferOutputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -72,23 +73,27 @@ public class JsonHelper implements Closeable
     {
       Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
       methodsField.setAccessible(true);
-
       // get the methods field modifiers
       Field modifiersField = Field.class.getDeclaredField("modifiers");
       // bypass the "private" modifier
       modifiersField.setAccessible(true);
-
       // remove the "final" modifier
       modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
 
-      // valid HTTP methods
-      String[] methods =
-      {
-        "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE", "PATCH"
-      };
+      // recupera elenco metodi prima della modifica
+      String[] methodsOriginal = (String[]) methodsField.get(null);
 
-      // set the new methods - including patch
-      methodsField.set(null, methods);
+      if(!ArrayUtils.contains(methodsOriginal, "PATCH"))
+      {
+        // valid HTTP methods
+        String[] methods =
+        {
+          "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE", "PATCH"
+        };
+
+        // set the new methods - including patch
+        methodsField.set(null, methods);
+      }
 
       javaPatchApplied = true;
     }
@@ -179,22 +184,31 @@ public class JsonHelper implements Closeable
     return wrappedJsonResponse(rv);
   }
 
-  public Pair<Integer, String> patchAsText(JSONObject request)
+  public synchronized Pair<Integer, String> patchAsText(JSONObject request)
      throws Exception
   {
+    if(!javaPatchApplied)
+      javaPatchWorkaround();
+
     return patchRequest(uri, request);
   }
 
-  public Pair<Integer, JSONObject> patchAsJson(JSONObject request)
+  public synchronized Pair<Integer, JSONObject> patchAsJson(JSONObject request)
      throws Exception
   {
+    if(!javaPatchApplied)
+      javaPatchWorkaround();
+
     Pair<Integer, String> rv = patchRequest(uri, request);
     return wrappedJsonResponse(rv);
   }
 
-  public Pair<Integer, JSONObject> patchAsJson(JSONArray request)
+  public synchronized Pair<Integer, JSONObject> patchAsJson(JSONArray request)
      throws Exception
   {
+    if(!javaPatchApplied)
+      javaPatchWorkaround();
+
     Pair<Integer, String> rv = patchRequest(uri, request);
     return wrappedJsonResponse(rv);
   }
@@ -355,15 +369,21 @@ public class JsonHelper implements Closeable
     return genericRequest(uri, "PUT", req);
   }
 
-  protected Pair<Integer, String> patchRequest(URI uri, JSONObject req)
+  protected synchronized Pair<Integer, String> patchRequest(URI uri, JSONObject req)
      throws Exception
   {
+    if(!javaPatchApplied)
+      javaPatchWorkaround();
+
     return genericRequest(uri, "PATCH", req);
   }
 
-  protected Pair<Integer, String> patchRequest(URI uri, JSONArray req)
+  protected synchronized Pair<Integer, String> patchRequest(URI uri, JSONArray req)
      throws Exception
   {
+    if(!javaPatchApplied)
+      javaPatchWorkaround();
+
     return genericRequest(uri, "PATCH", req);
   }
 }
