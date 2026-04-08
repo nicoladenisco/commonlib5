@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -28,6 +28,7 @@ import javax.net.ssl.SSLSession;
  * @deprecated usare TrustAllSecurityProvider.registerHttpsURL
  * @author Nicola De Nisco
  */
+@Deprecated
 public class TrustAllHostnameVerifier
 {
   private static HostnameVerifier oldVerifier = null;

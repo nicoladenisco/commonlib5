@@ -1144,6 +1144,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(String[] arStrings, char separator)
   {
     if(arStrings == null || arStrings.length < 1)
@@ -1176,6 +1177,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(String[] arStrings, char separator, char delimiter)
   {
     if(arStrings == null || arStrings.length < 1)
@@ -1208,6 +1210,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(String[] arStrings, String separator, String delimiter)
   {
     if(arStrings == null || arStrings.length < 1)
@@ -1244,6 +1247,7 @@ public class StringOper
    * @throws java.lang.Exception
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static <T> String join(T[] arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
      throws Exception
   {
@@ -1280,6 +1284,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static <T> String join2(T[] arStrings, Function<T, String> fn, String separator, String delimiter)
   {
     if(arStrings == null || arStrings.length < 1)
@@ -1316,6 +1321,7 @@ public class StringOper
    * @throws java.lang.Exception
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static <T> String join(Collection<T> arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
      throws Exception
   {
@@ -1356,6 +1362,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static <T> String join2(Collection<T> arStrings, Function<T, String> fn, String separator, String delimiter)
   {
     if(arStrings == null || arStrings.isEmpty())
@@ -1394,6 +1401,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static <T> String join2int(Collection<T> arStrings, Function<T, Integer> fn, String separator)
   {
     if(arStrings == null || arStrings.isEmpty())
@@ -1429,6 +1437,7 @@ public class StringOper
    * @throws java.lang.Exception
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static <T> String joinNotNull(Collection<T> arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
      throws Exception
   {
@@ -1475,6 +1484,7 @@ public class StringOper
    * @throws java.lang.Exception
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static <T> String joinNotNull(T[] arStrings, FunctionTrowException<T, String> fn, String separator, String delimiter)
      throws Exception
   {
@@ -1520,6 +1530,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static <T> String join2NotNull(Collection<T> arStrings, Function<T, String> fn, String separator, String delimiter)
   {
     if(arStrings == null || arStrings.isEmpty())
@@ -1560,6 +1571,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String joinNotEmpty(String separator, String delimiter, String... arStrings)
   {
     if(arStrings == null || arStrings.length < 1)
@@ -1598,6 +1610,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(String[] arStrings, char separator, int min, int max)
   {
     return join(Arrays.copyOfRange(arStrings, min, max), separator);
@@ -1614,6 +1627,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(String[] arStrings, char separator, char delimiter, int min, int max)
   {
     return join(Arrays.copyOfRange(arStrings, min, max), separator, delimiter);
@@ -1630,6 +1644,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(String[] arStrings, String separator, String delimiter, int min, int max)
   {
     return join(Arrays.copyOfRange(arStrings, min, max), separator, delimiter);
@@ -1645,6 +1660,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(Iterator itr, char separator)
   {
     StringBuilder rv = new StringBuilder(512);
@@ -1672,6 +1688,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(Iterator itr, char separator, char delimiter)
   {
     StringBuilder rv = new StringBuilder(512);
@@ -1699,6 +1716,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(Iterator itr, String separator, String delimiter)
   {
     StringBuilder rv = new StringBuilder(512);
@@ -1729,6 +1747,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(int[] arInt, char separator)
   {
     if(arInt == null || arInt.length < 1)
@@ -1748,6 +1767,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String join(int[] arInt, char separator, int min, int max)
   {
     return join(Arrays.copyOfRange(arInt, min, max), separator);
@@ -1821,7 +1841,7 @@ public class StringOper
     if(s == null || (l = string2List(s, delim, removeEmpty)) == null || l.isEmpty())
       return EMPTY_STRING_ARRAY;
 
-    return (String[]) l.toArray(new String[0]);
+    return (String[]) l.toArray(String[]::new);
   }
 
   /**
@@ -1846,7 +1866,7 @@ public class StringOper
     else
       l.sort(String::compareTo);
 
-    return (String[]) l.toArray(new String[0]);
+    return (String[]) l.toArray(String[]::new);
   }
 
   /**
@@ -1879,7 +1899,7 @@ public class StringOper
    */
   public static Map<String, String> string2Map(String s, String delim, char split, boolean removeEmpty)
   {
-    ArrayMap<String, String> rv = new ArrayMap<String, String>();
+    ArrayMap<String, String> rv = new ArrayMap<>();
     List<String> lsStr = string2List(s, delim, removeEmpty);
     if(lsStr == null || lsStr.isEmpty())
       return rv;
@@ -2657,7 +2677,7 @@ public class StringOper
 
   public static Map<Character, String> createUnicode2HtmlMap()
   {
-    HashMap<Character, String> m = new HashMap<Character, String>(128);
+    HashMap<Character, String> m = new HashMap<>(128);
 
     // accenti gravi
     m.put('à', "&agrave;");
@@ -2765,7 +2785,7 @@ public class StringOper
   public static Map<String, Character> createHtml2UnicodeMap()
   {
     Map<Character, String> m = createUnicode2HtmlMap();
-    return reverseMap(m, new HashMap<String, Character>());
+    return reverseMap(m, new HashMap<>());
   }
 
   /**
@@ -2863,7 +2883,7 @@ public class StringOper
     if(ls.isEmpty())
       return EMPTY_STRING_ARRAY;
 
-    return ls.toArray(new String[ls.size()]);
+    return ls.toArray(String[]::new);
   }
 
   /**
@@ -3001,6 +3021,7 @@ public class StringOper
    * @return
    * @deprecated usare la classe StringJoin; più semplice e più funzionale
    */
+  @Deprecated
   public static String joinCommand(String[] arStrings)
   {
     if(arStrings == null || arStrings.length <= 0)
@@ -3044,60 +3065,60 @@ public class StringOper
     {
       int c = arChar[i];
 
-      switch(stato)
-      {
-        case 0: // quiete
-          if(c == '\"')
+      OUTER:
+          switch(stato)
           {
-            stato = 1;
+            case 0:
+              // quiete
+              switch(c)
+              {
+                case '\"':
+                  stato = 1;
+                  break;
+                case ' ':
+                  break OUTER;
+                case ',':
+                  rv.add(sb.toString().trim());
+                  sb = new StringBuilder();
+                  stato = 0;
+                  break;
+                default:
+                  stato = 2;
+                  sb.append((char) c);
+                  break;
+              }
+              break;
+            case 1: // dentro apici
+              if(c == '\"')
+              {
+                stato = 3;
+              }
+              else
+              {
+                sb.append((char) c);
+              }
+              break;
+            case 2: // dentro no apici
+              if(c == ',')
+              {
+                rv.add(sb.toString().trim());
+                sb = new StringBuilder();
+                stato = 0;
+              }
+              else
+              {
+                sb.append((char) c);
+              }
+              break;
+            case 3: // aspetto virgola dopo apici
+              if(c == ',')
+              {
+                rv.add(sb.toString().trim());
+                sb = new StringBuilder();
+                stato = 0;
+              }
+              break;
           }
-          else if(c == ' ')
-          {
-            break;
-          }
-          else if(c == ',')
-          {
-            rv.add(sb.toString().trim());
-            sb = new StringBuilder();
-            stato = 0;
-          }
-          else
-          {
-            stato = 2;
-            sb.append((char) c);
-          }
-          break;
-        case 1: // dentro apici
-          if(c == '\"')
-          {
-            stato = 3;
-          }
-          else
-          {
-            sb.append((char) c);
-          }
-          break;
-        case 2: // dentro no apici
-          if(c == ',')
-          {
-            rv.add(sb.toString().trim());
-            sb = new StringBuilder();
-            stato = 0;
-          }
-          else
-          {
-            sb.append((char) c);
-          }
-          break;
-        case 3: // aspetto virgola dopo apici
-          if(c == ',')
-          {
-            rv.add(sb.toString().trim());
-            sb = new StringBuilder();
-            stato = 0;
-          }
-          break;
-      }
     }
 
     // recupero del residuo

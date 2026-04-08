@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -59,6 +59,7 @@ public interface FileTransfer
    * @throws Exception
    * @deprecated usa getFileBlockCRC32
    */
+  @Deprecated
   public byte[] getFileBlock(String clientID, String idFile, int block)
      throws Exception;
 
@@ -102,6 +103,7 @@ public interface FileTransfer
    * @throws Exception
    * @deprecated usa putFileBlockCRC32
    */
+  @Deprecated
   public int putFileBlock(String clientID, String idFile, int block, byte[] data)
      throws Exception;
 

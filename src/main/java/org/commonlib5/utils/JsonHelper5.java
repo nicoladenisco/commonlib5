@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Nicola De Nisco
+ * Copyright (C) 2026 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,12 +17,16 @@
  */
 package org.commonlib5.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Map;
 import org.commonlib5.io.ByteBufferOutputStream;
 import org.json.JSONArray;
@@ -33,13 +37,17 @@ import org.json.JSONObject;
  *
  * @author nicola
  */
-public class JsonHelper implements Closeable
+public class JsonHelper5 implements Closeable
 {
   protected final URI uri;
   protected final ArrayMap<String, String> headers = new ArrayMap<>();
   protected boolean wrapException = false;
 
-  public JsonHelper(URI uri)
+  private static final HttpClient httpClient = HttpClient.newBuilder()
+     .connectTimeout(Duration.ofSeconds(60))
+     .build();
+
+  public JsonHelper5(URI uri)
   {
     this.uri = uri;
   }
@@ -120,6 +128,26 @@ public class JsonHelper implements Closeable
     return wrappedJsonResponse(rv);
   }
 
+  public Pair<Integer, String> patchAsText(JSONObject request)
+     throws Exception
+  {
+    return patchRequest(uri, request);
+  }
+
+  public Pair<Integer, JSONObject> patchAsJson(JSONObject request)
+     throws Exception
+  {
+    Pair<Integer, String> rv = patchRequest(uri, request);
+    return wrappedJsonResponse(rv);
+  }
+
+  public Pair<Integer, JSONObject> patchAsJson(JSONArray request)
+     throws Exception
+  {
+    Pair<Integer, String> rv = patchRequest(uri, request);
+    return wrappedJsonResponse(rv);
+  }
+
   public Pair<Integer, JSONObject> deleteAsJson()
      throws Exception
   {
@@ -140,30 +168,17 @@ public class JsonHelper implements Closeable
     }
   }
 
-  protected Pair<Integer, String> processResponse(HttpURLConnection conn)
+  protected Pair<Integer, String> processResponse(HttpResponse<byte[]> response)
      throws Exception
   {
+    /* Con HttpClient il body è sempre disponibile sia per successi che per errori.
+       Inoltre, wrapException è superfluo: non serve più il catch per recuperare l'ErrorStream. */
     ByteBufferOutputStream bos = new ByteBufferOutputStream();
+    InputStream is = new ByteArrayInputStream(response.body());
 
-    try(InputStream is = conn.getInputStream())
-    {
-      CommonFileUtils.copyStream(is, bos);
-    }
-    catch(Exception ex)
-    {
-      if(wrapException)
-      {
-        try(InputStream is = conn.getErrorStream())
-        {
-          if(is != null)
-            CommonFileUtils.copyStream(is, bos);
-        }
-      }
-      else
-        throw ex;
-    }
+    CommonFileUtils.copyStream(is, bos);
 
-    return new Pair<>(conn.getResponseCode(), bos.toString("UTF-8"));
+    return new Pair<>(response.statusCode(), bos.toString("UTF-8"));
   }
 
   public URL buildConnection(URI uri1)
@@ -172,35 +187,11 @@ public class JsonHelper implements Closeable
     return uri1.toURL();
   }
 
-  protected Pair<Integer, String> genericRequest(URI uri, String method)
-     throws Exception
-  {
-    URL url = buildConnection(uri);
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-    try
-    {
-      conn.setDoOutput(true);
-      conn.setRequestMethod(method);
-      conn.setRequestProperty("Content-Type", "application/json");
-      headers.forEach((k, v) -> conn.setRequestProperty(k, v));
-
-      return processResponse(conn);
-    }
-    finally
-    {
-      conn.disconnect();
-    }
-  }
-
   protected Pair<Integer, String> genericRequest(URI uri, String method, JSONObject req)
      throws Exception
   {
     String input = req.toString();
     byte[] byteInput = input.getBytes("UTF-8");
-
-    if(byteInput.length == 0)
-      return genericRequest(uri, method);
 
     return genericRequest(uri, method, byteInput);
   }
@@ -211,48 +202,51 @@ public class JsonHelper implements Closeable
     String input = req.toString();
     byte[] byteInput = input.getBytes("UTF-8");
 
-    if(byteInput.length == 0)
-      return genericRequest(uri, method);
-
     return genericRequest(uri, method, byteInput);
   }
 
   protected Pair<Integer, String> genericRequest(URI uri, String method, byte[] byteInput)
      throws Exception
   {
-    URL url = buildConnection(uri);
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
     try
     {
-      conn.setDoOutput(true);
-      conn.setRequestProperty("Content-Type", "application/json");
-      conn.setRequestProperty("Accept", "application/json");
-      conn.setRequestMethod(method);
+      // Se byteInput è null o vuoto, usa noBody(), altrimenti usa il publisher per i byte
+      HttpRequest.BodyPublisher publisher = (byteInput == null || byteInput.length == 0)
+                                               ? HttpRequest.BodyPublishers.noBody()
+                                               : HttpRequest.BodyPublishers.ofByteArray(byteInput);
 
-      headers.forEach((k, v) -> conn.setRequestProperty(k, v));
+      HttpRequest.Builder builder = HttpRequest.newBuilder()
+         .uri(uri)
+         .header("Content-Type", "application/json")
+         .header("Accept", "application/json")
+         .method(method, publisher);
 
-      conn.setFixedLengthStreamingMode(byteInput.length);
-      conn.getOutputStream().write(byteInput);
+      headers.forEach((k, v) -> builder.setHeader(k, v));
 
-      return processResponse(conn);
+      HttpResponse<byte[]> response = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofByteArray());
+      return processResponse(response);
     }
-    finally
+    catch(Exception e)
     {
-      conn.disconnect();
+      // Se wrapException è attivo vengono gestiti errori di rete, timeout o parsing (non coperti dagli status HTTP)
+      if(wrapException)
+      {
+        return new Pair<>(-1, e.getMessage());
+      }
+      throw e;
     }
   }
 
   protected Pair<Integer, String> getRequest(URI uri)
      throws Exception
   {
-    return genericRequest(uri, "GET");
+    return genericRequest(uri, "GET", (byte[]) null);
   }
 
   protected Pair<Integer, String> deleteRequest(URI uri)
      throws Exception
   {
-    return genericRequest(uri, "DELETE");
+    return genericRequest(uri, "DELETE", (byte[]) null);
   }
 
   protected Pair<Integer, String> postRequest(URI uri, JSONObject req)
@@ -265,5 +259,17 @@ public class JsonHelper implements Closeable
      throws Exception
   {
     return genericRequest(uri, "PUT", req);
+  }
+
+  protected Pair<Integer, String> patchRequest(URI uri, JSONObject req)
+     throws Exception
+  {
+    return genericRequest(uri, "PATCH", req);
+  }
+
+  protected Pair<Integer, String> patchRequest(URI uri, JSONArray req)
+     throws Exception
+  {
+    return genericRequest(uri, "PATCH", req);
   }
 }

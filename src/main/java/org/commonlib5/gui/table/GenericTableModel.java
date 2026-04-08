@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -501,6 +501,7 @@ abstract public class GenericTableModel<T> extends AbstractTableModel
    * @return lista delle righe cancellate
    * @deprecated usa deleteRows(JTable tbl)
    */
+  @Deprecated
   public synchronized List<T> deleteSelectedRows(JTable tbl)
   {
     return deleteRows(tbl);
