@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -206,5 +206,15 @@ public class HtmlTableHelper
     StringBuilder sb = new StringBuilder(1024);
     formatHtmlTable(sb);
     return sb.toString();
+  }
+
+  public int headerSize()
+  {
+    return header.size();
+  }
+
+  public int rowsSize()
+  {
+    return rows.size();
   }
 }
