@@ -132,7 +132,7 @@ public class SimpleMailSender extends AbstractMailSender
   {
     MimeMessage message = new MimeMessage(mailSession);
     message.setFrom(new InternetAddress(from));
-    InternetAddress[] arDest = destinatari.toArray(new InternetAddress[0]);
+    InternetAddress[] arDest = destinatari.toArray(InternetAddress[]::new);
     message.setRecipients(Message.RecipientType.TO, arDest);
     message.setSubject(subject, "UTF-8");
 
