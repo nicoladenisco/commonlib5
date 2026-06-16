@@ -18,6 +18,7 @@
 package org.commonlib5.utils;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,6 +104,12 @@ public class JsonHelper5 implements Closeable
     return getRequest(uri);
   }
 
+  public Pair<Integer, byte[]> getAsByte()
+     throws Exception
+  {
+    return getRequestByte(uri);
+  }
+
   public Pair<Integer, String> postAsText(JSONObject request)
      throws Exception
   {
@@ -181,6 +188,19 @@ public class JsonHelper5 implements Closeable
     return new Pair<>(response.statusCode(), bos.toString("UTF-8"));
   }
 
+  protected Pair<Integer, byte[]> processResponseByte(HttpResponse<byte[]> response)
+     throws Exception
+  {
+    /* Con HttpClient il body è sempre disponibile sia per successi che per errori.
+       Inoltre, wrapException è superfluo: non serve più il catch per recuperare l'ErrorStream. */
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    InputStream is = new ByteArrayInputStream(response.body());
+
+    CommonFileUtils.copyStream(is, bos);
+
+    return new Pair<>(response.statusCode(), bos.toByteArray());
+  }
+
   public URL buildConnection(URI uri1)
      throws Exception
   {
@@ -230,9 +250,35 @@ public class JsonHelper5 implements Closeable
     {
       // Se wrapException è attivo vengono gestiti errori di rete, timeout o parsing (non coperti dagli status HTTP)
       if(wrapException)
-      {
         return new Pair<>(-1, e.getMessage());
-      }
+      throw e;
+    }
+  }
+
+  protected Pair<Integer, byte[]> genericRequestByte(URI uri, String method, byte[] byteInput)
+     throws Exception
+  {
+    try
+    {
+      HttpRequest.BodyPublisher publisher = (byteInput == null || byteInput.length == 0)
+                                               ? HttpRequest.BodyPublishers.noBody()
+                                               : HttpRequest.BodyPublishers.ofByteArray(byteInput);
+      HttpRequest.Builder builder = HttpRequest.newBuilder()
+         .uri(uri)
+         .header("Content-Type", "application/json")
+         .header("Accept", "application/pdf")
+         .method(method, publisher);
+
+      headers.forEach(builder::setHeader);
+
+      HttpResponse<byte[]> response = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofByteArray());
+      return processResponseByte(response);
+    }
+    catch(Exception e)
+    {
+      // Se wrapException è attivo vengono gestiti errori di rete, timeout o parsing (non coperti dagli status HTTP)
+      if(wrapException)
+        return new Pair<>(-1, null);
       throw e;
     }
   }
@@ -271,5 +317,11 @@ public class JsonHelper5 implements Closeable
      throws Exception
   {
     return genericRequest(uri, "PATCH", req);
+  }
+
+  protected Pair<Integer, byte[]> getRequestByte(URI uri)
+     throws Exception
+  {
+    return genericRequestByte(uri, "GET", (byte[]) null);
   }
 }
