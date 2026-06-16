@@ -344,7 +344,7 @@ public class ByteBufferOutputStream extends OutputStream
    * @param fromIndex indice iniziale da cui incominciare la ricerca
    * @return posizione di target all'interno di source o -1 se non trovato
    */
-  static int indexOf(byte[] source, int sourceOffset, int sourceCount,
+  public static int indexOf(byte[] source, int sourceOffset, int sourceCount,
      byte[] target, int targetOffset, int targetCount,
      int fromIndex)
   {

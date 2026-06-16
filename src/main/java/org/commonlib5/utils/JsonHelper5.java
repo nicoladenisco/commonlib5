@@ -17,11 +17,8 @@
  */
 package org.commonlib5.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -29,7 +26,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
-import org.commonlib5.io.ByteBufferOutputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -180,12 +176,7 @@ public class JsonHelper5 implements Closeable
   {
     /* Con HttpClient il body è sempre disponibile sia per successi che per errori.
        Inoltre, wrapException è superfluo: non serve più il catch per recuperare l'ErrorStream. */
-    ByteBufferOutputStream bos = new ByteBufferOutputStream();
-    InputStream is = new ByteArrayInputStream(response.body());
-
-    CommonFileUtils.copyStream(is, bos);
-
-    return new Pair<>(response.statusCode(), bos.toString("UTF-8"));
+    return new Pair<>(response.statusCode(), new String(response.body(), "UTF-8"));
   }
 
   protected Pair<Integer, byte[]> processResponseByte(HttpResponse<byte[]> response)
@@ -193,12 +184,7 @@ public class JsonHelper5 implements Closeable
   {
     /* Con HttpClient il body è sempre disponibile sia per successi che per errori.
        Inoltre, wrapException è superfluo: non serve più il catch per recuperare l'ErrorStream. */
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    InputStream is = new ByteArrayInputStream(response.body());
-
-    CommonFileUtils.copyStream(is, bos);
-
-    return new Pair<>(response.statusCode(), bos.toByteArray());
+    return new Pair<>(response.statusCode(), response.body());
   }
 
   public URL buildConnection(URI uri1)
