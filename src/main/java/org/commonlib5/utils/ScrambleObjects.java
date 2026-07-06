@@ -60,10 +60,15 @@ public class ScrambleObjects<T> extends ArrayList<T>
       if(i1 == i2)
         continue;
 
-      int v = scrambleArray[i1];
-      scrambleArray[i1] = scrambleArray[i2];
-      scrambleArray[i2] = v;
+      swap(i1, i2);
     }
+  }
+
+  private void swap(int i1, int i2)
+  {
+    int v = scrambleArray[i1];
+    scrambleArray[i1] = scrambleArray[i2];
+    scrambleArray[i2] = v;
   }
 
   /**
