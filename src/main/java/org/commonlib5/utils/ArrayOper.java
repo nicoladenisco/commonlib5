@@ -887,4 +887,36 @@ public class ArrayOper
 
     return rv;
   }
+
+  public static boolean containsInt(int[] is, int i)
+  {
+    for(int j : is)
+      if(i == j)
+        return true;
+    return false;
+  }
+
+  public static boolean containsLong(long[] is, long i)
+  {
+    for(long j : is)
+      if(i == j)
+        return true;
+    return false;
+  }
+
+  public static boolean containsFloat(float[] is, float i)
+  {
+    for(float j : is)
+      if(i == j)
+        return true;
+    return false;
+  }
+
+  public static boolean containsDouble(double[] is, double i)
+  {
+    for(double j : is)
+      if(i == j)
+        return true;
+    return false;
+  }
 }
