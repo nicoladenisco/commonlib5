@@ -21,6 +21,7 @@ import com.itextpdf.text.pdf.security.ExternalSignature;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.Security;
 import java.security.Signature;
 import java.util.List;
 import org.apache.commons.logging.Log;
@@ -42,16 +43,23 @@ public class SmartcardPrivateKeySignature implements ExternalSignature
   protected String hashAlgorithm;
   /** The encryption algorithm (obtained from the protected key) */
   protected String encryptionAlgorithm;
-  /** The security provider */
+  /** The security provider name */
   protected String provider;
+  /**
+   * The security provider object (preferred over name to avoid Signature$Delegate
+   * wrapping)
+   */
+  protected Provider providerObject;
   /** il tipo di firma */
   protected String tipoFirma;
 
   /**
    * Creates an ExternalSignature instance
-   * @param pk	a PrivateKey object
-   * @param hashAlgorithm	the hash algorithm (e.g. "SHA-1", "SHA-256",...)
-   * @param provider	the security provider (e.g. "BC") if null try to load auto
+   * 
+   * @param pk            a PrivateKey object
+   * @param hashAlgorithm the hash algorithm (e.g. "SHA-1", "SHA-256",...)
+   * @param provider      the security provider (e.g. "BC") if null try to load
+   *                      auto
    */
   public SmartcardPrivateKeySignature(PrivateKey pk, String hashAlgorithm, String provider)
   {
@@ -60,13 +68,15 @@ public class SmartcardPrivateKeySignature implements ExternalSignature
     this.hashAlgorithm = hashAlgorithm;
     this.encryptionAlgorithm = pk.getAlgorithm();
 
-    if(encryptionAlgorithm.startsWith("EC"))
+    if (encryptionAlgorithm.startsWith("EC"))
       encryptionAlgorithm = "ECDSA";
 
     this.tipoFirma = this.hashAlgorithm.replace("-", "") + "with" + encryptionAlgorithm;
 
-    if(this.provider == null)
+    if (this.provider == null)
       loadProviderAuto();
+    else
+      this.providerObject = Security.getProvider(this.provider);
   }
 
   /**
@@ -79,25 +89,28 @@ public class SmartcardPrivateKeySignature implements ExternalSignature
     String search = "Signature." + tipoFirma;
     ClassificatoreOrdinato<String, Provider> clprov = SignUtils.getSignProviders();
     List<Provider> lsProv = clprov.get(search);
-    if(lsProv == null)
+    if (lsProv == null)
     {
       log.info("Nessun provider di firma per " + tipoFirma);
       return;
     }
 
-    this.provider = lsProv.get(0).getName();
+    this.providerObject = lsProv.get(0);
+    this.provider = this.providerObject.getName();
 
-    if(lsProv.size() > 1)
+    if (lsProv.size() > 1)
     {
       String keyDesk = pk.toString();
-      for(Provider pt : lsProv)
+      for (Provider pt : lsProv)
       {
         String pname = pt.getName();
 
-        // in genere nella descrizione della chiave viene inserito il nome del provider da cui dipende
+        // in genere nella descrizione della chiave viene inserito il nome del provider
+        // da cui dipende
         // la ricerca non è esaustiva ma rappresenta un buon default
-        if(keyDesk.startsWith(pname))
+        if (keyDesk.startsWith(pname))
         {
+          this.providerObject = pt;
           this.provider = pname;
           log.info("Provider di firma ambiguo per " + tipoFirma + "; trovati " + lsProv + "; per default uso " + pname);
           return;
@@ -110,7 +123,8 @@ public class SmartcardPrivateKeySignature implements ExternalSignature
 
   /**
    * Returns the hash algorithm.
-   * @return	the hash algorithm (e.g. "SHA-1", "SHA-256,...")
+   * 
+   * @return the hash algorithm (e.g. "SHA-1", "SHA-256,...")
    * @see com.itextpdf.text.pdf.security.ExternalSignature#getHashAlgorithm()
    */
   @Override
@@ -121,6 +135,7 @@ public class SmartcardPrivateKeySignature implements ExternalSignature
 
   /**
    * Returns the encryption algorithm used for signing.
+   * 
    * @return the encryption algorithm ("RSA" or "DSA")
    * @see com.itextpdf.text.pdf.security.ExternalSignature#getEncryptionAlgorithm()
    */
@@ -132,7 +147,9 @@ public class SmartcardPrivateKeySignature implements ExternalSignature
 
   /**
    * Ritorna il tipo firma.
-   * Il valore è una combinazione di algoritmo di hash e algoritmo di crittografia.
+   * Il valore è una combinazione di algoritmo di hash e algoritmo di
+   * crittografia.
+   * 
    * @return qualcosa del tipo SHA256withRSA
    */
   public String getTipoFirma()
@@ -142,15 +159,23 @@ public class SmartcardPrivateKeySignature implements ExternalSignature
 
   /**
    * Calcola la firma per i byte indicati.
+   * 
    * @param b the message you want to be hashed and signed
    * @return a signed message digest
    * @throws GeneralSecurityException
    */
   @Override
   public byte[] sign(byte[] b)
-     throws GeneralSecurityException
+    throws GeneralSecurityException
   {
-    Signature javasign = Signature.getInstance(tipoFirma, provider);
+    // Usare l'oggetto Provider invece del nome stringa evita la creazione di
+    // Signature$Delegate in Java 17+ che tenta di tradurre le chiavi PKCS#11
+    // opache (non esportabili da smartcard) causando InvalidKeyException.
+    Signature javasign;
+    if (providerObject != null)
+      javasign = Signature.getInstance(tipoFirma, providerObject);
+    else
+      javasign = Signature.getInstance(tipoFirma, provider);
     javasign.initSign(pk);
     javasign.update(b);
 
