@@ -1947,6 +1947,45 @@ public class StringOper
   }
 
   /**
+   * Parsing di una stringa di proprietà per delimitatore.
+   * Effettua il parsing di una stringa del tipo
+   * "CHIAVE1=VALORE1, CHIAVE2=VALORE2, CHIAVE3=VALORE3"
+   * nella corrispondente mappa chiave/valore.
+   * Chiave e valore sono trimmati.
+   * A differenza di string2Map() ritorna un classificatore,
+   * ovvero per ogni chiave può esserci una lista di valori.
+   * @param s stringa da convertire
+   * @param delim delimitatore delle coppie chiave/valore
+   * @param split il carattere che separa CHIAVE da VALORE (nell'esempio '=')
+   * @param removeEmpty vero per rimuovere i valori nulli
+   * @return Classificatore chiave/lista di valori
+   */
+  public static Classificatore<String, String> string2MultiMap(String s, String delim, char split, boolean removeEmpty)
+  {
+    Classificatore<String, String> rv = new Classificatore<>();
+    List<String> lsStr = string2List(s, delim, removeEmpty);
+    if(lsStr == null || lsStr.isEmpty())
+      return rv;
+
+    int pos;
+    for(String ss : lsStr)
+    {
+      if((pos = ss.indexOf(split)) != -1)
+      {
+        String key = okStr(ss.substring(0, pos));
+        String val = okStr(ss.substring(pos + 1));
+
+        if(key.isEmpty() || (removeEmpty && val.isEmpty()))
+          continue;
+
+        rv.aggiungi(key, val);
+      }
+    }
+
+    return rv;
+  }
+
+  /**
    * Converte un array di stringhe nel corrispettivo
    * array di interi. Le stringhe non convertibili
    * diventano defVal nell'indice corrispondente dell'array

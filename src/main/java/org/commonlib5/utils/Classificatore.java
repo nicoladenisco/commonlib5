@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -194,5 +194,32 @@ public class Classificatore<K, V> extends HashMap<K, List<V>>
     }
 
     return rv;
+  }
+
+  public boolean isUnique(K chiave)
+  {
+    List<V> valore = get(chiave);
+    if(valore == null)
+      return false;
+
+    return valore.size() == 1;
+  }
+
+  public V optUnique(K chiave)
+  {
+    List<V> valore = get(chiave);
+    if(valore == null || valore.size() != 1)
+      return null;
+
+    return valore.get(0);
+  }
+
+  public V getUnique(K chiave)
+  {
+    V valore = optUnique(chiave);
+    if(valore == null)
+      throw new RuntimeException("Missing or multiple value for " + chiave);
+
+    return valore;
   }
 }

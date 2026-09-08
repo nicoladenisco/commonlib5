@@ -101,7 +101,7 @@ public class JavaHelper
    * @param classMain the main class of the application (or "-jar mainapp.jar")
    * @param dirJars a directory with the jars need by application (my be null for nothing)
    * @param cmdarray an array with the command line for the application (my be null for nothing)
-   * @param envp envirnment for the application (my be null for nothing)
+   * @param envp environment for the application (my be null for nothing)
    * @param charset the charset used for application (my be null for default)
    * @return the helper with exec results
    * @throws IOException
@@ -114,7 +114,7 @@ public class JavaHelper
 
   /**
    * Run external Java program.
-   * @param jvmExec the JVM to launch
+   * @param jvmExec the JVM to launch (use getRunningJvm() for the current)
    * @param classMain the main class of the application (or "-jar mainapp.jar")
    * @param classPath the classpath to use for the application (my be null for nothing)
    * @param cmdarray an array with the command line for the application (my be null for nothing)
@@ -131,11 +131,11 @@ public class JavaHelper
 
   /**
    * Run external Java program.
-   * @param jvmExec the JVM to launch
+   * @param jvmExec the JVM to launch (use getRunningJvm() for the current)
    * @param classMain the main class of the application (or "-jar mainapp.jar")
    * @param classPath the classpath to use for the application (my be null for nothing)
    * @param cmdarray an array with the command line for the application (my be null for nothing)
-   * @param envp envirnment for the application (my be null for nothing)
+   * @param envp environment for the application (my be null for nothing)
    * @return the helper with exec results
    * @throws IOException
    */
@@ -150,12 +150,12 @@ public class JavaHelper
    * Each JVM option must be passed as a distinct element of jvmOptions
    * (do NOT concatenate multiple options separated by spaces in a single
    * string: on Windows they would be delivered to the JVM as one argument).
-   * @param jvmExec the JVM to launch
+   * @param jvmExec the JVM to launch (use getRunningJvm() for the current)
    * @param jvmOptions options for the JVM (es. -Xmx512m, -Xdebug, ...); may be null
    * @param classMain the main class of the application (or "-jar mainapp.jar")
    * @param classPath the classpath to use for the application (my be null for nothing)
    * @param cmdarray an array with the command line for the application (my be null for nothing)
-   * @param envp envirnment for the application (my be null for nothing)
+   * @param envp environment for the application (my be null for nothing)
    * @param charset the charset used for application (my be null for default)
    * @return the helper with exec results
    * @throws IOException
@@ -171,12 +171,12 @@ public class JavaHelper
    * Each JVM option must be passed as a distinct element of jvmOptions
    * (do NOT concatenate multiple options separated by spaces in a single
    * string: on Windows they would be delivered to the JVM as one argument).
-   * @param jvmExec the JVM to launch
+   * @param jvmExec the JVM to launch (use getRunningJvm() for the current)
    * @param jvmOptions options for the JVM (es. -Xmx512m, -Xdebug, ...); may be null
    * @param classMain the main class of the application (or "-jar mainapp.jar")
    * @param classPath the classpath to use for the application (my be null for nothing)
    * @param cmdarray an array with the command line for the application (my be null for nothing)
-   * @param envp envirnment for the application (my be null for nothing)
+   * @param envp environment for the application (my be null for nothing)
    * @return the launched process
    * @throws IOException
    */
@@ -185,20 +185,27 @@ public class JavaHelper
   {
     ArrayList<String> cmd = new ArrayList<>();
     cmd.add(jvmExec.getAbsolutePath());
+
+    // eventuali opzioni per la JVM
     if(jvmOptions != null && jvmOptions.length > 0)
       cmd.addAll(Arrays.asList(jvmOptions));
+
+    // eventuale classpath
     if(classPath != null)
     {
       cmd.add("-cp");
       cmd.add(classPath);
     }
+
+    // la classe che contiene il metodo main()
     cmd.add(classMain);
+
+    // aggiunge parametri per applicazione java
     if(cmdarray != null && cmdarray.length > 0)
       cmd.addAll(Arrays.asList(cmdarray));
 
-    String[] cmdcommand = new String[cmd.size()];
-    cmd.toArray(cmdcommand);
-
+    // lancia il programma esterno
+    String[] cmdcommand = cmd.toArray(String[]::new);
     return Runtime.getRuntime().exec(cmdcommand, envp);
   }
 }
