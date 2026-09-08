@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -142,8 +142,51 @@ public class JavaHelper
   public static Process exec(File jvmExec, String classMain, String classPath, String[] cmdarray, String[] envp)
      throws IOException
   {
-    ArrayList<String> cmd = new ArrayList<String>();
+    return exec(jvmExec, null, classMain, classPath, cmdarray, envp);
+  }
+
+  /**
+   * Run external Java program with explicit JVM options.
+   * Each JVM option must be passed as a distinct element of jvmOptions
+   * (do NOT concatenate multiple options separated by spaces in a single
+   * string: on Windows they would be delivered to the JVM as one argument).
+   * @param jvmExec the JVM to launch
+   * @param jvmOptions options for the JVM (es. -Xmx512m, -Xdebug, ...); may be null
+   * @param classMain the main class of the application (or "-jar mainapp.jar")
+   * @param classPath the classpath to use for the application (my be null for nothing)
+   * @param cmdarray an array with the command line for the application (my be null for nothing)
+   * @param envp envirnment for the application (my be null for nothing)
+   * @param charset the charset used for application (my be null for default)
+   * @return the helper with exec results
+   * @throws IOException
+   */
+  public static ExecHelper exec(File jvmExec, String[] jvmOptions, String classMain, String classPath, String[] cmdarray, String[] envp, String charset)
+     throws IOException
+  {
+    return new ExecHelper(exec(jvmExec, jvmOptions, classMain, classPath, cmdarray, envp), charset);
+  }
+
+  /**
+   * Run external Java program with explicit JVM options.
+   * Each JVM option must be passed as a distinct element of jvmOptions
+   * (do NOT concatenate multiple options separated by spaces in a single
+   * string: on Windows they would be delivered to the JVM as one argument).
+   * @param jvmExec the JVM to launch
+   * @param jvmOptions options for the JVM (es. -Xmx512m, -Xdebug, ...); may be null
+   * @param classMain the main class of the application (or "-jar mainapp.jar")
+   * @param classPath the classpath to use for the application (my be null for nothing)
+   * @param cmdarray an array with the command line for the application (my be null for nothing)
+   * @param envp envirnment for the application (my be null for nothing)
+   * @return the launched process
+   * @throws IOException
+   */
+  public static Process exec(File jvmExec, String[] jvmOptions, String classMain, String classPath, String[] cmdarray, String[] envp)
+     throws IOException
+  {
+    ArrayList<String> cmd = new ArrayList<>();
     cmd.add(jvmExec.getAbsolutePath());
+    if(jvmOptions != null && jvmOptions.length > 0)
+      cmd.addAll(Arrays.asList(jvmOptions));
     if(classPath != null)
     {
       cmd.add("-cp");
