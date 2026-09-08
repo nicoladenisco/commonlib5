@@ -296,12 +296,29 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
     return this;
   }
 
+  public <T> StringJoin addObjectsInteger(Collection<T> cs, Function<T, Integer> fun)
+  {
+    for(T c : cs)
+      if(c != null)
+        stringhe.add(Integer.toString(fun.apply(c)));
+    return this;
+  }
+
   public <T> StringJoin addObjectsEx(Collection<T> cs, FunctionTrowException<T, String> fun)
      throws Exception
   {
     for(T c : cs)
       if(c != null)
         stringhe.add(fun.apply(c));
+    return this;
+  }
+
+  public <T> StringJoin addObjectsExInteger(Collection<T> cs, FunctionTrowException<T, Integer> fun)
+     throws Exception
+  {
+    for(T c : cs)
+      if(c != null)
+        stringhe.add(Integer.toString(fun.apply(c)));
     return this;
   }
 
@@ -333,9 +350,9 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   public <T> StringJoin addObjects(Stream<T> cs)
   {
     cs.forEach((o) ->
-    {
-      if(o != null)
-        stringhe.add(o.toString());
+       {
+         if(o != null)
+           stringhe.add(o.toString());
     });
     return this;
   }
@@ -343,9 +360,9 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
   public <T> StringJoin addObjects(Stream<T> cs, Function<T, String> fun)
   {
     cs.forEach((o) ->
-    {
-      if(o != null)
-        stringhe.add(fun.apply(o));
+       {
+         if(o != null)
+           stringhe.add(fun.apply(o));
     });
     return this;
   }
@@ -354,9 +371,9 @@ public class StringJoin implements Serializable, Cloneable, Iterable<String>
      throws Exception
   {
     cs.forEach(c((o) ->
-    {
-      if(o != null)
-        stringhe.add(fun.apply(o));
+       {
+         if(o != null)
+           stringhe.add(fun.apply(o));
     }));
     return this;
   }
