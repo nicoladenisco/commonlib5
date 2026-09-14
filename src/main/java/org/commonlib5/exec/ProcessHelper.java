@@ -19,6 +19,8 @@ package org.commonlib5.exec;
 
 import java.io.*;
 import java.util.Collection;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Classe di supporto per l'avvio di processi server esterni.
@@ -27,15 +29,17 @@ import java.util.Collection;
  */
 public class ProcessHelper
 {
-  private Process process = null;
-  private int exitValue = 0;
-  private boolean running = false;
-  private boolean errors = false;
-  private Thread thRun = null;
-  private PrintStream out, err;
-  private boolean killOnExit = true;
+  private static final Log log = LogFactory.getLog(ProcessHelper.class);
 
-  private final ProcessWatchListner defaultListner = new ProcessWatchListner()
+  protected Process process = null;
+  protected int exitValue = 0;
+  protected boolean running = false;
+  protected boolean errors = false;
+  protected Thread thRun = null;
+  protected PrintStream out, err;
+  protected boolean killOnExit = true;
+
+  protected final ProcessWatchListner defaultListner = new ProcessWatchListner()
   {
     @Override
     public void notifyStdout(byte[] output, int offset, int length)
@@ -158,6 +162,13 @@ public class ProcessHelper
   }
 
   /**
+   * Solo per classi derivate.
+   */
+  protected ProcessHelper()
+  {
+  }
+
+  /**
    * Costruttore di servizio.
    * Attacca questo ProcessHelper ad un processo già creato.
    * Vedi in alternativa le funzioni exec(...).
@@ -208,7 +219,7 @@ public class ProcessHelper
     startThread(listner);
   }
 
-  private synchronized void startThread(final ProcessWatchListner listner)
+  protected synchronized void startThread(final ProcessWatchListner listner)
   {
     if(out == null)
       out = System.out;
@@ -224,14 +235,13 @@ public class ProcessHelper
         try
         {
           runExecHelper(process, listner);
-          exitValue = process.exitValue();
           process = null;
         }
         catch(Exception ex)
         {
-          ex.printStackTrace();
           errors = true;
           running = false;
+          log.error("", ex);
         }
       }
     };
@@ -279,7 +289,7 @@ public class ProcessHelper
   {
     try
     {
-      ProcessWatch.watch(process, killOnExit, listner);
+      exitValue = ProcessWatch.watch(process, killOnExit, listner);
     }
     finally
     {

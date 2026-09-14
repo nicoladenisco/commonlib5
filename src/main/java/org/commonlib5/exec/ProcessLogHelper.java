@@ -24,21 +24,13 @@ import java.io.*;
  *
  * @author Nicola De Nisco
  */
-public class ProcessLogHelper
+public class ProcessLogHelper extends ProcessHelper
 {
-  private Process process = null;
-  private int exitValue = 0;
-  private boolean running = false;
-  private boolean errors = false;
-  private Thread thRun = null;
-  private OutputStream logStdout = null;
-  private OutputStream logStderr = null;
-
   public static ProcessLogHelper exec(String cmd, File log)
      throws IOException
   {
     FileOutputStream fos = new FileOutputStream(log);
-    return new ProcessLogHelper(Runtime.getRuntime().exec(cmd), fos, fos);
+    return new ProcessLogHelper(Runtime.getRuntime().exec(cmd), fos);
   }
 
   public static ProcessLogHelper exec(String cmd,
@@ -55,6 +47,12 @@ public class ProcessLogHelper
     return new ProcessLogHelper(Runtime.getRuntime().exec(cmdArray), logStdout, logStderr);
   }
 
+  public static ProcessLogHelper exec(String[] cmdArray, String[] env, OutputStream logStream)
+     throws IOException
+  {
+    return new ProcessLogHelper(Runtime.getRuntime().exec(cmdArray, env), logStream);
+  }
+
   public static ProcessLogHelper exec(String[] cmdArray, String[] env,
      OutputStream logStdout, OutputStream logStderr)
      throws IOException
@@ -67,125 +65,59 @@ public class ProcessLogHelper
    * Attacca questo ProcessLogHelper ad un processo già creato.
    * Vedi in alternativa le funzioni exec(...).
    * @param process processo da monitorare
+   * @param logStream stream a cui inviare l'output del processo (entrambi stdin e stderr)
+   * @throws IOException
+   */
+  public ProcessLogHelper(Process process, OutputStream logStream)
+     throws IOException
+  {
+    this.process = process;
+    this.out = new PrintStream(logStream);
+    this.err = this.out;
+    startThread(defaultListner);
+  }
+
+  /**
+   * Costruttore di servizio.
+   * Attacca questo ProcessLogHelper ad un processo già creato.
+   * Vedi in alternativa le funzioni exec(...).
+   * @param process processo da monitorare
    * @param logStdout stream a cui inviare lo stdout del processo creato
    * @param logStderr stream a cui inviare lo stderr del processo creato
    * @throws IOException
    */
-  public ProcessLogHelper(Process process,
-     OutputStream logStdout, OutputStream logStderr)
+  public ProcessLogHelper(Process process, OutputStream logStdout, OutputStream logStderr)
      throws IOException
   {
     this.process = process;
-    this.logStdout = logStdout;
-    this.logStderr = logStderr;
-    startThread();
+    this.out = new PrintStream(logStdout);
+    this.err = new PrintStream(logStderr);
+    startThread(defaultListner);
   }
 
-  private void startThread()
-  {
-    running = true;
-    thRun = new Thread()
-    {
-      @Override
-      public void run()
-      {
-        try
-        {
-          runExecHelper(process);
-          exitValue = process.exitValue();
-          process = null;
-
-          // chiude gli stream ignorando gli errori
-          closeSilent(logStdout);
-          closeSilent(logStderr);
-        }
-        catch(Exception ex)
-        {
-          ex.printStackTrace();
-          errors = true;
-          running = false;
-        }
-      }
-    };
-
-    thRun.setName("ProcessLogHelper");
-    thRun.setDaemon(true);
-    thRun.start();
-  }
-
-  public int getExitValue()
-  {
-    return exitValue;
-  }
-
-  public boolean isRunning()
-  {
-    return running;
-  }
-
-  public boolean isErrors()
-  {
-    return errors;
-  }
-
-  public void destroy()
-  {
-    if(process != null)
-      process.destroy();
-  }
-
-  public synchronized void waitFor()
+  @Override
+  protected void runExecHelper(Process process, ProcessWatchListner listner)
+     throws IOException
   {
     try
     {
-      if(running)
-        wait();
+      exitValue = ProcessWatch.watch(process, killOnExit, listner);
     }
-    catch(Exception ex)
+    finally
     {
+      synchronized(this)
+      {
+        // chiude gli stream ignorando gli errori
+        closeSilent(out);
+        closeSilent(err);
+
+        running = false;
+        notify();
+      }
     }
   }
 
-  protected void runExecHelper(Process process)
-     throws IOException
-  {
-    ProcessWatch.watch(process, true, new ProcessWatchListner()
-    {
-      @Override
-      public void notifyStdout(byte[] output, int offset, int length)
-      {
-        try
-        {
-          logStdout.write(output, offset, length);
-        }
-        catch(IOException ex)
-        {
-          ex.printStackTrace();
-        }
-      }
-
-      @Override
-      public void notifyStderr(byte[] output, int offset, int length)
-      {
-        try
-        {
-          logStderr.write(output, offset, length);
-        }
-        catch(IOException ex)
-        {
-          ex.printStackTrace();
-        }
-      }
-    });
-
-    synchronized(this)
-    {
-      running = false;
-      notify();
-    }
-  }
-
-  private void closeSilent(OutputStream os)
+  protected void closeSilent(PrintStream os)
   {
     try
     {

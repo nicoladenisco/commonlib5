@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -81,7 +81,7 @@ public final class ExecHelper
   public static ExecHelper exec(Collection<String> cmdarray)
      throws IOException
   {
-    String[] cmdArr = cmdarray.toArray(new String[cmdarray.size()]);
+    String[] cmdArr = cmdarray.toArray(String[]::new);
     return new ExecHelper(Runtime.getRuntime().exec(cmdArr), null);
   }
 
@@ -327,7 +327,7 @@ public final class ExecHelper
   private StringBuilder berror = new StringBuilder();
   private String charset;
 
-  private ProcessWatchListner defaultListner = new ProcessWatchListner()
+  private final ProcessWatchListner defaultListner = new ProcessWatchListner()
   {
     private String convert(byte[] output, int offset, int length)
     {
@@ -359,7 +359,7 @@ public final class ExecHelper
      throws IOException
   {
     this.charset = _charset;
-    ProcessWatch.watch(process, true, defaultListner);
+    this.status = ProcessWatch.watch(process, true, defaultListner);
   }
 
   /**
@@ -385,6 +385,7 @@ public final class ExecHelper
   {
     return berror.toString();
   }
+
   /**
    * The status of the job that ran.
    *
