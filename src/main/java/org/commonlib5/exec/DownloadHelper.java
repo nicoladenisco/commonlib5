@@ -230,8 +230,38 @@ public class DownloadHelper
    */
   public static boolean downloadWithCurl(String url, File outputFile, String username, String password,
      boolean followRedirects, boolean failOnError, int timeoutMillis)
-     throws IOException,
-     InterruptedException
+     throws IOException, InterruptedException
+  {
+    return downloadWithCurl(url, outputFile, username, password, followRedirects, failOnError, timeoutMillis, null);
+  }
+
+  /**
+   * Scarica un file da un URL utilizzando curl con autenticazione, opzioni per il
+   * controllo dei redirect, errori HTTP e timeout.
+   *
+   * @param url L'URL della risorsa da scaricare.
+   * @param outputFile Il file di destinazione locale dove salvare il
+   * contenuto.
+   * @param username Nome utente per l'autenticazione HTTP (può essere null
+   * se non richiesta).
+   * @param password Password per l'autenticazione HTTP (può essere null se
+   * non richiesta).
+   * @param followRedirects Se true, aggiunge l'opzione -L per seguire i
+   * reindirizzamenti.
+   * @param failOnError Se true, aggiunge l'opzione -f per far fallire curl in
+   * caso di errori HTTP (es. 404, 500).
+   * @param timeoutMillis Timeout in millisecondi (0 per nessun timeout).
+   * @param logFileCurl eventuale file con output di curl (può essere null
+   * se non richiesto).
+   * @return true se il download ha avuto successo (exit code 0), false
+   * altrimenti.
+   * @throws IOException Se si verifica un errore I/O durante
+   * l'esecuzione del processo.
+   * @throws InterruptedException Se il processo viene interrotto.
+   */
+  public static boolean downloadWithCurl(String url, File outputFile, String username, String password,
+     boolean followRedirects, boolean failOnError, int timeoutMillis, File logFileCurl)
+     throws IOException, InterruptedException
   {
     List<String> command = new ArrayList<>();
     command.add("curl");
@@ -272,6 +302,15 @@ public class DownloadHelper
     command.add(url);
 
     ProcessBuilder pb = new ProcessBuilder(command);
+
+    // se richiesto invia output di curl a file log dedicato
+    if(logFileCurl != null)
+    {
+      // fonde stderr e stdout
+      pb.redirectErrorStream(true);
+      pb.redirectOutput(logFileCurl);
+    }
+
     Process process = pb.start();
     int exitCode;
 
