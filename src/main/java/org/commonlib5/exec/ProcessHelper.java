@@ -35,7 +35,7 @@ public class ProcessHelper
   private PrintStream out, err;
   private boolean killOnExit = true;
 
-  private ProcessWatchListner defaultListner = new ProcessWatchListner()
+  private final ProcessWatchListner defaultListner = new ProcessWatchListner()
   {
     @Override
     public void notifyStdout(byte[] output, int offset, int length)
@@ -71,7 +71,7 @@ public class ProcessHelper
   public static ProcessHelper exec(Collection<String> cmdArray)
      throws IOException
   {
-    String[] cmd = cmdArray.toArray(new String[0]);
+    String[] cmd = cmdArray.toArray(String[]::new);
     return new ProcessHelper(Runtime.getRuntime().exec(cmd));
   }
 
@@ -84,16 +84,17 @@ public class ProcessHelper
   public static ProcessHelper exec(Collection<String> cmdArray, Collection<String> envArray)
      throws IOException
   {
-    String[] cmd = cmdArray.toArray(new String[0]);
-    String[] env = envArray.toArray(new String[0]);
+    String[] cmd = cmdArray.toArray(String[]::new);
+    String[] env = envArray.toArray(String[]::new);
     return new ProcessHelper(Runtime.getRuntime().exec(cmd, env));
   }
 
-  public static ProcessHelper exec(Collection<String> cmdArray, Collection<String> envArray, ProcessWatchListner listner)
+  public static ProcessHelper exec(Collection<String> cmdArray, Collection<String> envArray,
+     ProcessWatchListner listner)
      throws IOException
   {
-    String[] cmd = cmdArray.toArray(new String[0]);
-    String[] env = envArray.toArray(new String[0]);
+    String[] cmd = cmdArray.toArray(String[]::new);
+    String[] env = envArray.toArray(String[]::new);
     return new ProcessHelper(Runtime.getRuntime().exec(cmd, env), listner);
   }
 
@@ -152,7 +153,7 @@ public class ProcessHelper
   public static ProcessHelper execUsingShell(String command, Collection<String> envArray)
      throws IOException
   {
-    String[] env = envArray.toArray(new String[0]);
+    String[] env = envArray.toArray(String[]::new);
     return execUsingShell(command, env);
   }
 
@@ -160,6 +161,7 @@ public class ProcessHelper
    * Costruttore di servizio.
    * Attacca questo ProcessHelper ad un processo già creato.
    * Vedi in alternativa le funzioni exec(...).
+   *
    * @param process processo da monitorare
    * @throws IOException
    */
@@ -173,6 +175,7 @@ public class ProcessHelper
    * Costruttore di servizio.
    * Attacca questo ProcessHelper ad un processo già creato.
    * Vedi in alternativa le funzioni exec(...).
+   *
    * @param process processo da monitorare
    * @param listner listner a cui notificare l'avanzamento (può essere null)
    * @throws IOException
@@ -187,6 +190,7 @@ public class ProcessHelper
    * Costruttore di servizio.
    * Attacca questo ProcessHelper ad un processo già creato.
    * Vedi in alternativa le funzioni exec(...).
+   *
    * @param process processo da monitorare
    * @param listner listner a cui notificare l'avanzamento (può essere null)
    * @param out stream per raccogliere l'output
@@ -206,6 +210,11 @@ public class ProcessHelper
 
   private synchronized void startThread(final ProcessWatchListner listner)
   {
+    if(out == null)
+      out = System.out;
+    if(err == null)
+      err = System.err;
+
     running = true;
     thRun = new Thread()
     {
@@ -215,6 +224,7 @@ public class ProcessHelper
         try
         {
           runExecHelper(process, listner);
+          exitValue = process.exitValue();
           process = null;
         }
         catch(Exception ex)
@@ -264,22 +274,20 @@ public class ProcessHelper
     }
   }
 
-  protected synchronized void runExecHelper(Process process, ProcessWatchListner listner)
+  protected void runExecHelper(Process process, ProcessWatchListner listner)
      throws IOException
   {
-    if(out == null)
-      out = System.out;
-    if(err == null)
-      err = System.err;
-
     try
     {
       ProcessWatch.watch(process, killOnExit, listner);
     }
     finally
     {
-      running = false;
-      notify();
+      synchronized(this)
+      {
+        running = false;
+        notify();
+      }
     }
   }
 

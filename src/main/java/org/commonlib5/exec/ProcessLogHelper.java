@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -34,26 +34,30 @@ public class ProcessLogHelper
   private OutputStream logStdout = null;
   private OutputStream logStderr = null;
 
-  public static ProcessLogHelper exec(String cmd, File log) throws IOException
+  public static ProcessLogHelper exec(String cmd, File log)
+     throws IOException
   {
     FileOutputStream fos = new FileOutputStream(log);
     return new ProcessLogHelper(Runtime.getRuntime().exec(cmd), fos, fos);
   }
 
   public static ProcessLogHelper exec(String cmd,
-     OutputStream logStdout, OutputStream logStderr) throws IOException
+     OutputStream logStdout, OutputStream logStderr)
+     throws IOException
   {
     return new ProcessLogHelper(Runtime.getRuntime().exec(cmd), logStdout, logStderr);
   }
 
   public static ProcessLogHelper exec(String[] cmdArray,
-     OutputStream logStdout, OutputStream logStderr) throws IOException
+     OutputStream logStdout, OutputStream logStderr)
+     throws IOException
   {
     return new ProcessLogHelper(Runtime.getRuntime().exec(cmdArray), logStdout, logStderr);
   }
 
   public static ProcessLogHelper exec(String[] cmdArray, String[] env,
-     OutputStream logStdout, OutputStream logStderr) throws IOException
+     OutputStream logStdout, OutputStream logStderr)
+     throws IOException
   {
     return new ProcessLogHelper(Runtime.getRuntime().exec(cmdArray, env), logStdout, logStderr);
   }
@@ -68,7 +72,8 @@ public class ProcessLogHelper
    * @throws IOException
    */
   public ProcessLogHelper(Process process,
-     OutputStream logStdout, OutputStream logStderr) throws IOException
+     OutputStream logStdout, OutputStream logStderr)
+     throws IOException
   {
     this.process = process;
     this.logStdout = logStdout;
@@ -87,6 +92,7 @@ public class ProcessLogHelper
         try
         {
           runExecHelper(process);
+          exitValue = process.exitValue();
           process = null;
 
           // chiude gli stream ignorando gli errori
@@ -140,7 +146,8 @@ public class ProcessLogHelper
     }
   }
 
-  protected synchronized void runExecHelper(Process process) throws IOException
+  protected void runExecHelper(Process process)
+     throws IOException
   {
     ProcessWatch.watch(process, true, new ProcessWatchListner()
     {
@@ -171,8 +178,11 @@ public class ProcessLogHelper
       }
     });
 
-    running = false;
-    notify();
+    synchronized(this)
+    {
+      running = false;
+      notify();
+    }
   }
 
   private void closeSilent(OutputStream os)
@@ -186,4 +196,3 @@ public class ProcessLogHelper
     }
   }
 }
-
