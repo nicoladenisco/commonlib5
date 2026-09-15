@@ -226,7 +226,7 @@ public class DownloadHelperTest
      throws Exception
   {
     File outFile = new File(tempDir, "http_redirect.txt");
-    boolean ok = DownloadHelper.downloadWithHttpClient(redirectUrl, outFile, true, true);
+    boolean ok = DownloadHelper.downloadWithHttpClient(redirectUrl, outFile);
     assertTrue("Il download con redirect su HttpClient dovrebbe avere successo", ok);
     assertEquals("Hello World", Files.readString(outFile.toPath()));
   }
@@ -236,7 +236,7 @@ public class DownloadHelperTest
      throws Exception
   {
     File outFile = new File(tempDir, "curl_redirect.txt");
-    boolean ok = DownloadHelper.downloadWithCurl(redirectUrl, outFile, true, true);
+    boolean ok = DownloadHelper.downloadWithCurl(redirectUrl, outFile);
     assertTrue("Il download con redirect su Curl dovrebbe avere successo", ok);
     assertEquals("Hello World", Files.readString(outFile.toPath()));
   }
@@ -246,7 +246,7 @@ public class DownloadHelperTest
      throws Exception
   {
     File outFile = new File(tempDir, "http_404.txt");
-    boolean ok = DownloadHelper.downloadWithHttpClient(notFoundUrl, outFile, true, true);
+    boolean ok = DownloadHelper.downloadWithHttpClient(notFoundUrl, outFile);
     assertFalse("Il download su 404 deve ritornare false", ok);
     assertFalse("Il file non deve essere salvato se failOnError è true", outFile.exists());
   }
@@ -256,7 +256,7 @@ public class DownloadHelperTest
      throws Exception
   {
     File outFile = new File(tempDir, "curl_404.txt");
-    boolean ok = DownloadHelper.downloadWithCurl(notFoundUrl, outFile, true, true);
+    boolean ok = DownloadHelper.downloadWithCurl(notFoundUrl, outFile);
     assertFalse("Il download su 404 deve ritornare false", ok);
     assertFalse("Il file non deve essere salvato se failOnError è true", outFile.exists());
   }

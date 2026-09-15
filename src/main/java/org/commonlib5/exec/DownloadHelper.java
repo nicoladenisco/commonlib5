@@ -53,8 +53,7 @@ public class DownloadHelper
    * @throws InterruptedException Se il processo viene interrotto.
    */
   public static boolean downloadWithCurl(String url, File outputFile)
-     throws IOException,
-     InterruptedException
+     throws IOException, InterruptedException
   {
     return downloadWithCurl(url, outputFile, null, null, true, true, 0);
   }
@@ -65,7 +64,7 @@ public class DownloadHelper
    * @param url L'URL della risorsa da scaricare.
    * @param outputFile Il file di destinazione locale dove salvare il
    * contenuto.
-   * @param timeoutMillis Timeout in millisecondi (0 per nessun timeout).
+   * @param timeoutMillis Timeout in millisecondi per la connessione (0 per nessun timeout).
    * @return true se il download ha avuto successo (exit code 0), false
    * altrimenti.
    * @throws IOException Se si verifica un errore I/O durante
@@ -73,8 +72,7 @@ public class DownloadHelper
    * @throws InterruptedException Se il processo viene interrotto.
    */
   public static boolean downloadWithCurl(String url, File outputFile, int timeoutMillis)
-     throws IOException,
-     InterruptedException
+     throws IOException, InterruptedException
   {
     return downloadWithCurl(url, outputFile, null, null, true, true, timeoutMillis);
   }
@@ -96,8 +94,7 @@ public class DownloadHelper
    * @throws InterruptedException Se il processo viene interrotto.
    */
   public static boolean downloadWithCurl(String url, File outputFile, String username, String password)
-     throws IOException,
-     InterruptedException
+     throws IOException, InterruptedException
   {
     return downloadWithCurl(url, outputFile, username, password, true, true, 0);
   }
@@ -113,98 +110,17 @@ public class DownloadHelper
    * se non richiesta).
    * @param password Password per l'autenticazione HTTP (può essere null se
    * non richiesta).
-   * @param timeoutMillis Timeout in millisecondi (0 per nessun timeout).
+   * @param timeoutMillis Timeout in millisecondi per la connessione (0 per nessun timeout).
    * @return true se il download ha avuto successo (exit code 0), false
    * altrimenti.
    * @throws IOException Se si verifica un errore I/O durante
    * l'esecuzione del processo.
    * @throws InterruptedException Se il processo viene interrotto.
    */
-  public static boolean downloadWithCurl(String url, File outputFile, String username, String password,
-     int timeoutMillis)
-     throws IOException,
-     InterruptedException
+  public static boolean downloadWithCurl(String url, File outputFile, String username, String password, int timeoutMillis)
+     throws IOException, InterruptedException
   {
     return downloadWithCurl(url, outputFile, username, password, true, true, timeoutMillis);
-  }
-
-  /**
-   * Scarica un file da un URL utilizzando curl con opzioni per il controllo dei
-   * redirect ed errori HTTP.
-   *
-   * @param url L'URL della risorsa da scaricare.
-   * @param outputFile Il file di destinazione locale dove salvare il
-   * contenuto.
-   * @param followRedirects Se true, aggiunge l'opzione -L per seguire i
-   * reindirizzamenti.
-   * @param failOnError Se true, aggiunge l'opzione -f per far fallire curl in
-   * caso di errori HTTP (es. 404, 500).
-   * @return true se il download ha avuto successo (exit code 0), false
-   * altrimenti.
-   * @throws IOException Se si verifica un errore I/O durante
-   * l'esecuzione del processo.
-   * @throws InterruptedException Se il processo viene interrotto.
-   */
-  public static boolean downloadWithCurl(String url, File outputFile, boolean followRedirects, boolean failOnError)
-     throws IOException,
-     InterruptedException
-  {
-    return downloadWithCurl(url, outputFile, null, null, followRedirects, failOnError, 0);
-  }
-
-  /**
-   * Scarica un file da un URL utilizzando curl con opzioni per il controllo dei
-   * redirect, errori HTTP e timeout.
-   *
-   * @param url L'URL della risorsa da scaricare.
-   * @param outputFile Il file di destinazione locale dove salvare il
-   * contenuto.
-   * @param followRedirects Se true, aggiunge l'opzione -L per seguire i
-   * reindirizzamenti.
-   * @param failOnError Se true, aggiunge l'opzione -f per far fallire curl in
-   * caso di errori HTTP (es. 404, 500).
-   * @param timeoutMillis Timeout in millisecondi (0 per nessun timeout).
-   * @return true se il download ha avuto successo (exit code 0), false
-   * altrimenti.
-   * @throws IOException Se si verifica un errore I/O durante
-   * l'esecuzione del processo.
-   * @throws InterruptedException Se il processo viene interrotto.
-   */
-  public static boolean downloadWithCurl(String url, File outputFile, boolean followRedirects, boolean failOnError,
-     int timeoutMillis)
-     throws IOException,
-     InterruptedException
-  {
-    return downloadWithCurl(url, outputFile, null, null, followRedirects, failOnError, timeoutMillis);
-  }
-
-  /**
-   * Scarica un file da un URL utilizzando curl con autenticazione, opzioni per il
-   * controllo dei redirect ed errori HTTP.
-   *
-   * @param url L'URL della risorsa da scaricare.
-   * @param outputFile Il file di destinazione locale dove salvare il
-   * contenuto.
-   * @param username Nome utente per l'autenticazione HTTP (può essere null
-   * se non richiesta).
-   * @param password Password per l'autenticazione HTTP (può essere null se
-   * non richiesta).
-   * @param followRedirects Se true, aggiunge l'opzione -L per seguire i
-   * reindirizzamenti.
-   * @param failOnError Se true, aggiunge l'opzione -f per far fallire curl in
-   * caso di errori HTTP (es. 404, 500).
-   * @return true se il download ha avuto successo (exit code 0), false
-   * altrimenti.
-   * @throws IOException Se si verifica un errore I/O durante
-   * l'esecuzione del processo.
-   * @throws InterruptedException Se il processo viene interrotto.
-   */
-  public static boolean downloadWithCurl(String url, File outputFile, String username, String password,
-     boolean followRedirects, boolean failOnError)
-     throws IOException,
-     InterruptedException
-  {
-    return downloadWithCurl(url, outputFile, username, password, followRedirects, failOnError, 0);
   }
 
   /**
@@ -222,7 +138,7 @@ public class DownloadHelper
    * reindirizzamenti.
    * @param failOnError Se true, aggiunge l'opzione -f per far fallire curl in
    * caso di errori HTTP (es. 404, 500).
-   * @param timeoutMillis Timeout in millisecondi (0 per nessun timeout).
+   * @param timeoutMillis Timeout in millisecondi per la connessione (0 per nessun timeout).
    * @return true se il download ha avuto successo (exit code 0), false
    * altrimenti.
    * @throws IOException Se si verifica un errore I/O durante
@@ -411,8 +327,7 @@ public class DownloadHelper
    * @throws InterruptedException Se la richiesta viene interrotta.
    */
   public static boolean downloadWithHttpClient(String url, File outputFile, String username, String password)
-     throws IOException,
-     InterruptedException
+     throws IOException, InterruptedException
   {
     return downloadWithHttpClient(url, outputFile, username, password, true, true, 0);
   }
@@ -435,89 +350,10 @@ public class DownloadHelper
    * download.
    * @throws InterruptedException Se la richiesta viene interrotta.
    */
-  public static boolean downloadWithHttpClient(String url, File outputFile, String username, String password,
-     int timeoutMillis)
-     throws IOException,
-     InterruptedException
+  public static boolean downloadWithHttpClient(String url, File outputFile, String username, String password, int timeoutMillis)
+     throws IOException, InterruptedException
   {
     return downloadWithHttpClient(url, outputFile, username, password, true, true, timeoutMillis);
-  }
-
-  /**
-   * Scarica un file da un URL utilizzando l'HttpClient nativo di Java 11+ con
-   * opzioni per il controllo dei redirect ed errori HTTP.
-   *
-   * @param url L'URL della risorsa da scaricare.
-   * @param outputFile Il file di destinazione locale dove salvare il
-   * contenuto.
-   * @param followRedirects Se true, segue i reindirizzamenti HTTP.
-   * @param failOnError Se true, fa fallire il download e cancella il file in
-   * caso di codice di errore HTTP (>= 400).
-   * @return true se il download ha avuto successo (status code 200-299), false
-   * altrimenti.
-   * @throws IOException Se si verifica un errore I/O durante il
-   * download.
-   * @throws InterruptedException Se la richiesta viene interrotta.
-   */
-  public static boolean downloadWithHttpClient(String url, File outputFile, boolean followRedirects,
-     boolean failOnError)
-     throws IOException,
-     InterruptedException
-  {
-    return downloadWithHttpClient(url, outputFile, null, null, followRedirects, failOnError, 0);
-  }
-
-  /**
-   * Scarica un file da un URL utilizzando l'HttpClient nativo di Java 11+ con
-   * opzioni per il controllo dei redirect, errori HTTP e timeout.
-   *
-   * @param url L'URL della risorsa da scaricare.
-   * @param outputFile Il file di destinazione locale dove salvare il
-   * contenuto.
-   * @param followRedirects Se true, segue i reindirizzamenti HTTP.
-   * @param failOnError Se true, fa fallire il download e cancella il file in
-   * caso di codice di errore HTTP (>= 400).
-   * @param timeoutMillis Timeout in millisecondi (0 per nessun timeout).
-   * @return true se il download ha avuto successo (status code 200-299), false
-   * altrimenti.
-   * @throws IOException Se si verifica un errore I/O durante il
-   * download.
-   * @throws InterruptedException Se la richiesta viene interrotta.
-   */
-  public static boolean downloadWithHttpClient(String url, File outputFile, boolean followRedirects,
-     boolean failOnError, int timeoutMillis)
-     throws IOException,
-     InterruptedException
-  {
-    return downloadWithHttpClient(url, outputFile, null, null, followRedirects, failOnError, timeoutMillis);
-  }
-
-  /**
-   * Scarica un file da un URL utilizzando l'HttpClient nativo di Java 11+ con
-   * autenticazione e opzioni per il controllo dei redirect ed errori HTTP.
-   *
-   * @param url L'URL della risorsa da scaricare.
-   * @param outputFile Il file di destinazione locale dove salvare il
-   * contenuto.
-   * @param username Nome utente per l'autenticazione HTTP (può essere null
-   * se non richiesta).
-   * @param password Password per l'autenticazione HTTP (può essere null se
-   * non richiesta).
-   * @param followRedirects Se true, segue i reindirizzamenti HTTP.
-   * @param failOnError Se true, fa fallire il download e cancella il file in
-   * caso di codice di errore HTTP (>= 400).
-   * @return true se il download ha avuto successo (status code 200-299), false
-   * altrimenti.
-   * @throws IOException Se si verifica un errore I/O durante il
-   * download.
-   * @throws InterruptedException Se la richiesta viene interrotta.
-   */
-  public static boolean downloadWithHttpClient(String url, File outputFile, String username, String password,
-     boolean followRedirects, boolean failOnError)
-     throws IOException,
-     InterruptedException
-  {
-    return downloadWithHttpClient(url, outputFile, username, password, followRedirects, failOnError, 0);
   }
 
   /**
@@ -543,8 +379,7 @@ public class DownloadHelper
    */
   public static boolean downloadWithHttpClient(String url, File outputFile, String username, String password,
      boolean followRedirects, boolean failOnError, int timeoutMillis)
-     throws IOException,
-     InterruptedException
+     throws IOException, InterruptedException
   {
     File parent = outputFile.getParentFile();
     if(parent != null && !parent.exists())
