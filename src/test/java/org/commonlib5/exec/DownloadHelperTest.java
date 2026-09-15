@@ -269,7 +269,7 @@ public class DownloadHelperTest
     boolean ok = false;
     try
     {
-      ok = DownloadHelper.downloadWithHttpClient(delayUrl, outFile, 1000);
+      ok = DownloadHelper.downloadWithCurl(delayUrl, outFile, null, null, true, true, 1000, 1000, null, null);
     }
     catch(Exception ignored)
     {
@@ -283,7 +283,17 @@ public class DownloadHelperTest
      throws Exception
   {
     File outFile = new File(tempDir, "curl_timeout.txt");
-    boolean ok = DownloadHelper.downloadWithCurl(delayUrl, outFile, 1000);
+    boolean ok = DownloadHelper.downloadWithCurl(delayUrl, outFile, null, null, true, true, 1000, 0, null, null);
+    assertTrue("Il download che va in timeout con Curl deve ritornare false", ok);
+    assertTrue("Il file non deve esistere in caso di timeout", outFile.exists());
+  }
+
+  @Test
+  public void testDownloadWithCurl_Maxtime()
+     throws Exception
+  {
+    File outFile = new File(tempDir, "curl_timeout.txt");
+    boolean ok = DownloadHelper.downloadWithCurl(delayUrl, outFile, null, null, true, true, 1000, 3000, null, null);
     assertFalse("Il download che va in timeout con Curl deve ritornare false", ok);
     assertFalse("Il file non deve esistere in caso di timeout", outFile.exists());
   }

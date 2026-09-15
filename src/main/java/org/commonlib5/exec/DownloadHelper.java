@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -232,40 +233,46 @@ public class DownloadHelper
      boolean followRedirects, boolean failOnError, int timeoutMillis)
      throws IOException, InterruptedException
   {
-    return downloadWithCurl(url, outputFile, username, password, followRedirects, failOnError, timeoutMillis, null);
+    return downloadWithCurl(url, outputFile, username, password, followRedirects, failOnError, timeoutMillis, 0, null, null);
   }
 
   /**
    * Scarica un file da un URL utilizzando curl con autenticazione, opzioni per il
-   * controllo dei redirect, errori HTTP e timeout.
+   * controllo dei redirect, errori HTTP e timeout.<br>
+   * curl supporta una vasta gamma di protocolli ed estese funzioni di globbing.
+   * <ul>
+   * <li>https://fun.example/{one,two,three}.jpg</li>
+   * <li>sftp://{one,two,three}.example/README</li>
+   * <li>ftp://ftp.example.com/file[1-100].txt</li>
+   * </ul>
+   * usa 'man curl' per maggiori informazioni
    *
    * @param url L'URL della risorsa da scaricare.
-   * @param outputFile Il file di destinazione locale dove salvare il
-   * contenuto.
-   * @param username Nome utente per l'autenticazione HTTP (può essere null
-   * se non richiesta).
-   * @param password Password per l'autenticazione HTTP (può essere null se
-   * non richiesta).
-   * @param followRedirects Se true, aggiunge l'opzione -L per seguire i
-   * reindirizzamenti.
+   * @param outputFile Il file di destinazione locale dove salvare il contenuto.
+   * @param username Nome utente per l'autenticazione HTTP (può essere null se non richiesta).
+   * @param password Password per l'autenticazione HTTP (può essere null se non richiesta).
+   * @param followRedirects Se true, aggiunge l'opzione -L per seguire i reindirizzamenti.
    * @param failOnError Se true, aggiunge l'opzione -f per far fallire curl in
    * caso di errori HTTP (es. 404, 500).
-   * @param timeoutMillis Timeout in millisecondi (0 per nessun timeout).
-   * @param logFileCurl eventuale file con output di curl (può essere null
-   * se non richiesto).
-   * @return true se il download ha avuto successo (exit code 0), false
-   * altrimenti.
-   * @throws IOException Se si verifica un errore I/O durante
-   * l'esecuzione del processo.
+   * @param timeoutMillis Timeout in millisecondi per la connessione (0 per nessun timeout).
+   * @param maxTimeMillis tempo massimo in millisecondi per il trasferimento (0 per nessun limite).
+   * @param options eventuali opzioni per curl (può essere null se non richiesto).
+   * @param logFileCurl eventuale file con output di curl (può essere null se non richiesto).
+   * @return true se il download ha avuto successo (exit code 0), false altrimenti.
+   * @throws IOException Se si verifica un errore I/O durante l'esecuzione del processo.
    * @throws InterruptedException Se il processo viene interrotto.
    */
   public static boolean downloadWithCurl(String url, File outputFile, String username, String password,
-     boolean followRedirects, boolean failOnError, int timeoutMillis, File logFileCurl)
+     boolean followRedirects, boolean failOnError, int timeoutMillis, int maxTimeMillis,
+     Collection<String> options, File logFileCurl)
      throws IOException, InterruptedException
   {
     List<String> command = new ArrayList<>();
     command.add("curl");
     command.add("-sS"); // Silent mode, ma mostra eventuali errori
+
+    if(options != null)
+      command.addAll(options);
 
     if(failOnError)
     {
@@ -279,9 +286,16 @@ public class DownloadHelper
 
     if(timeoutMillis > 0)
     {
-      int timeoutSecs = Math.max(1, (int) Math.ceil(timeoutMillis / 1000.0));
-      command.add("-m");
+      float timeoutSecs = timeoutMillis / 1000.0f;
+      command.add("--connect-timeout");
       command.add(String.valueOf(timeoutSecs));
+    }
+
+    if(maxTimeMillis > 0)
+    {
+      float mantimeSecs = maxTimeMillis / 1000.0f;
+      command.add("--max-time");
+      command.add(String.valueOf(mantimeSecs));
     }
 
     if(username != null && !username.isEmpty())
@@ -314,9 +328,9 @@ public class DownloadHelper
     Process process = pb.start();
     int exitCode;
 
-    if(timeoutMillis > 0)
+    if(maxTimeMillis > 0)
     {
-      boolean finished = process.waitFor(timeoutMillis, TimeUnit.MILLISECONDS);
+      boolean finished = process.waitFor(maxTimeMillis + 500, TimeUnit.MILLISECONDS);
       if(!finished)
       {
         process.destroyForcibly();
