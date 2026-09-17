@@ -2550,6 +2550,16 @@ public class StringOper
   }
 
   /**
+   * Ritorna la prima stringa valida dei parametri passati.
+   * @param values valori da confrontare
+   * @return la prima occorrenza valida trimmata oppure stringa vuota se nessun valore valido
+   */
+  public static String okStrAnyEmpty(Object... values)
+  {
+    return okStr(values, "");
+  }
+
+  /**
    * Converte stringa in intero.
    * Ritorna il valore intero della stringa in base 10 senza
    * sollevare alcuna eccezione. In caso di errore di qualsiasi
