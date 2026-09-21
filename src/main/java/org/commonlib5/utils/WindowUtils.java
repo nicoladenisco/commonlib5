@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import javax.swing.*;
+import static javax.swing.JOptionPane.UNINITIALIZED_VALUE;
 import javax.swing.table.TableColumn;
 
 /**
@@ -33,7 +34,9 @@ import javax.swing.table.TableColumn;
 public class WindowUtils
 {
   /**
-   * Ritorna una dimensione scalata in percentuale rispetto alle dimensioni schermo.
+   * Ritorna una dimensione scalata in percentuale rispetto alle dimensioni
+   * schermo.
+   *
    * @param percWidth da 0 a 1
    * @param percHeight da 0 a 1
    * @return dimensione scalata
@@ -45,7 +48,9 @@ public class WindowUtils
   }
 
   /**
-   * Ritorna una dimensione scalata in percentuale rispetto alle dimensioni del contenitore.
+   * Ritorna una dimensione scalata in percentuale rispetto alle dimensioni del
+   * contenitore.
+   *
    * @param parent contenitore di riferimento
    * @param percWidth da 0 a 1
    * @param percHeight da 0 a 1
@@ -60,6 +65,7 @@ public class WindowUtils
   /**
    * Centra una pannello nello schermo ridimensionandolo
    * ad una frazione della dimensione dello schermo.
+   *
    * @param wnd
    * @param percWidth da 0 a 1
    * @param percHeight da 0 a 1
@@ -74,8 +80,30 @@ public class WindowUtils
   }
 
   /**
+   * Centra un pannello nello schermo che contiene il componente di riferimento,
+   * ridimensionandolo ad una frazione della dimensione dello schermo.
+   *
+   * @param wnd pannello da ridimensionare e centrare
+   * @param screenComponent componente che identifica lo schermo di destinazione
+   * @param percWidth da 0 a 1
+   * @param percHeight da 0 a 1
+   */
+  public static void fitAndCenterInScreen(Component wnd, Component screenComponent,
+     float percWidth, float percHeight)
+  {
+    GraphicsConfiguration gc = screenComponent.getGraphicsConfiguration();
+    Rectangle screenBounds = gc.getBounds();
+    Dimension dlgSize = new Dimension((int) (screenBounds.width * percWidth),
+       (int) (screenBounds.height * percHeight));
+    wnd.setSize(dlgSize);
+    wnd.setLocation(screenBounds.x + (screenBounds.width - dlgSize.width) / 2,
+       screenBounds.y + (screenBounds.height - dlgSize.height) / 2);
+  }
+
+  /**
    * Centra una pannello all'interno del suo contenitore ridimensionandolo
    * ad una frazione della dimensione del contenitore.
+   *
    * @param parent
    * @param wnd
    * @param percWidth da 0 a 1
@@ -92,6 +120,7 @@ public class WindowUtils
 
   /**
    * Centra un pannello nello schermo.
+   *
    * @param ed pannello da centrare
    */
   public static void centerInScreen(Component ed)
@@ -103,7 +132,112 @@ public class WindowUtils
   }
 
   /**
+   * Centra un pannello nello schermo che contiene il componente di riferimento.
+   *
+   * @param wnd pannello da centrare
+   * @param screenComponent componente che identifica lo schermo di destinazione
+   */
+  public static void centerInScreen(Component wnd, Component screenComponent)
+  {
+    Rectangle screenBounds = screenComponent.getGraphicsConfiguration().getBounds();
+    Dimension wndSize = wnd.getSize();
+    wnd.setLocation(screenBounds.x + (screenBounds.width - wndSize.width) / 2,
+       screenBounds.y + (screenBounds.height - wndSize.height) / 2);
+  }
+
+  /**
+   * Mostra un messaggio centrato nello schermo e restituisce la
+   * scelta dell'utente.
+   *
+   * @param wnd componente parent
+   * @param screenComponent componente che identifica lo schermo di destinazione (può essere null)
+   * @param message messaggio da visualizzare (preferibile racchiudere il messaggio in JLabel)
+   * @param title titolo della finestra
+   * @param optionType tipo di opzioni, ad esempio YES_NO_OPTION
+   * @return scelta dell'utente, ad esempio YES_OPTION o NO_OPTION
+   */
+  public static int showMessageDialog(Component wnd, Component screenComponent, Object message, String title, int optionType)
+  {
+    JOptionPane pane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, optionType);
+    JDialog dialog = pane.createDialog(wnd, title);
+    if(screenComponent != null)
+      centerInScreen(dialog, screenComponent);
+    else if(wnd != null)
+      dialog.setLocationRelativeTo(wnd);
+    else
+      centerInScreen(dialog);
+    dialog.setVisible(true);
+
+    Object selectedValue = pane.getValue();
+    return selectedValue instanceof Integer
+              ? (Integer) selectedValue
+              : JOptionPane.CLOSED_OPTION;
+  }
+
+  /**
+   * Mostra una richiesta di conferma centrata nello schermo e restituisce la
+   * scelta dell'utente.
+   *
+   * @param wnd componente parent
+   * @param screenComponent componente che identifica lo schermo di destinazione (può essere null)
+   * @param message messaggio da visualizzare (preferibile racchiudere il messaggio in JLabel)
+   * @param title titolo della finestra
+   * @param optionType tipo di opzioni, ad esempio YES_NO_OPTION
+   * @return scelta dell'utente, ad esempio YES_OPTION o NO_OPTION
+   */
+  public static int showConfirmDialog(Component wnd, Component screenComponent, Object message, String title, int optionType)
+  {
+    JOptionPane pane = new JOptionPane(message, JOptionPane.QUESTION_MESSAGE, optionType);
+    JDialog dialog = pane.createDialog(wnd, title);
+    if(screenComponent != null)
+      centerInScreen(dialog, screenComponent);
+    else if(wnd != null)
+      dialog.setLocationRelativeTo(wnd);
+    else
+      centerInScreen(dialog);
+    dialog.setVisible(true);
+
+    Object selectedValue = pane.getValue();
+    return selectedValue instanceof Integer
+              ? (Integer) selectedValue
+              : JOptionPane.CLOSED_OPTION;
+  }
+
+  /**
+   * Mostra una richiesta di input centrata nello schermo e restituisce la
+   * scelta dell'utente.
+   *
+   * @param wnd componente parent
+   * @param screenComponent componente che identifica lo schermo di destinazione (può essere null)
+   * @param message messaggio da visualizzare (preferibile racchiudere il messaggio in JLabel)
+   * @param title titolo della finestra
+   * @param optionType tipo di opzioni, ad esempio YES_NO_OPTION
+   * @return scelta dell'utente, null se annullato
+   */
+  public static Object showInputDialog(Component wnd, Component screenComponent, Object message, String title, int optionType)
+  {
+    JOptionPane pane = new JOptionPane(message, JOptionPane.QUESTION_MESSAGE, optionType);
+    pane.setWantsInput(true);
+    JDialog dialog = pane.createDialog(wnd, title);
+    pane.selectInitialValue();
+    if(screenComponent != null)
+      centerInScreen(dialog, screenComponent);
+    else if(wnd != null)
+      dialog.setLocationRelativeTo(wnd);
+    else
+      centerInScreen(dialog);
+    dialog.setVisible(true);
+
+    Object value = pane.getInputValue();
+    if(value == UNINITIALIZED_VALUE)
+      return null;
+
+    return value;
+  }
+
+  /**
    * Centra un pannello all'interno di un contenitore.
+   *
    * @param parent contentitore
    * @param wnd pannello da centrare
    */
@@ -115,6 +249,7 @@ public class WindowUtils
   /**
    * Scorre la catena dei contenitori a caccia dell'oggetto Frame contenitore.
    * Serve per aprire correttamente le JDialog da qualsiasi pannello.
+   *
    * @param c componente da cui iniziare la ricerca
    * @return la Frame più esterna oppure null
    */
@@ -134,6 +269,7 @@ public class WindowUtils
    * Recupera tutti i valori di un combo box.
    * Vengono eliminati i doppioni.
    * L'ordine non è assicurato uguale a quello dell'oggetto.
+   *
    * @param cb oggetto di riferimento
    * @return array dei valori
    */
@@ -151,6 +287,7 @@ public class WindowUtils
 
   /**
    * This routine used to set column widths using percentages.
+   *
    * @param table table to resize
    * @param percentages column width (will be normalized)
    */
@@ -174,6 +311,7 @@ public class WindowUtils
 
   /**
    * Recupera dimensioni attuali delle colonne.
+   *
    * @param table tabella di cui recuperare le dimensioni colonne
    * @return array di dimensioni, uno per colonna
    */
@@ -190,6 +328,7 @@ public class WindowUtils
 
   /**
    * Draw a text string with justify.
+   *
    * @param s string to print
    * @param px point x coord
    * @param py point y coort
@@ -243,6 +382,7 @@ public class WindowUtils
    * Stampa un array di stringhe.
    * Le stringhe vengono stampate una sotto l'altra nell'oggetto
    * Grapthics specificato.
+   *
    * @param strings array di stringhe
    * @param px point x coord
    * @param py point y coort
@@ -275,6 +415,7 @@ public class WindowUtils
    * La ricerca componenti è ricorsiva se fra i componenti ci sono
    * oggetti di tipo Container (generalmente oggetti JPanel all'interno
    * di una JDialog).
+   *
    * @param container container su cui eseguire l'azione
    * @param enable valore da passare a setEnable()
    */
@@ -295,6 +436,7 @@ public class WindowUtils
    * Aggiunge una funzione di chiusura alla dialog con tasto ESC.
    * La dialog viene chiusa con setVisible(false) ovvero
    * va bene per dialog non modali.
+   *
    * @param dialog dialog a cui aggiungere la funzione
    */
   public static void addEscapeListenerVisible(final JDialog dialog)
@@ -317,6 +459,7 @@ public class WindowUtils
    * Aggiunge una funzione di chiusura alla dialog con tasto ESC.
    * La dialog viene chiusa con dispose() ovvero
    * va bene per dialog modali.
+   *
    * @param dialog dialog a cui aggiungere la funzione
    */
   public static void addEscapeListenerDispose(final JDialog dialog)
@@ -337,6 +480,7 @@ public class WindowUtils
 
   /**
    * Aggiunge una funzione generica alla dialog con tasto ESC.
+   *
    * @param dialog dialog a cui aggiungere la funzione
    * @param escListener azione da intraprendere alla pressione di ESC
    */
@@ -349,6 +493,7 @@ public class WindowUtils
 
   /**
    * Aggiunge una funzione generica alla dialog con tasto INVIO.
+   *
    * @param dialog dialog a cui aggiungere la funzione
    * @param enterListener azione da intraprendere alla pressione di INVIO
    */
@@ -360,7 +505,9 @@ public class WindowUtils
   }
 
   /**
-   * Abilita/disabilita un pannello e tutti i controlli che contiene in modo ricorsivo.
+   * Abilita/disabilita un pannello e tutti i controlli che contiene in modo
+   * ricorsivo.
+   *
    * @param panel pannello da modificare
    * @param isEnabled vero per abilitare altrimenti false
    */
