@@ -139,6 +139,12 @@ public class WindowUtils
    */
   public static void centerInScreen(Component wnd, Component screenComponent)
   {
+    if(screenComponent == null)
+    {
+      centerInScreen(wnd);
+      return;
+    }
+
     Rectangle screenBounds = screenComponent.getGraphicsConfiguration().getBounds();
     Dimension wndSize = wnd.getSize();
     wnd.setLocation(screenBounds.x + (screenBounds.width - wndSize.width) / 2,

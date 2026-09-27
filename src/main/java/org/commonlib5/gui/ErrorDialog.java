@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -21,6 +21,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import javax.swing.Timer;
+import org.commonlib5.utils.WindowUtils;
 
 /**
  * Maschera per la visualizzazione dell'errore.
@@ -198,9 +199,7 @@ public class ErrorDialog extends javax.swing.JDialog
     }
 
     // centraggio nello schermo
-    Dimension dlgSize = ed.getSize();
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    ed.setLocation((screenSize.width - dlgSize.width) / 2, (screenSize.height - dlgSize.height) / 2);
+    WindowUtils.centerInScreen(ed, parent);
     ed.setVisible(true);
     return ed.rv;
   }
