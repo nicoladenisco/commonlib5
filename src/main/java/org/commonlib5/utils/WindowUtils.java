@@ -76,7 +76,9 @@ public class WindowUtils
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     Dimension dlgSize = new Dimension((int) (screenSize.width * percWidth), (int) (screenSize.height * percHeight));
     wnd.setSize(dlgSize);
-    wnd.setLocation((screenSize.width - dlgSize.width) / 2, (screenSize.height - dlgSize.height) / 2);
+    wnd.setLocation(
+       (screenSize.width - dlgSize.width) / 2,
+       (screenSize.height - dlgSize.height) / 2);
   }
 
   /**
@@ -91,12 +93,20 @@ public class WindowUtils
   public static void fitAndCenterInScreen(Component wnd, Component screenComponent,
      float percWidth, float percHeight)
   {
+    if(wnd == null)
+      throw new IllegalArgumentException("finestra da centrare non può essere null");
+
+    if(screenComponent == null)
+      screenComponent = wnd;
+
     GraphicsConfiguration gc = screenComponent.getGraphicsConfiguration();
     Rectangle screenBounds = gc.getBounds();
-    Dimension dlgSize = new Dimension((int) (screenBounds.width * percWidth),
+    Dimension dlgSize = new Dimension(
+       (int) (screenBounds.width * percWidth),
        (int) (screenBounds.height * percHeight));
     wnd.setSize(dlgSize);
-    wnd.setLocation(screenBounds.x + (screenBounds.width - dlgSize.width) / 2,
+    wnd.setLocation(
+       screenBounds.x + (screenBounds.width - dlgSize.width) / 2,
        screenBounds.y + (screenBounds.height - dlgSize.height) / 2);
   }
 
@@ -111,9 +121,14 @@ public class WindowUtils
    */
   public static void fitAndCenterInParent(Container parent, Window wnd, float percWidth, float percHeight)
   {
+    if(wnd == null || parent == null)
+      throw new IllegalArgumentException("contenitore e finestra da centrare non possono essere null");
+
     // dimensione automatiche al percWidth/percHeight dello schermo
     Dimension parentSize = parent.getSize();
-    Dimension dlgSize = new Dimension((int) (parentSize.width * percWidth), (int) (parentSize.height * percHeight));
+    Dimension dlgSize = new Dimension(
+       (int) (parentSize.width * percWidth),
+       (int) (parentSize.height * percHeight));
     wnd.setSize(dlgSize);
     wnd.setLocationRelativeTo(parent);
   }
@@ -139,11 +154,11 @@ public class WindowUtils
    */
   public static void centerInScreen(Component wnd, Component screenComponent)
   {
+    if(wnd == null)
+      throw new IllegalArgumentException("finestra da centrare non può essere null");
+
     if(screenComponent == null)
-    {
-      centerInScreen(wnd);
-      return;
-    }
+      screenComponent = wnd;
 
     Rectangle screenBounds = screenComponent.getGraphicsConfiguration().getBounds();
     Dimension wndSize = wnd.getSize();
@@ -281,14 +296,14 @@ public class WindowUtils
    */
   public static String[] getAllItems(JComboBox cb)
   {
-    HashSet<String> hs = new HashSet<String>();
+    HashSet<String> hs = new HashSet<>();
     if(cb.isEditable())
       hs.add(StringOper.okStr(cb.getSelectedItem()));
 
     for(int i = 0; i < cb.getItemCount(); i++)
       hs.add(StringOper.okStr(cb.getItemAt(i)));
 
-    return hs.toArray(new String[hs.size()]);
+    return hs.toArray(String[]::new);
   }
 
   /**
@@ -447,16 +462,7 @@ public class WindowUtils
    */
   public static void addEscapeListenerVisible(final JDialog dialog)
   {
-    ActionListener escListener = new ActionListener()
-    {
-      @Override
-      public void actionPerformed(ActionEvent e)
-      {
-        dialog.setVisible(false);
-      }
-    };
-
-    dialog.getRootPane().registerKeyboardAction(escListener,
+    dialog.getRootPane().registerKeyboardAction((ActionEvent e) -> dialog.setVisible(false),
        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
        JComponent.WHEN_IN_FOCUSED_WINDOW);
   }
@@ -470,16 +476,7 @@ public class WindowUtils
    */
   public static void addEscapeListenerDispose(final JDialog dialog)
   {
-    ActionListener escListener = new ActionListener()
-    {
-      @Override
-      public void actionPerformed(ActionEvent e)
-      {
-        dialog.dispose();
-      }
-    };
-
-    dialog.getRootPane().registerKeyboardAction(escListener,
+    dialog.getRootPane().registerKeyboardAction((ActionEvent e) -> dialog.dispose(),
        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
        JComponent.WHEN_IN_FOCUSED_WINDOW);
   }
