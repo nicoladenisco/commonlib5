@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -36,53 +36,46 @@ public class Parser extends Calcolatore
 
   public Parser()
   {
+    init();
   }
 
   public void init()
-     throws ParserException
   {
     setCacheLevels(numCache);
   }
 
   public void destroy()
-     throws ParserException
   {
     cache = null;
     htVars.clear();
   }
 
-  public void FlushAllCache()
-     throws ParserException
+  public void flushAllCache()
   {
     setCacheLevels(numCache);
   }
 
-  public void FlushCache(int level)
-     throws ParserException
+  public void flushCache(int level)
   {
     cache[level].clear();
   }
 
-  public void FlushVariabili()
-     throws ParserException
+  public void flushVariabili()
   {
     htVars.clear();
   }
 
-  public void AddVariabile(String nome, String espressione)
-     throws ParserException
+  public void addVariabile(String nome, String espressione)
   {
     htVars.put(nome, espressione);
   }
 
-  public void AddCacheEntry(int Level, String nome, double val)
-     throws ParserException
+  public void addCacheEntry(int Level, String nome, double val)
   {
     cache[Level].put(nome, val);
   }
 
   public void setCacheLevels(int NumLevels)
-     throws ParserException
   {
     numCache = NumLevels;
     cache = new HashMap[numCache];
@@ -91,7 +84,6 @@ public class Parser extends Calcolatore
   }
 
   public int getCacheLevels()
-     throws ParserException
   {
     return numCache;
   }

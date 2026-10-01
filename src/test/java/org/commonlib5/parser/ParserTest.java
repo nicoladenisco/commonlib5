@@ -46,7 +46,7 @@ public class ParserTest
 
     // test con cache
     double mia = 125;
-    pa.AddCacheEntry(0, "mia", 125);
+    pa.addCacheEntry(0, "mia", 125);
     expr = "( 14 + mia ) / 2";
     val = pa.parse(expr);
     System.out.println("cache (mia=125) " + expr + "=" + val);
@@ -54,7 +54,7 @@ public class ParserTest
 
     // test con cache
     double mia100 = 1250;
-    pa.AddCacheEntry(0, "mia100", 1250);
+    pa.addCacheEntry(0, "mia100", 1250);
     expr = "(140+mia100)/2";
     val = pa.parse(expr);
     System.out.println("cache (mia100=1250) " + expr + "=" + val);
@@ -62,7 +62,7 @@ public class ParserTest
 
     // test variabili
     double tua = mia * 2;
-    pa.AddVariabile("tua", "mia*2");
+    pa.addVariabile("tua", "mia*2");
     expr = "tua*10";
     val = pa.parse(expr);
     System.out.println("variabili (mia=125, tua=mia*2) " + expr + "=" + val);
@@ -70,7 +70,7 @@ public class ParserTest
 
     // test variabili
     double tua100 = mia100 * 2;
-    pa.AddVariabile("tua100", "mia100*2");
+    pa.addVariabile("tua100", "mia100*2");
     expr = "tua100*10";
     val = pa.parse(expr);
     System.out.println("variabili (mia100=1250, tua100=mia100*2) " + expr + "=" + val);
@@ -78,13 +78,13 @@ public class ParserTest
 
     // test cache multilivello
     double lamb = 1000, hamb = 1000, lelem = 222, helem = 333;
-    pa.AddCacheEntry(0, "lamb", 1000);
-    pa.AddCacheEntry(0, "hamb", 1000);
-    pa.AddCacheEntry(1, "lelem", 222);
-    pa.AddCacheEntry(1, "helem", 333);
+    pa.addCacheEntry(0, "lamb", 1000);
+    pa.addCacheEntry(0, "hamb", 1000);
+    pa.addCacheEntry(1, "lelem", 222);
+    pa.addCacheEntry(1, "helem", 333);
     double uno = lamb + lelem, due = hamb + helem;
-    pa.AddVariabile("uno", "lamb+lelem");
-    pa.AddVariabile("due", "hamb+helem");
+    pa.addVariabile("uno", "lamb+lelem");
+    pa.addVariabile("due", "hamb+helem");
     expr = "uno+due";
     val = pa.parse(expr);
     System.out.println("multilivello " + expr + "=" + val);
@@ -94,9 +94,9 @@ public class ParserTest
     helem = 555;
     uno = lamb + lelem;
     due = hamb + helem;
-    pa.FlushCache(1);
-    pa.AddCacheEntry(1, "lelem", 444);
-    pa.AddCacheEntry(1, "helem", 555);
+    pa.flushCache(1);
+    pa.addCacheEntry(1, "lelem", 444);
+    pa.addCacheEntry(1, "helem", 555);
     val = pa.parse(expr);
     System.out.println("multilivello " + expr + "=" + val);
     assertEquals("multilivello " + expr, uno + due, val, epsilon);
