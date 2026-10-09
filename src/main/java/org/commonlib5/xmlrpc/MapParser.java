@@ -229,6 +229,9 @@ public class MapParser extends AbstractMap<Object, Object>
   {
     Object obj = get(key);
 
+    if(obj != null && (obj instanceof MapParser))
+      return (MapParser) obj;
+
     if(obj != null && (obj instanceof Map))
       return new MapParser((Map) obj);
 
@@ -262,6 +265,12 @@ public class MapParser extends AbstractMap<Object, Object>
   public Map<String, Object> toMapPure()
   {
     Map<String, Object> rv = new HashMap<>();
+    this.forEach((k, v) -> rv.put(k.toString(), v));
+    return rv;
+  }
+
+  public Map<String, Object> copyTo(Map<String, Object> rv)
+  {
     this.forEach((k, v) -> rv.put(k.toString(), v));
     return rv;
   }
