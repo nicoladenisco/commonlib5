@@ -233,6 +233,12 @@ public class DownloadHelper
 
     ProcessBuilder pb = new ProcessBuilder(command);
 
+    // String.valueOf(float) usa sempre il punto decimale, versioni di curl<7.87.0 interpretano
+    // i timeout secondo LC_NUMERIC (ad esempio 3,0 con locale it_IT).
+    // Forziamo un formato numerico coerente per --connect-timeout e --max-time.
+    //versioni di curl successive alle 7.87.0 lo fanno di default.
+    pb.environment().put("LC_NUMERIC", "C");
+
     // se richiesto invia output di curl a file log dedicato
     if(logFileCurl != null)
     {
@@ -240,6 +246,12 @@ public class DownloadHelper
       pb.redirectErrorStream(true);
       pb.redirectOutput(logFileCurl);
     }
+    else
+    {
+      // evita di perdere gli errori di curl in una pipe che nessuno legge
+      pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+    }
+
 
     Process process = pb.start();
     int exitCode;
