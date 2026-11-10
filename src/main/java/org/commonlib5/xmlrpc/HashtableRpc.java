@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import org.commonlib5.utils.DateTime;
 import org.commonlib5.utils.StringOper;
+import static org.commonlib5.utils.StringOper.isEquNocase;
 
 /**
  * Hashtable con controllo sui valori inseriti.
@@ -185,5 +186,16 @@ public class HashtableRpc extends Hashtable<String, Object>
   public boolean getAsBoolean(String key, boolean defVal)
   {
     return StringOper.checkTrueFalse(get(key), defVal);
+  }
+
+  public Object getIgnorecase(String key, Object defVal)
+  {
+    for(Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) entrySet())
+    {
+      if(isEquNocase(key, entry.getKey()))
+        return entry.getValue();
+    }
+
+    return defVal;
   }
 }
