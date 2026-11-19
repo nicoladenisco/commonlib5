@@ -105,30 +105,16 @@ public class ProcessHelper
   public static ProcessHelper execUsingShell(String command)
      throws IOException
   {
-    if(command == null)
-      throw new NullPointerException();
-    String[] cmdarray;
-    String os = System.getProperty("os.name");
-    if(os.equals("Windows 95") || os.equals("Windows 98") || os.equals("Windows ME"))
-      cmdarray = new String[]
-      {
-        "command.exe", "/C", command
-      };
-    else if(os.startsWith("Windows"))
-      cmdarray = new String[]
-      {
-        "cmd.exe", "/C", command
-      };
-    else
-      cmdarray = new String[]
-      {
-        "/bin/sh", "-c", command
-      };
-
-    return new ProcessHelper(Runtime.getRuntime().exec(cmdarray));
+    return execUsingShell(command, (String[]) null);
   }
 
   public static ProcessHelper execUsingShell(String command, String[] env)
+     throws IOException
+  {
+    return execUsingShell(command, env, null);
+  }
+
+  public static ProcessHelper execUsingShell(String command, String[] env, ProcessWatchListner listner)
      throws IOException
   {
     if(command == null)
@@ -151,7 +137,10 @@ public class ProcessHelper
         "/bin/sh", "-c", command
       };
 
-    return new ProcessHelper(Runtime.getRuntime().exec(cmdarray, env));
+    if(env == null)
+      return new ProcessHelper(Runtime.getRuntime().exec(cmdarray));
+
+    return new ProcessHelper(Runtime.getRuntime().exec(cmdarray, env), listner);
   }
 
   public static ProcessHelper execUsingShell(String command, Collection<String> envArray)
