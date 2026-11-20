@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2025 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,8 +17,14 @@
  */
 package org.commonlib5.io;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * Implementazione di un buffer di bytes utilizzabile
@@ -36,6 +42,9 @@ import java.io.PushbackInputStream;
  */
 public class ByteBufferInputStream extends PushbackInputStream
 {
+  // le dimensioni sono state prese dai default di InputStream in Java26 (DEFAULT_BUFFER_SIZE)
+  public static final int BUFFER_SIZE = 16384;
+
   /**
    * Determina il comportamento bloccante/non bloccante.
    */
@@ -50,9 +59,10 @@ public class ByteBufferInputStream extends PushbackInputStream
   protected int mark;
 
   /**
+   * Posizione di inserimento nel buffer.
    * This indicates the maximum number of bytes that can be read from this
    * stream. It is the array index of the position after the last valid
-   * byte in the buffer <code>buf</code>
+   * byte in the buffer <code>buf</code>.
    */
   protected int count;
 
@@ -210,6 +220,35 @@ public class ByteBufferInputStream extends PushbackInputStream
   }
 
   /**
+   * Ricerca di pattern nel buffer.
+   * Lo stream viene letto fino a trovare la pattern indicata.
+   * Se la pattern viene trovata la posizione dello stream sarà al byte immediatamente successivo.
+   * @param pattern sequenza di byte da cercare
+   * @return vero se la pattern è stata trovata
+   * @throws IOException
+   */
+  public synchronized boolean skipPattern(byte[] pattern)
+     throws IOException
+  {
+    int i = 0, c = 0;
+
+    do
+    {
+      for(i = 0; i < pattern.length; i++)
+      {
+        if((c = read()) == -1)
+          return false;
+
+        if(c != pattern[i])
+          break;
+      }
+    }
+    while(i < pattern.length);
+
+    return true;
+  }
+
+  /**
    * Aggiunge byte al buffer in memoria.
    * @param toAdd byte da aggiungere
    */
@@ -232,6 +271,34 @@ public class ByteBufferInputStream extends PushbackInputStream
 
   /**
    * Aggiunge byte al buffer in memoria.
+   * Il file viene letto in memoria (BUFFER_SIZE) e aggiunto al buffer.
+   * @param toAdd file con dati da aggiungere
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public synchronized void addToBuffer(File toAdd)
+     throws FileNotFoundException, IOException
+  {
+    long lenFile = toAdd.length();
+    if(lenFile == 0)
+      return;
+
+    // prealloca il buffer per contenere tutto il file
+    ensureSize((int) lenFile);
+
+    try(InputStream is = new FileInputStream(toAdd))
+    {
+      int n;
+      byte[] buffer = new byte[BUFFER_SIZE];
+      while((n = is.read(buffer)) > 0)
+      {
+        addToBuffer(buffer, 0, n);
+      }
+    }
+  }
+
+  /**
+   * Aggiunge byte al buffer in memoria.
    * L'array di byte passato viene copiato nel buffer interno
    * dopo che questi e' stato allargato di conseguenza.
    * Non ci sono limiti alla dimensione interna del buffer.
@@ -244,19 +311,50 @@ public class ByteBufferInputStream extends PushbackInputStream
     if(alength == 0)
       return;
 
+    ensureSize(alength);
+    System.arraycopy(toAdd, apos, buf, pos, alength);
+    pos = mark = 0;
+    count += alength;
+    notify();
+  }
+
+  /**
+   * Alloca il buffer per la lughezza richiesta.
+   * @param alength la dimensione richiesta per il buffer
+   * @return la dimensione ancora disponibile nel buffer
+   */
+  public synchronized int ensureSize(int alength)
+  {
+    if(alength == 0)
+      return buf.length - count;
+
     int avail = available();
     int newSize = avail + alength;
-    byte[] newBuf = new byte[newSize];
 
-    if(buf != null && avail != 0)
-      System.arraycopy(buf, pos, newBuf, 0, avail);
-    System.arraycopy(toAdd, apos, newBuf, avail, alength);
+    if(buf == null)
+    {
+      // il buffer non è stato ancora creato
+      buf = new byte[newSize + BUFFER_SIZE];
+      pos = mark = 0;
+      count = 0;
+    }
+    else if(buf.length > newSize)
+    {
+      // il buffer è sufficientemente capiente per la dimensione richiesta
+    }
+    else
+    {
+      // il buffer va riallocato e copiato
+      // attenzione: qui vengono copiati solo i bytes ancora da leggere
+      byte[] newBuf = new byte[newSize + BUFFER_SIZE];
+      if(avail != 0)
+        System.arraycopy(buf, pos, newBuf, 0, avail);
+      buf = newBuf;
+      count = avail;
+      pos = mark = 0;
+    }
 
-    buf = newBuf;
-    pos = mark = 0;
-    count = newBuf.length;
-
-    notify();
+    return buf.length - count;
   }
 
   /**
@@ -299,14 +397,25 @@ public class ByteBufferInputStream extends PushbackInputStream
   public synchronized void unread(int b)
      throws IOException
   {
-    super.unread(b);
+    ensureSize(1);
+    if(pos == 0)
+    {
+      throw new IOException("Push back buffer is full");
+    }
+    buf[--pos] = (byte) b;
   }
 
   @Override
-  public synchronized void unread(byte[] b, int off, int len)
+  public void unread(byte[] b, int off, int len)
      throws IOException
   {
-    super.unread(b, off, len);
+    ensureSize(len);
+    if(len > pos)
+    {
+      throw new IOException("Push back buffer is full");
+    }
+    pos -= len;
+    System.arraycopy(b, off, buf, pos, len);
   }
 
   @Override
@@ -337,6 +446,29 @@ public class ByteBufferInputStream extends PushbackInputStream
   @Override
   public synchronized String toString()
   {
-    return buf == null ? "" : new String(buf, pos, buf.length);
+    return buf == null ? "" : new String(buf, pos, count - pos);
+  }
+
+  public synchronized String toString(String encoding)
+     throws UnsupportedEncodingException
+  {
+    return buf == null ? "" : new String(buf, pos, count - pos, encoding);
+  }
+
+  public synchronized String toString(Charset encoding)
+  {
+    return buf == null ? "" : new String(buf, pos, count - pos, encoding);
+  }
+
+  /**
+   * Accesso diretto al buffer interno.
+   * Consente di accedere direttamente al buffer interno
+   * dei byte salvati. Il numero di byte validi all'interno
+   * di questo buffer viene restituito da position().
+   * @return buffer interno con i dati accumulati
+   */
+  synchronized public byte[] array()
+  {
+    return buf;
   }
 }

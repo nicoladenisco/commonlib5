@@ -36,8 +36,9 @@ import java.nio.charset.Charset;
  */
 public class ByteBufferOutputStream extends OutputStream
 {
-  public static final int BUFFER_SIZE = 4096;
-  public static final int BUFFER_STEP = 4096;
+  // le dimensioni sono state prese dai default di InputStream in Java26 (DEFAULT_BUFFER_SIZE)
+  public static final int BUFFER_SIZE = 16384;
+  public static final int BUFFER_STEP = 16384;
   protected int count = 0;
   protected byte[] buffer = null;
 
