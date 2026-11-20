@@ -422,7 +422,7 @@ public class ByteBufferInputStream extends PushbackInputStream
   public synchronized void unread(byte[] b)
      throws IOException
   {
-    super.unread(b);
+    unread(b, 0, b.length);
   }
 
   /**

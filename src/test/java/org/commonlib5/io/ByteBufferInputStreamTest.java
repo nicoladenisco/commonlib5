@@ -166,8 +166,12 @@ public class ByteBufferInputStreamTest
     ByteBufferInputStream instance = new ByteBufferInputStream();
     instance.addToBuffer(toAdd);
     instance.read(buffer, 0, 4);
+    assertEquals(6, instance.available());
+    instance.skip(2);
+    assertEquals(4, instance.available());
     instance.unread(buffer, 0, 4);
-    assertEquals(str, instance.toString(StandardCharsets.UTF_8));
+    assertEquals(8, instance.available());
+    assertEquals("01236789", instance.toString(StandardCharsets.UTF_8));
   }
 
   @Test
@@ -181,7 +185,11 @@ public class ByteBufferInputStreamTest
     ByteBufferInputStream instance = new ByteBufferInputStream();
     instance.addToBuffer(toAdd);
     instance.read(buffer, 0, 4);
+    assertEquals(6, instance.available());
+    instance.skip(2);
+    assertEquals(4, instance.available());
     instance.unread(buffer);
-    assertEquals(str, instance.toString(StandardCharsets.UTF_8));
+    assertEquals(8, instance.available());
+    assertEquals("01236789", instance.toString(StandardCharsets.UTF_8));
   }
 }
