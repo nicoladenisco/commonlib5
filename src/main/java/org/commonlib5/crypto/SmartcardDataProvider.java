@@ -18,6 +18,7 @@
 package org.commonlib5.crypto;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +48,7 @@ import xades4j.verification.UnexpectedJCAException;
  *
  * @author Nicola De Nisco
  */
-public class SmartcardDataProvider implements KeyingDataProvider
+public class SmartcardDataProvider implements KeyingDataProvider, Closeable
 {
   // costanti
   public static final String PKCS11_KEYSTORE_TYPE = "PKCS11";
@@ -400,6 +401,13 @@ public class SmartcardDataProvider implements KeyingDataProvider
   public void unloadSmartcard()
   {
     Security.removeProvider(SUN_PKCS11_PROVIDER_NAME);
+  }
+
+  @Override
+  public void close()
+     throws IOException
+  {
+    unloadSmartcard();
   }
 
   /**
