@@ -55,7 +55,6 @@ public class SmartcardDataProvider implements KeyingDataProvider, Closeable
   public static final String X509_CERTIFICATE_TYPE = "X.509";
   public static final String CERTIFICATION_CHAIN_ENCODING = "PkiPath";
   public static final String SUN_PKCS11_PROVIDER_CLASS = "sun.security.pkcs11.SunPKCS11";
-  public static final String SUN_PKCS11_PROVIDER_NAME = "SunPKCS11-SmartCard";
   //
   // libreria nativa con l'implementazione PKCS11
   protected File libraryFile = null;
@@ -400,7 +399,8 @@ public class SmartcardDataProvider implements KeyingDataProvider, Closeable
 
   public void unloadSmartcard()
   {
-    Security.removeProvider(SUN_PKCS11_PROVIDER_NAME);
+    Security.removeProvider(pkcs11Provider.getName());
+    pkcs11Provider = null;
   }
 
   @Override
